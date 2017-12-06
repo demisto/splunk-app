@@ -1,0 +1,5 @@
+<nav search_view="search" color="#5a6464">
+	<view name="summary" default="true" />
+	<view name="demisto_incident_detail" />	
+	<view name="search" />	
+</nav>

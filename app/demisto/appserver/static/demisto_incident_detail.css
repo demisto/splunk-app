@@ -1,0 +1,4 @@
+#element1 td:nth-child(8){
+	font-style: italic;
+	text-decoration: underline;
+}

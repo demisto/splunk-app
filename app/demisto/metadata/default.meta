@@ -1,0 +1,36 @@
+
+# Application-level permissions
+
+[]
+access = read : [ * ], write : [ admin, power ]
+
+## Macros
+[macros/demisto_get_index]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.4.0
+modtime = 1481549949.530391000
+
+
+### VIEWSTATES: even normal users should be able to create shared viewstates
+
+[viewstates]
+access = read : [ * ], write : [ * ]
+export = system
+
+[views/summary]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.4.0
+modtime = 1480671512.601593000
+
+##SAVEDSEARCHES: All user should be able to execute this saved search
+[savedsearches/demisto_savedsearch_detail]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.5.0
+modtime = 1484219938.624158000
+

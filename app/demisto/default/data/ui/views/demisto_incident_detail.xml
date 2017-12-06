@@ -1,0 +1,60 @@
+<form script="demisto_incident_detail.js" stylesheet="demisto_incident_detail.css">
+  <label>Incident Information</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input id="severity_id" token="severity_form" type="multiselect">
+      <label>Severity</label>
+      <choice value="">All</choice>
+      <choice value="0">Unknown</choice>
+      <choice value="0.5">Informational</choice>
+      <choice value="1">Low</choice>
+      <choice value="2">Medium</choice>
+      <choice value="3">High</choice>
+      <choice value="4">Critical</choice>
+      <default></default>
+      <delimiter> OR </delimiter>
+      <valuePrefix>severity="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+    </input>
+    <input id="savedsearch_id" token="savedsearch_name_form" type="multiselect">
+      <label>SavedSearch Name</label>
+      <choice value="">All</choice>
+      <search>
+        <query>| rest /services/saved/searches | search actions="*demisto*" | table title</query>
+      </search>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <default></default>
+      <delimiter> OR </delimiter>
+      <valuePrefix>savedsearch_name="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+    </input>
+    <input id="investigation_id" token="investigation_form" type="text">
+      <label>Search Text/ID</label>
+      <default></default>
+      <prefix>"</prefix>
+      <suffix>"</suffix>
+    </input>
+    <input id="time_id" type="time">
+      <label>Time</label>
+      <default>Last 24 hours</default>
+    </input>
+  </fieldset>
+  <row>
+    <table id="element1">
+      
+      <search>
+        <query>`demisto_get_index` source="demisto" sourcetype="demistoresponse" $severity$  | rename orig_sid as sid | join type=left sid [search index="_internal" sourcetype="scheduler"  alert_actions = "demisto" $savedsearch_name$ ] | search $savedsearch_name$ $investigation_form$ | eval Severity=case(severity = 0,"Unknown",severity = 0.5,"Informational",severity = 1,"Low",severity = 2,"Medium",severity = 3,"High", severity = 4,"Critical"), Action="Create Demisto Incident", Occurred= strftime( strptime( occurred, "%Y-%m-%dT%H:%M:%SZ" ), "%Y-%m-%d %H:%M:%S"),Created= strftime( strptime( created, "%Y-%m-%dT%H:%M:%SZ" ), "%Y-%m-%d %H:%M:%S"), author="system", Incident ID =id, Pivot ="Demisto War Room" | rename savedsearch_name as "Savedsearch Name", investigationId as "Investigation ID", details as Details | table id, "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Occurred, Created, Details, DEMISTOURL, author, Pivot, Action | fillnull value="Not Applicable" | join type=inner author [| rest /services/demisto/demistocustomendpoint | eval PORT = if (PORT ="", 443, PORT) | table author DEMISTOURL PORT ] | table "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Occurred, Created, Details, DEMISTOURL, PORT, id, Pivot,Action</query>
+      </search>
+      <fields>Occurred, Action, "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Details, Pivot</fields>
+      <option name="drilldown">cell</option>
+      <option name="wrap">true</option>
+      <option name="count">10</option>
+      <drilldown>
+        <condition field="Pivot"><link target="_blank"><![CDATA[ https://$row.DEMISTOURL$:$row.PORT$/#/WarRoom/$row.Incident ID$]]></link></condition>
+        <condition field="*">
+        <link target="_blank">search?q=`demisto_get_index` source="demisto" sourcetype="demistoresponse" id="$row.Incident ID$"  &amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+      </condition>
+      </drilldown>
+    </table>
+  </row>
+</form>

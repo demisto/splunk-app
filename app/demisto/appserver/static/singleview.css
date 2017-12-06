@@ -1,0 +1,25 @@
+.single-value .under-label {
+color: #FF0000;
+font-size: 12px !important;
+vertical-align: -4px;
+margin: 0px 6px;
+}
+
+.single-value .single-result {
+/*color: #FF0000;*/
+font-size: 50px !important;
+vertical-align: -4px;
+margin: 0px 6px;
+}
+
+.single-value .single-result-unit {
+	font-size: 15px !important;
+}
+
+.singlelabel {
+    text-align: center;
+}
+
+.single-value .delta-label {
+	font-size: 25px !important;
+}

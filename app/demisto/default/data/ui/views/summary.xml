@@ -1,0 +1,209 @@
+<form stylesheet="singleview.css">
+  <label>Alert Action Summary</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input id="time_id" type="time">
+      <label>Time</label>
+      <default>Last 24 hours</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+        <title>Summary over last 24 hours</title>
+      <single>
+        <title>Searches Performed</title>
+        <search>
+          <query> | savedsearch demisto_savedsearch_detail | join type=inner savedsearch_name [| rest /services/saved/searches | search actions="*demisto*" | rename title as savedsearch_name ] |timechart span=1d sum(count) as count | appendpipe [|stats count | where count="0"] </query>
+          <earliest>-1d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <link target="_blank">search?q=index="_internal" sourcetype=scheduler savedsearch_name=* | join type=inner savedsearch_name [| rest /services/saved/searches | search actions="*demisto*" | rename title as savedsearch_name ] &amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+        </drilldown>
+        <option name="underLabel">Compared to last 24 hours</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-24h</option>
+      </single>
+      <single>
+        <title>Matching Events</title>
+        <search>
+          <query >|savedsearch demisto_savedsearch_detail | where result_count >0 | join type=inner savedsearch_name [| rest /services/saved/searches | search actions="*demisto*" | rename title as savedsearch_name ] |timechart span=1d sum(result_count) as count | appendpipe [|stats count | where count="0"]</query>
+          <earliest>-1d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <link target="_blank">search?q=index="_internal" sourcetype=scheduler result_count >0 | join type=inner savedsearch_name [| rest /services/saved/searches | search actions="*demisto*" | rename title as savedsearch_name ] &amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+        </drilldown>
+        <option name="underLabel">Compared to last 24 hours</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-24h</option>
+      </single>
+      <single>
+        <title>Qualified Events</title>
+        <search>
+          <query>index="_internal" sourcetype="scheduler" fired >0 alert_actions=demisto | timechart span=1d sum(fired) as count | appendpipe [|stats count | where count="0"]  </query>
+          <earliest>-1d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <link target="_blank">search?q=index="_internal" sourcetype="scheduler" fired >0 alert_actions=demisto  &amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+        </drilldown>
+        <option name="underLabel">Compared to last 24 hours</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-24h</option>
+      </single>
+      <single>
+        <title>Suppressed Events</title>
+        <search>
+          <query>|savedsearch demisto_savedsearch_detail | where suppressed >0 | join type=inner savedsearch_name [| rest /services/saved/searches | search actions="*demisto*" | rename title as savedsearch_name ] | timechart span=1d sum(suppressed) as count | appendpipe [|stats count | where count="0"] </query>
+          <earliest>-1d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <link target="_blank">search?q=index="_internal" sourcetype=scheduler suppressed >0 | join type=inner savedsearch_name [| rest /services/saved/searches | search actions="*demisto*" | rename title as savedsearch_name ]&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+        </drilldown>
+        <option name="underLabel">Compared to last 24 hours</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-24h</option>
+      </single>
+      <single>
+        <title>No of Incidents</title>
+        <search>
+          <query>search `demisto_get_index` source=demisto sourcetype=demistoResponse status=1 | timechart span=1d dc(id) as count | appendcols  [ | stats count | eval count="0"]</query>
+          <earliest>-1d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+           <condition match="'click.value' == &quot;N/A&quot;">
+          </condition>
+          <condition match="'click.value' != &quot;N/A&quot;">
+          <link target="_blank">search?q=`demisto_get_index` source=demisto sourcetype=demistoResponse status=1 | rename orig_sid as sid | join type=inner sid [search index="_internal" sourcetype="scheduler"]&amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$ </link>
+          </condition>
+        </drilldown>
+        <option name="underLabel">Compared to last 24 hours</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-24h</option>
+      </single>
+      <single>
+        <title>No of Failures</title>
+        <search>
+          <query>index="_internal" sourcetype="scheduler"  savedsearch_name="*" alert_actions = "demisto" | join type=inner sid [search `demisto_get_index` source=demisto sourcetype=demistoResponse status!=1| rename orig_sid as sid | table sid id] | timechart span=1d dc(sid) as count | appendcols  [ | stats count | eval count="0"]</query>
+          <earliest>-1d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+           <condition match="'click.value' == &quot;N/A&quot;">
+          </condition>
+          <condition match="'click.value' != &quot;N/A&quot;">
+          <link target="_blank">search?q=`demisto_get_index` source=demisto sourcetype=demistoResponse status!=1 | rename orig_sid as sid | join type=inner sid [search index="_internal" sourcetype="scheduler"] &amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+          </condition>
+        </drilldown>
+        <option name="underLabel">Compared to last 24 hours</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-24h</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Successful Incidents by Severity</title>
+        <search >
+          <query>
+  `demisto_get_index` source=demisto sourcetype="demistoresponse" status = 1 | eval Severity=case(severity=0,"Unknown",severity=0.5,"Informational",severity=1,"Low",severity=2,"Medium",severity=3,"High",severity=4,"Critical") | stats count by Severity
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <drilldown>
+          <eval token="severity_value">case($click.value$="Unknown","0",$click.value$="Informational","0.5",$click.value$="Low","1",$click.value$="Medium","2",$click.value$="High","3",$click.value$="Critical","4")</eval>
+          <link target="_blank">demisto_incident_detail?form.severity_form=$severity_value$&amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top 10 Incident Contributor by Saved Searches</title>
+        <search >
+          <query>index="_internal" sourcetype=scheduler alert_actions="*demisto*" status = "success" fired > 0 | stats sum(fired) as Incidents by savedsearch_name  | sort - count | head 10</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <drilldown>
+          <link target="_blank">demisto_incident_detail?form.savedsearch_name_form=$click.value$&amp;earliest=$earliest$&amp;latest=$latest$&amp;auto_pause=$auto_pause$</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+</form>
