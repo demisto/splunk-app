@@ -20,6 +20,7 @@ import requests
 from requests import Request
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
+import datetime
 
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
@@ -54,7 +55,7 @@ def get_logger(logger_id):
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     logger = logging.getLogger(logger_id)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     logger.addHandler(handler)
     return logger
@@ -67,12 +68,12 @@ logger1 = ModularAction.setup_logger('demisto_modalert')
 
 
 class DemistoAction(ModularAction):
-    def dowork(self, result, url, authkey, verify, search_query = "", search_url = ""):
-        resp = ""
+    def dowork(self, result, url, authkey, verify, search_query = "", search_url = "", ssl_cert_loc = ""):
+
         try:
             logger.info("Do Work called")
 
-            resp = createIncident(url, authkey, self.configuration, verify, search_query, search_url)
+            resp = createIncident(url, authkey, self.configuration, verify, search_query, search_url, ssl_cert_loc, result)
 
             if resp.status_code == 201 or resp.status_code == 200:
                 self.message('Successfully created incident in Demisto', status = 'success')
@@ -104,41 +105,65 @@ class DemistoAction(ModularAction):
 '''
 
 
-def createIncident(url, authkey, data, verify_req, search_query = "", search_url = ""):
+def createIncident(url, authkey, data, verify_req, search_query = "", search_url = "", ssl_cert_loc = "", result=None):
     incident = {}
-
     incident["details"] = data.get('details', '')
 
-    incident["occurred"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.localtime(int(float(data["occured"]))))
+    local_offset = datetime.timedelta(seconds=-time.altzone)
+    matchObj = re.match("(.*):(\d+):(\d+)", str(local_offset))
+    hours = int(matchObj.group(1))
+    timezone = "-"+"{:0>2}".format(int(matchObj.group(1))*-1) +":"+matchObj.group(2) \
+        if hours <0 else "+"+"{:0>2}".format(int(matchObj.group(1))) +":"+matchObj.group(2)
+
+    incident["occurred"] = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(int(float(data["occured"])))) + timezone
 
     # Always pass True for create investigation
     incident["createInvestigation"] = True
-
-    incident["created"] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     incident["name"] = data.get('incident_name', '')
 
     incident["type"] = data.get('type', '')
 
+    ignore_labels=data.get('ignore_labels','').lower().split(",")
+
     if "severity" in data:
         incident["severity"] = float(data["severity"])
 
-    if data.get("labels") is not None:
+    label = []
+    data_dir = {'type': 'SplunkSearch', 'value': search_query}
+    label.append(data_dir)
+
+    data_dir = {'type': 'SplunkURL', 'value': search_url}
+    label.append(data_dir)
+
+    logger.debug("Label::::"+str(result.keys()))
+
+    logger.debug("Ignore Label::::"+str(ignore_labels))
+
+
+    if data.get("labels"):
         strdata = data["labels"].split(",")
-        label = []
-
-        data_dir = {'type': 'SplunkSearch', 'value': search_query}
-        label.append(data_dir)
-
-        data_dir = {'type': 'SplunkURL', 'value': search_url}
-        label.append(data_dir)
-
-        for data in strdata:
-            paramData = data.split(":")
+        for data_label in strdata:
+            paramData = data_label.split(":")
             data_dir = {"type": paramData[0], "value": ":".join(paramData[1:])}
             label.append(data_dir)
+    else:
+        for key in result.keys():
+            if key.lower() not in ignore_labels and not key.startswith("__"):
+                data_dir = {"type": key, "value": result[key]}
+                label.append(data_dir)
 
-        incident["labels"] = label
+    incident["labels"] = label
+
+
+    if "custom_field" in data:
+        strdata = data["custom_field"].split(",")
+        custom_fields = {}
+        for data in strdata:
+            paramData = data.split(":")
+            custom_fields[paramData[0]] = ":".join(paramData[1:])
+
+        incident["customFields"] = custom_fields
 
     s = requests.session()
 
@@ -150,11 +175,44 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
     prepped.headers['Content-type'] = "application/json"
     prepped.headers['Accept'] = "application/json"
 
-    logger.info("Passing verify=" + str(verify_req != 'true'))
-    resp = s.send(prepped, verify = (verify_req != 'true'))
 
-    s.close()
+    if ssl_cert_loc:
+        logger.info("Passing verify=" +ssl_cert_loc )
+        resp = s.send(prepped, verify = ssl_cert_loc)
+    else:
+        logger.info("Passing verify=True")
+        resp = s.send(prepped, verify = True)
+
+
     return resp
+
+
+'''
+    This method is used to validate Authorisation token. It takes four arguments.:
+    @url: Demisto URL, its mandatory parameter.
+    @authkey: Requires parameter, used for authentication.
+    @verify_req: If SSC is to be used,
+    @ssl_cert_loc: Location of the public key of the SSC.
+'''
+
+
+def validate_token(url, authkey, verify_cert, ssl_cert_loc = ""):
+    headers = {'Authorization': authkey, 'Content-type': 'application/json', 'Accept': 'application/json'}
+
+    if verify_cert and ssl_cert_loc is None:
+        logger.info("Passing"+str(verify_cert))
+        r = requests.get(url = url, verify = True,
+                         allow_redirects = True, headers = headers)
+    else:
+        logger.info("Passing verify="+ssl_cert_loc)
+        r = requests.get(url = url, verify = ssl_cert_loc or True,
+                         allow_redirects = True, headers = headers)
+
+    logger.info("Token Validation Status:" + str(r.status_code))
+    if 200 <= r.status_code < 300 and len(r.content) > 0:
+        return True
+
+    return False
 
 
 if __name__ == '__main__':
@@ -233,13 +291,12 @@ if __name__ == '__main__':
             ## can be used as the result ID (rid)
             '''
             for num, result in enumerate(csv.DictReader(fh)):
-
                 result.setdefault('rid', str(num))
                 modaction.update(result)
                 modaction.invoke()
-                modaction.dowork(result, url = url, authkey = password, verify = inputargs["SSC"],
+                modaction.dowork(result, url = url, authkey = password, verify = True,
                                  search_query = search,
-                                 search_url = search_url)
+                                 search_url = search_url, ssl_cert_loc = inputargs.get("SSL_CERT_LOC",''))
                 time.sleep(1.6)
 
         modaction.writeevents(index = "main", source = 'demisto')

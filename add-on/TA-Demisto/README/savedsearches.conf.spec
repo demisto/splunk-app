@@ -35,6 +35,12 @@ action.demisto.param.type = <string>
     * Type of Demisto incident.
     * Defaults to blank
 
+action.demisto.param.custom_field = <string>
+    * Comma separated key-value pair to insert custom fields of demisto.
+
+action.demisto.param.ignore_labels = <string>
+    * Comma separated column names which won't be pushed to  demisto.
+
 action.demisto.param.label = <string>
     * Comma separated key-value pair to be inserted into Label field of Incident
     * Key-value pair is separated by ":"

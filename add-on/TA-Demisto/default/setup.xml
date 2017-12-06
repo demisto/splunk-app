@@ -4,16 +4,15 @@
   		This is a setup page for Demisto Splunk app which enables end user in pushing incidents to Demisto.
   		<![CDATA[
     <script>
+	
 	$(document).ready(function(e)
-	{
-		
+	{			
 		var app = Splunk.util.getCurrentApp();
 		var css = "/static/app/" + app + "/setup.css";
 		addStylesheet(css);
 
 		$(window).keydown(function(event){			
 			if(event.keyCode == 13) {
-				
 				if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
 				{
 					return true;
@@ -29,7 +28,7 @@
 		$(".splButton-primary").on("click",function(e) { 
 		    $('.custom-error').remove();
 			
-			if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
+			if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL")&&(ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked))
 			{
 				return true;
 			}
@@ -56,10 +55,18 @@
 			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> To generate new API key, login to Demisto application, go to Settings-->Integrations-->API Keys(Get Your Key)</font>";
 
 			document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+
+			label=document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML;
+
+			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter the full path to  Certificate if you are using Self Signed/Internal CA signed certificate</font>";
+
+			document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 		}
-		
-		
+
+
+
 	});
+	
 	function addStylesheet( filename )
 	{
 		if( document.createStyleSheet )
@@ -211,11 +218,10 @@
         <label>API Key</label>
         <type>text</type>
 	  </input>
-	  <input field="SSC">
-        <label>Allow Self Signed Certificate</label>
-        <type>bool</type>
+	  <input field="SSL_CERT_LOC" >
+        <label>Location to Certificate</label>
+        <type>text</type>
 	  </input>
-	  
   </block>
 
 </setup>

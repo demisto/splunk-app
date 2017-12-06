@@ -27,11 +27,27 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label" for="custom_field">Custom Fields</label>
+
+        <div class="controls">
+            <input type="text" name="action.demisto.param.custom_field" id="custom_field"  placeholder="e.g. killchain:1.1.1.1,User:john" />
+            <span class="help-block">Comma-separated 'key:value' pairs</span>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label" for="labels">Labels</label>
 
         <div class="controls">
             <input type="text" name="action.demisto.param.labels" id="labels"  placeholder="e.g. IP:1.1.1.1,User:john" />
-            <span class="help-block">Comma-separated 'key:value' pairs</span>
+            <span class="help-block">If Labels field is empty, all fields from Splunk will be passed into Demisto incident labels unless specified in Ignore labels section
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="labels">Ignore Labels</label>
+        <div class="controls">
+            <input type="text" name="action.demisto.param.ignore_labels" id="ignore_labels"  placeholder="e.g. dest,User" />
+            <span class="help-block"></span>
         </div>
     </div>
     <div class="control-group" style="display: none;">

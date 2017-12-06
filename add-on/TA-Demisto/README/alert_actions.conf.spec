@@ -21,6 +21,17 @@ param.labels = <string>
 	*Comma separted key value pair of strings to be put in Label field of Demisto
 	*e.g IP:1.1.1.1,Type:Trojan
 	*Defaults to blank
+
+param.custom_field = <string>
+	*Comma separted key value pair of strings to be put in Custom fields of Demisto
+	*e.g KillChain:1.1.1.1,Type:Trojan
+	*Defaults to blank
+
+param.ignore_labels = <string>
+	*Comma separted column names which won't be pushed to demisto when no label is set.
+	*e.g User,Type
+	*Defaults to blank
+	
 param.investigate = <int>
 	*Indicates if investigation should be created in Demisto. 
 	*Takes either 1 or 0 
