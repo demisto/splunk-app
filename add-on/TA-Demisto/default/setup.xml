@@ -1,0 +1,221 @@
+<setup>
+  <block title="Demisto Setup Page" endpoint="demisto/demistocustomendpoint" entity="demistoenv">
+  	<text>
+  		This is a setup page for Demisto Splunk app which enables end user in pushing incidents to Demisto.
+  		<![CDATA[
+    <script>
+	$(document).ready(function(e)
+	{
+		
+		var app = Splunk.util.getCurrentApp();
+		var css = "/static/app/" + app + "/setup.css";
+		addStylesheet(css);
+
+		$(window).keydown(function(event){			
+			if(event.keyCode == 13) {
+				
+				if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
+				{
+					return true;
+				}
+				else
+				{
+					event.preventDefault();
+					return false;
+				}
+			}
+		});
+		
+		$(".splButton-primary").on("click",function(e) { 
+		    $('.custom-error').remove();
+			
+			if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
+			{
+				return true;
+			}
+			else 
+			{
+				e.preventDefault();
+			}
+		});
+
+		var label=document.getElementById('/demisto/demistocustomendpoint/demistoenv/DEMISTOURL_id').parentElement.parentElement.firstElementChild.innerHTML;
+		
+
+		if (!label.includes("*"))
+		{
+
+			label = label +"<font color=\"red\"><b>*</b></font>";
+
+			document.getElementById('/demisto/demistocustomendpoint/demistoenv/DEMISTOURL_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+
+			label=document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML;
+
+			label = label +"<font color=\"red\"><b>*</b></font>";
+
+			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> To generate new API key, login to Demisto application, go to Settings-->Integrations-->API Keys(Get Your Key)</font>";
+
+			document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+		}
+		
+		
+	});
+	function addStylesheet( filename )
+	{
+		if( document.createStyleSheet )
+		{
+			document.createStyleSheet(filename);
+		}
+		else
+		{
+			var link = $("<link>");
+			link.attr({type: 'text/css',rel: 'stylesheet', href: filename});
+			$("head").append( link );
+		}
+	}
+
+	function validateTextBox(name) 
+	{
+		console.log("Called for "+name);
+		var errMsg = "";
+		var _errid = name+'_err';
+		var errid = '#'+_errid;
+		var fieldval = "";
+		var fieldLabel = "";
+		
+
+		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
+
+		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
+		
+		if (name == "DEMISTOURL")
+		{
+			label="Host Name/IP Address";
+		}
+		else if( name == "AUTHKEY")
+		{
+			label="API Key";
+		}
+		console.log(fieldval);
+       	if(fieldval.length<=0)
+		{
+	   			
+	    	errMsg="Please enter " +label+" in the textbox";
+	    	var div = $(''+errid+'');
+	    	if (div.length ==0 )
+	    	{
+	    		$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>")
+			
+	    	}
+			return false;
+		}
+		else
+		{
+			$(errid).hide();
+			return true;
+		}
+	}
+
+	function validateNumber(name) 
+	{
+		console.log("Called for "+name);
+		var patt = /^[0-9]*$/i;
+		var errMsg = "";
+		var _errid = name+'_err';
+		var errid = '#'+_errid;
+		var fieldval = "";
+		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
+
+		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
+
+		if (!patt.test(fieldval) || fieldval <0 || fieldval > 65535 )
+		{
+			var div = $(''+errid+'');
+	    	if (div.length ==0 )
+	    	{
+				errMsg="Please enter valid " +label;
+				$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
+			}
+			return false;
+		}
+		else
+		{
+			$(errid).hide();
+			return true;
+		}
+	}
+
+	function validateHostName(name) 
+	{
+		
+		var errMsg = "";
+		var _errid = name+'_err';
+		var errid = '#'+_errid;
+		var fieldval = "";
+		var fieldLabel = "";
+		var ipRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+
+		var hostRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
+
+		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
+
+		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
+		
+		
+		if(fieldval.length>0)
+		{
+        	if(fieldval.match(ipRegex) || fieldval.match(hostRegex))
+			{
+		    	console.log("HostName is correct");
+		    	$(errid).hide();	
+		    	return true;		
+			}
+			else
+			{
+				console.log(fieldval);
+		    	errMsg="Please enter valid Host Name/IP Address";
+		    	var div = $(''+errid+'');
+		    	console.log(div.length);
+		    	if (div.length ==0)
+		    	{
+					$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>")
+				}
+				else if (div.length >0)
+				{
+					div[0].innerHTML = errMsg;
+					div[0].style = 'display:inline';
+				}
+				return false;
+			}
+		}
+		else
+		{
+			
+			return true;
+		}
+		
+	}
+	
+	</script>
+  ]]></text>
+
+  	  <input field="DEMISTOURL">
+        <label>Demisto Host Name/IP Address</label><font color="red"><b>*</b></font>
+        <type>text</type>
+	  </input>
+	  <input field="PORT">
+        <label>Demisto Application Port</label>
+        <type>text</type>
+	  </input>
+      <input field="AUTHKEY">
+        <label>API Key</label>
+        <type>text</type>
+	  </input>
+	  <input field="SSC">
+        <label>Allow Self Signed Certificate</label>
+        <type>bool</type>
+	  </input>
+	  
+  </block>
+
+</setup>
