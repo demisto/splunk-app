@@ -19,13 +19,13 @@
       <label>SavedSearch Name</label>
       <choice value="">All</choice>
       <search>
-        <query>| rest /services/saved/searches | search actions="*demisto*" | table title</query>
+        <query>| inputlookup demisto_savedsearch_name | dedup search_name| table search_name</query>
       </search>
-      <fieldForLabel>title</fieldForLabel>
-      <fieldForValue>title</fieldForValue>
+      <fieldForLabel>search_namesearch_name</fieldForLabel>
+      <fieldForValue>search_name</fieldForValue>
       <default></default>
       <delimiter> OR </delimiter>
-      <valuePrefix>savedsearch_name="</valuePrefix>
+      <valuePrefix>search_name="</valuePrefix>
       <valueSuffix>"</valueSuffix>
     </input>
     <input id="investigation_id" token="investigation_form" type="text">
@@ -43,7 +43,7 @@
     <table id="element1">
       
       <search>
-        <query>`demisto_get_index` source="demisto" sourcetype="demistoresponse" $severity$  | rename orig_sid as sid | join type=left sid [search index="_internal" sourcetype="scheduler"  alert_actions = "demisto" $savedsearch_name$ ] | search $savedsearch_name$ $investigation_form$ | eval Severity=case(severity = 0,"Unknown",severity = 0.5,"Informational",severity = 1,"Low",severity = 2,"Medium",severity = 3,"High", severity = 4,"Critical"), Action="Create Demisto Incident", Occurred= strftime( strptime( occurred, "%Y-%m-%dT%H:%M:%SZ" ), "%Y-%m-%d %H:%M:%S"),Created= strftime( strptime( created, "%Y-%m-%dT%H:%M:%SZ" ), "%Y-%m-%d %H:%M:%S"), author="system", Incident ID =id, Pivot ="Demisto War Room" | rename savedsearch_name as "Savedsearch Name", investigationId as "Investigation ID", details as Details | table id, "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Occurred, Created, Details, DEMISTOURL, author, Pivot, Action | fillnull value="Not Applicable" | join type=inner author [| rest /services/demisto/demistocustomendpoint | eval PORT = if (PORT ="", 443, PORT) | table author DEMISTOURL PORT ] | table "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Occurred, Created, Details, DEMISTOURL, PORT, id, Pivot,Action</query>
+        <query>`demisto_get_index` source="demisto" sourcetype="demistoresponse" $severity$  | rename orig_sid as sid | search $investigation_form$ | demistosearch | search $savedsearch_name$ | eval Severity=case(severity = 0,"Unknown",severity = 0.5,"Informational",severity = 1,"Low",severity = 2,"Medium",severity = 3,"High", severity = 4,"Critical"), Action="Create Demisto Incident", Occurred= occurred,Created= created, author="system", Incident ID =id, Pivot ="Demisto War Room" | rename search_name as "Savedsearch Name", investigationId as "Investigation ID", details as Details | table id, "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Occurred, Created, Details, DEMISTOURL, author, Pivot, Action | fillnull value="Not Applicable" | join type=inner author [| rest /services/demisto/demistocustomendpoint | eval PORT = if (PORT ="", 443, PORT) | table author DEMISTOURL PORT ] | table "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Occurred, Created, Details, DEMISTOURL, PORT, id, Pivot,Action</query>
       </search>
       <fields>Occurred, Action, "Savedsearch Name", "Incident ID", "Investigation ID",Severity, Details, Pivot</fields>
       <option name="drilldown">cell</option>
