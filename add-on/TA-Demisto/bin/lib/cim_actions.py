@@ -468,12 +468,9 @@ class ModularAction(object):
                 fout = header_line + default_breaker + (default_breaker).join(chunk)
                 ## write output string
                 try:
-                    fn = '%s_%s.stash_%s' % (mktimegm(time.gmtime()), random.randint(0, 100000), fext)
+                    fn = '%s_%s.stash_demisto_%s' % (mktimegm(time.gmtime()), random.randint(0, 100000), fext)
                     # fp = make_splunkhome_path(['var', 'spool', 'splunk', fn])
-                    if not (os.path.isdir(make_splunkhome_path(["etc", "apps", "TA-Demisto", "local"]))):
-                        os.makedirs(make_splunkhome_path(["etc", "apps", "TA-Demisto", "local"]))
-
-                    fp = make_splunkhome_path(["etc", "apps", "TA-Demisto", "local", fn])
+                    fp = make_splunkhome_path(["var", "spool","splunk", fn])
                     ## obtain fh    
                     with open(fp, 'w') as fh:
                         fh.write(fout)

@@ -20,7 +20,6 @@ import requests
 from requests import Request
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
-import datetime
 
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
@@ -68,17 +67,23 @@ logger1 = ModularAction.setup_logger('demisto_modalert')
 
 
 class DemistoAction(ModularAction):
-    def dowork(self, result, url, authkey, verify, search_query = "", search_url = "", ssl_cert_loc = ""):
+    def dowork(self, result, url, authkey, verify, search_query = "", search_url = "", ssl_cert_loc = "",search_name=None):
 
         try:
             logger.info("Do Work called")
 
-            resp = createIncident(url, authkey, self.configuration, verify, search_query, search_url, ssl_cert_loc, result)
+            resp = createIncident(url, authkey, self.configuration, verify, search_query, search_url, ssl_cert_loc, result,search_name)
 
             if resp.status_code == 201 or resp.status_code == 200:
                 self.message('Successfully created incident in Demisto', status = 'success')
+
+                # Removing rawJSON from the response as it creates too large demistoResponse
+                resp = json.loads(resp.text)
+                del resp["rawJSON"]
+                resp = json.dumps(resp)
+
                 self.addevent(
-                    resp.text,
+                    resp,
                     sourcetype = "demistoResponse")
             else:
                 self.message('Error in creating incident in Demisto ', status = 'failure')
@@ -105,15 +110,12 @@ class DemistoAction(ModularAction):
 '''
 
 
-def createIncident(url, authkey, data, verify_req, search_query = "", search_url = "", ssl_cert_loc = "", result=None):
+def createIncident(url, authkey, data, verify_req, search_query = "", search_url = "", ssl_cert_loc = "", result=None,search_name=None):
     incident = {}
     incident["details"] = data.get('details', '')
 
-    local_offset = datetime.timedelta(seconds=-time.altzone)
-    matchObj = re.match("(.*):(\d+):(\d+)", str(local_offset))
-    hours = int(matchObj.group(1))
-    timezone = "-"+"{:0>2}".format(int(matchObj.group(1))*-1) +":"+matchObj.group(2) \
-        if hours <0 else "+"+"{:0>2}".format(int(matchObj.group(1))) +":"+matchObj.group(2)
+    zone = time.strftime("%z")
+    timezone= zone[-5:][:3] +":" +zone[-5:][3:]
 
     incident["occurred"] = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(int(float(data["occured"])))) + timezone
 
@@ -135,6 +137,10 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
 
     data_dir = {'type': 'SplunkURL', 'value': search_url}
     label.append(data_dir)
+
+    if search_name:
+        data_dir = {'type': 'search_name', 'value': search_name}
+        label.append(data_dir)
 
     logger.debug("Label::::"+str(result.keys()))
 
@@ -165,6 +171,9 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
 
         incident["customFields"] = custom_fields
 
+
+    incident["rawJSON"] = json.dumps(result)
+
     s = requests.session()
 
     logger.debug("JSON data for the Incident=" + json.dumps(incident))
@@ -177,11 +186,12 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
 
 
     if ssl_cert_loc:
-        logger.info("Passing verify=" +ssl_cert_loc )
+        logger.info("Setting passed certificate location as verify=" +ssl_cert_loc )
         resp = s.send(prepped, verify = ssl_cert_loc)
     else:
-        logger.info("Passing verify=True")
+        logger.info("Using default value for verify= True")
         resp = s.send(prepped, verify = True)
+        #resp = s.send(prepped, verify = False)
 
 
     return resp
@@ -196,15 +206,17 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
 '''
 
 
-def validate_token(url, authkey, verify_cert, ssl_cert_loc = ""):
+def validate_token(url, authkey, verify_cert, ssl_cert_loc = None):
     headers = {'Authorization': authkey, 'Content-type': 'application/json', 'Accept': 'application/json'}
 
     if verify_cert and ssl_cert_loc is None:
-        logger.info("Passing"+str(verify_cert))
-        r = requests.get(url = url, verify = True,
-                         allow_redirects = True, headers = headers)
+        logger.info("Using default value for verify= True")
+        #logger.info("Passing verify=False")
+        #r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
+
+        r = requests.get(url = url, verify = True,allow_redirects = True, headers = headers)
     else:
-        logger.info("Passing verify="+ssl_cert_loc)
+        logger.info("Passing verify="+str(ssl_cert_loc))
         r = requests.get(url = url, verify = ssl_cert_loc or True,
                          allow_redirects = True, headers = headers)
 
@@ -296,7 +308,7 @@ if __name__ == '__main__':
                 modaction.invoke()
                 modaction.dowork(result, url = url, authkey = password, verify = True,
                                  search_query = search,
-                                 search_url = search_url, ssl_cert_loc = inputargs.get("SSL_CERT_LOC",''))
+                                 search_url = search_url, ssl_cert_loc = inputargs.get("SSL_CERT_LOC",''),search_name = search_name)
                 time.sleep(1.6)
 
         modaction.writeevents(index = "main", source = 'demisto')
