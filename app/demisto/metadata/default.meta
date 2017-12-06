@@ -34,3 +34,31 @@ owner = admin
 version = 6.5.0
 modtime = 1484219938.624158000
 
+[Vulnerability Detection -Demisto]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.5.0
+modtime = 1484219938.624158000
+
+[Intrusion Detected - Demisto]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.5.0
+modtime = 1484219938.624158000
+
+[Malware Detection to Demisto]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.5.0
+modtime = 1484219938.624158000
+
+[savedsearches/Notable%20Events%20to%20Demisto]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = nobody
+
+
+

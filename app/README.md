@@ -34,6 +34,25 @@ Demisto App for Splunk helps in tracking Splunk to Demisto incident creation.
 
 * This app can be installed through UI using "Manage Apps" or extract zip file directly into /opt/splunk/etc/apps/ folder.
 
+# SAVEDSEARCHES
+* This app has four scheduled saved searches out of which one is accelerated saved search. Other three are disabled by default. These are sample searches for user to understand how to send data from Splunk to Demisto.
+
+*demisto_savedsearch_detail
+This saved search is used for loading data of panel "Searches Performed" on Summary page.
+
+*Intrusion Detection Detected
+This is saved search helps in sending all the Intrusion detection events to Demisto. It's disabled by default.
+
+*Vulnerability Detection -Demisto
+This is saved search helps in sending all the Vulnerablity detection events to Demisto. It's disabled by default.
+
+*Malware Detection to Demisto
+This is saved search helps in sending all the Malware detection events to Demisto. It's disabled by default.
+
+*Notable Events to Demisto
+This is saved search helps in sending all the notable events to Demisto. It's disabled by default.
+
+
 # TEST YOUR INSTALL
 
 The main app dashboard can take some time before the data is returned which will populate some of the panels. A good test is to run following query
