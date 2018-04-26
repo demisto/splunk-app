@@ -156,8 +156,8 @@ class ConfigApp(admin.MConfigHandler):
                 del self.callerArgs.data['AUTHKEY']
 
                 self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
-        except:
-            logger.exception("Exception while createing Test incident")
+        except Exception as e:
+            logger.exception("Exception while createing Test incident, error: " + str(e))
 
             '''
                 No need to post error if already raised.
@@ -165,10 +165,10 @@ class ConfigApp(admin.MConfigHandler):
             if not exceptionRaised:
                 postargs = {'severity': 'error', 'name': 'Demisto',
                             'value': 'Invalid configuration for Demisto, please update configuration for '
-                                     'Splunk-Demisto integration to work'}
+                                     'Splunk-Demisto integration to work, error is: ' + str(e)}
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                           postargs = postargs)
-            raise Exception("Invalid Configuration")
+            raise Exception("Invalid Configuration, error: " + str(e))
 
     def handleReload(self, confInfo = None):
         """

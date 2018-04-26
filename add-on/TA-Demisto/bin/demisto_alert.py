@@ -92,7 +92,7 @@ class DemistoAction(ModularAction):
                     sourcetype = "demistoResponse")
 
         except Exception as e:
-            logger.exception("Error in DO work")
+            logger.exception("Error in DO work, error: " + str(e))
             self.message('Failed in creating incident in Demisto',
                          status = 'failure')
 
@@ -189,11 +189,12 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
         logger.info("Setting passed certificate location as verify=" +ssl_cert_loc )
         resp = s.send(prepped, verify = ssl_cert_loc)
     else:
-        logger.info("Using default value for verify= True")
+        # logger.info("Using default value for verify = False")
+        # resp = s.send(prepped, verify = False)
+
+        logger.info("Using default value for verify = True")
         resp = s.send(prepped, verify = True)
-        #resp = s.send(prepped, verify = False)
-
-
+        
     return resp
 
 
@@ -209,11 +210,11 @@ def createIncident(url, authkey, data, verify_req, search_query = "", search_url
 def validate_token(url, authkey, verify_cert, ssl_cert_loc = None):
     headers = {'Authorization': authkey, 'Content-type': 'application/json', 'Accept': 'application/json'}
 
-    if verify_cert and ssl_cert_loc is None:
-        logger.info("Using default value for verify= True")
-        #logger.info("Passing verify=False")
-        #r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
+    if verify_cert and not ssl_cert_loc:
+        # logger.info("Passing verify = False")
+        # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
 
+        logger.info("Using default value for verify = True")
         r = requests.get(url = url, verify = True,allow_redirects = True, headers = headers)
     else:
         logger.info("Passing verify="+str(ssl_cert_loc))
@@ -291,7 +292,7 @@ if __name__ == '__main__':
                         userName = ele["content"]["username"]
                         break
         else:
-            raise Exception("Auth key couldn't be retrived from storage/passwords")
+            raise Exception("Auth key couldn't be retrived from storage/passwords, got: " + str(r[0]["status"]))
 
         '''
         Process the result set by opening results_file with gzip
@@ -314,7 +315,7 @@ if __name__ == '__main__':
         modaction.writeevents(index = "main", source = 'demisto')
     except Exception as e:
         ## adding additional logging since adhoc search invocations do not write to stderr
-        logger.exception("Error in main")
+        logger.exception("Error in main, error: " + str(e))
         try:
             modaction.message(e, status = 'failure', level = logging.CRITICAL)
         except:
