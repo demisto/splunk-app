@@ -63,7 +63,7 @@ class ConfigApp(admin.MConfigHandler):
 
         if self.callerArgs.data['PORT'][0] is None:
             self.callerArgs.data['PORT'] = ''
-        elif not re.match("^[0-9]{1,4}[0-5]?$", self.callerArgs.data['PORT'][0]):
+        elif not re.match("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$", self.callerArgs.data['PORT'][0]):
             logger.exception("Invalid Port Number")
             raise Exception("Invalid Port Number")
 
@@ -96,24 +96,23 @@ class ConfigApp(admin.MConfigHandler):
             '''
             url += "/incidenttype"
             if self.callerArgs.data['SSL_CERT_LOC']:
-                valid = validate_token(url, password,
+                valid, status = validate_token(url, password,
                                        verify_cert = True,
                                        ssl_cert_loc = self.callerArgs.data['SSL_CERT_LOC'][0])
             else:
-                valid = validate_token(url, password,
-                                       verify_cert = True)
+                valid, status = validate_token(url, password, verify_cert = True)
 
             if not valid:
-                logger.info("In resp.status_code ")
+                logger.info("resp status: " + str(status))
                 postargs = {'severity': 'error', 'name': 'Demisto',
-                            'value': 'Invalid configuration for Demisto. Please update  Splunk-Demisto configuration'
+                            'value': 'Token validation Failed, got status: ' + str(status)
                             }
 
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                           postargs = postargs)
                 exceptionRaised = True
 
-                raise Exception("Create Test Incident Failed")
+                raise Exception('Token validation Failed, got status: ' + str(status))
             else:
                 postargs = {'severity': 'info', 'name': 'Demisto',
                             'value': 'Demisto API key was successfully validated for host ' +self.callerArgs.data['DEMISTOURL'][0]
@@ -140,7 +139,6 @@ class ConfigApp(admin.MConfigHandler):
                         self.getSessionKey(), postargs = postArgs, method = 'POST')
 
                 else:
-
                     logger.info("Password not found")
                     postArgs = {
                         "name": user_name,
@@ -158,16 +156,12 @@ class ConfigApp(admin.MConfigHandler):
                 self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
         except Exception as e:
             logger.exception("Exception while createing Test incident, error: " + str(e))
-
-            '''
-                No need to post error if already raised.
-            '''
-            if not exceptionRaised:
-                postargs = {'severity': 'error', 'name': 'Demisto',
-                            'value': 'Invalid configuration for Demisto, please update configuration for '
-                                     'Splunk-Demisto integration to work, error is: ' + str(e)}
-                splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
-                                          postargs = postargs)
+            
+            postargs = {'severity': 'error', 'name': 'Demisto',
+                        'value': 'Invalid configuration for Demisto, please update configuration for '
+                                 'Splunk-Demisto integration to work, error is: ' + str(e)}
+            splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
+                                      postargs = postargs)
             raise Exception("Invalid Configuration, error: " + str(e))
 
     def handleReload(self, confInfo = None):

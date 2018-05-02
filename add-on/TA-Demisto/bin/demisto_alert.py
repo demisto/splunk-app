@@ -86,7 +86,9 @@ class DemistoAction(ModularAction):
                     resp,
                     sourcetype = "demistoResponse")
             else:
-                self.message('Error in creating incident in Demisto ', status = 'failure')
+                self.message(
+                    'Error in creating incident in Demisto, got status: '  + str(resp.status_code),
+                    status = 'failure')
                 self.addevent(
                     resp.text + "status= " + str(resp.status_code),
                     sourcetype = "demistoResponse")
@@ -223,9 +225,9 @@ def validate_token(url, authkey, verify_cert, ssl_cert_loc = None):
 
     logger.info("Token Validation Status:" + str(r.status_code))
     if 200 <= r.status_code < 300 and len(r.content) > 0:
-        return True
+        return True, str(r.status_code)
 
-    return False
+    return False, str(r.status_code)
 
 
 if __name__ == '__main__':
