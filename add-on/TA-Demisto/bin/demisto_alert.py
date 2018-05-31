@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 #
-# This code is written by Demisto Inc.
-
+# This code was written by Demisto Inc.
+#
 
 import json
 import logging
@@ -18,7 +18,7 @@ from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
-
+PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
 # Importing the cim_actions.py library
 # A.  Import make_splunkhome_path
 # B.  Append your library path to sys.path
@@ -45,13 +45,10 @@ except:
 logger = DemistoConfig.get_logger("DEMISTOALERT")
 modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
-
 class DemistoAction(ModularAction):
-    # todo change function name
     def create_demisto_incident(self, result, url, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
                                 search_name=None):
         try:
-            # todo change the log
             logger.info("create_demisto_incident called")
             demisto = DemistoIncident(logger)
             resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
@@ -64,6 +61,8 @@ class DemistoAction(ModularAction):
                 resp = json.loads(resp.text)
                 del resp["rawJSON"]
                 resp = json.dumps(resp)
+
+                logger.info("incident is: " + resp) #TODO remove
 
                 self.addevent(
                     resp,
@@ -96,7 +95,6 @@ if __name__ == '__main__':
 
     modaction = None
     try:
-        # todo change this to logger.debug ?
         logger.info("In Main Method")
         modaction = DemistoAction(sys.stdin.read(), modular_action_logger, 'demisto')
 
@@ -140,13 +138,10 @@ if __name__ == '__main__':
             url += ":" + str(inputargs["PORT"])
 
         if modaction.session_key is None:
-            # todo add sending a message to splunk
             logger.exception("Can not execute this script outside Splunk")
             sys.exit(-1)
-        # todo move api path to a global var
-        r = splunk.rest.simpleRequest("/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json",
-                                      modaction.session_key, method='GET')
-        # todo add the check through requests
+
+        r = splunk.rest.simpleRequest(PASSWORD_ENDPOINT, modaction.session_key, method='GET')
         if 200 <= int(r[0]["status"]) <= 300:
             result_op = json.loads(r[1])
             password = ""
@@ -157,11 +152,9 @@ if __name__ == '__main__':
                         userName = ele["content"]["username"]
                         break
         else:
-            # todo change the error message in the exception
             raise Exception(
                 "Authentication key couldn't be retrieved from storage/passwords, got: " + str(r[0]["status"]))
 
-        # todo move to another function
         '''
         Process the result set by opening results_file with gzip
         '''
@@ -184,12 +177,10 @@ if __name__ == '__main__':
         modaction.writeevents(index="main", source='demisto')
 
     except Exception as e:
-        # todo send e
         ## adding additional logging since adhoc search invocations do not write to stderr
         logger.exception("Error in main, error: " + str(e))
         try:
             modaction.message(e, status='failure', level=logging.CRITICAL)
-        except:
-            modular_action_logger.critical(e)
-        logger.exception("ERROR Unexpected error")
+        except Exception as ex:
+            modular_action_logger.critical(ex)
         sys.exit(-1)

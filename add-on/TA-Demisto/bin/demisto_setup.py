@@ -3,29 +3,29 @@
 #
 # This code is written by Demisto Inc
 
-# import your required python modules
 import json
 import re
 import splunk.admin as admin
 import splunk.rest
 
-from demisto_alert import get_logger
-from demisto_alert import validate_token
+from demisto_config import DemistoConfig
 
 # Logging configuration
 maxbytes = 2000000
 
-logger = get_logger("DEMISTOSETUP")
+PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
+IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+DOMAIN_REGEX = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$"
+
+logger = DemistoConfig.get_logger("DEMISTOSETUP")
+demisto = DemistoConfig(logger)
 
 
-# todo change function name to get_app_password or something like that
-# TODO MOVE REGEX EXPRESSION TO A GLOBAL VARIABLE
 # TODO move to a validate_configuration function
 # todo move api path to a global variable
 # todo add ".... Failed while checking the configuration" or something like that
 # todo move api path to a global variable
 
-# todo move to another object
 
 class ConfigApp(admin.MConfigHandler):
     def setup(self):
@@ -33,7 +33,7 @@ class ConfigApp(admin.MConfigHandler):
             for arg in ['AUTHKEY', 'DEMISTOURL', 'PORT', 'SSL_CERT_LOC']:
                 self.supportedArgs.addOptArg(arg)
 
-    def getstorage_detail(self):
+    def get_app_password(self):
         r = splunk.rest.simpleRequest(
             "/servicesNS/nobody/TA-Demisto/admin/passwords?search=TA-Demisto&output_mode=json",
             self.getSessionKey(), method='GET')
@@ -51,9 +51,9 @@ class ConfigApp(admin.MConfigHandler):
         return password
 
     def handleList(self, confInfo):
-        confDict = self.readConf("demistosetup")
+        config_dict = self.readConf("demistosetup")
 
-        for stanza, settings in confDict.items():
+        for stanza, settings in config_dict.items():
             for key, val in settings.items():
                 confInfo[stanza].append(key, val)
 
@@ -64,15 +64,12 @@ class ConfigApp(admin.MConfigHandler):
 
     def handleEdit(self, confInfo):
 
-        exceptionRaised = False
-
         if self.callerArgs.data['SSL_CERT_LOC'][0] is None:
             self.callerArgs.data['SSL_CERT_LOC'] = ''
 
         if self.callerArgs.data['PORT'][0] is None:
             self.callerArgs.data['PORT'] = ''
-        elif not re.match("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
-                          self.callerArgs.data['PORT'][0]):
+        elif not re.match(PORT_REGEX, self.callerArgs.data['PORT'][0]):
             logger.exception("Invalid Port Number")
             raise Exception("Invalid Port Number")
 
@@ -83,12 +80,9 @@ class ConfigApp(admin.MConfigHandler):
             logger.info("Auth key found")
             password = self.callerArgs.data['AUTHKEY'][0]
 
-        if not re.match(
-                "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$",
-                self.callerArgs.data['DEMISTOURL'][0]) \
-                and not re.match(
-            "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$",
-            self.callerArgs.data['DEMISTOURL'][0]):
+        if not re.match(IP_REGEX, self.callerArgs.data['DEMISTOURL'][0]) and not \
+                re.match(DOMAIN_REGEX, self.callerArgs.data['DEMISTOURL'][0]):
+
             logger.exception("Invalid URL")
             raise Exception("Invalid URL")
 
@@ -100,16 +94,16 @@ class ConfigApp(admin.MConfigHandler):
                 url += ":" + self.callerArgs.data['PORT'][0]
 
             '''
-                Create Test Incident to demisto to verify if the configuration entered are correct
+                Create Test Incident to demisto to verify if the configuration is correct
                 Store configuration only if create incident was successful.
             '''
             url += "/incidenttype"
             if self.callerArgs.data['SSL_CERT_LOC']:
-                valid, status = validate_token(url, password,
-                                               verify_cert=True,
-                                               ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0])
+                valid, status = demisto.validate_token(url, password,
+                                                       verify_cert=True,
+                                                       ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0])
             else:
-                valid, status = validate_token(url, password, verify_cert=True)
+                valid, status = demisto.validate_token(url, password, verify_cert=True)
 
             if not valid:
                 logger.info("resp status: " + str(status))
@@ -119,7 +113,6 @@ class ConfigApp(admin.MConfigHandler):
 
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                           postargs=postargs)
-                exceptionRaised = True
 
                 raise Exception('Token validation Failed, got status: ' + str(status))
             else:
@@ -131,12 +124,12 @@ class ConfigApp(admin.MConfigHandler):
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                           postargs=postargs)
                 user_name = "demisto"
-                password = self.getstorage_detail()
+                password = self.get_app_password()
                 '''
                 Store password into passwords.conf file. Following are different scenarios
                 1. Enters credentials for first time, use REST call to store it in passwords.conf
                 2. Updates password. Use REST call to update existing password.
-                3. Upadates Username. Delete existing User entry and insert new entry.
+                3. Updates Username. Delete existing User entry and insert new entry.
                 '''
                 if password:
                     postArgs = {
@@ -167,9 +160,12 @@ class ConfigApp(admin.MConfigHandler):
         except Exception as e:
             logger.exception("Exception while createing Test incident, error: " + str(e))
 
-            postargs = {'severity': 'error', 'name': 'Demisto',
-                        'value': 'Invalid configuration for Demisto, please update configuration for '
-                                 'Splunk-Demisto integration to work, error is: ' + str(e)}
+            postargs = {
+                'severity': 'error',
+                'name': 'Demisto',
+                'value': 'Invalid configuration for Demisto, please update configuration for '
+                         'Splunk-Demisto integration to work, error is: ' + str(e)
+            }
             splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                       postargs=postargs)
             raise Exception("Invalid Configuration, error: " + str(e))
