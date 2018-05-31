@@ -5,9 +5,7 @@
 
 
 import json
-import os
 import logging
-from logging.handlers import RotatingFileHandler
 import sys
 import time
 import csv
@@ -16,21 +14,15 @@ import re
 import urllib
 
 import splunk.rest
-import requests
-from requests import Request
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
-
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
-
 
 # Importing the cim_actions.py library
 # A.  Import make_splunkhome_path
 # B.  Append your library path to sys.path
 # C.  Import ModularAction from cim_actions
-
-maxbytes = 20000
 
 try:
     if version >= 6.4:
@@ -38,44 +30,35 @@ try:
     else:
         from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
 except ImportError as e:
-    sys.exit(3)
+    raise ImportError("Import splunk sub libraries failed\n")
 
 sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]))
 
+from demisto_config import DemistoConfig
+from demisto_splunk import DemistoIncident
 
-def get_logger(logger_id):
-    log_path = make_splunkhome_path(["var", "log", "demisto"])
-    if not (os.path.isdir(log_path)):
-        os.makedirs(log_path)
+try:
+    from cim_actions import ModularAction
+except:
+    sys.exit(3)
 
-    handler = RotatingFileHandler(log_path + '/demisto.log', maxBytes = maxbytes,
-                                  backupCount = 20)
-
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    handler.setFormatter(formatter)
-    logger = logging.getLogger(logger_id)
-    logger.setLevel(logging.INFO)
-
-    logger.addHandler(handler)
-    return logger
-
-
-from cim_actions import ModularAction
-
-logger = get_logger("DEMISTOALERT")
-logger1 = ModularAction.setup_logger('demisto_modalert')
+logger = DemistoConfig.get_logger("DEMISTOALERT")
+modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
 
 class DemistoAction(ModularAction):
-    def dowork(self, result, url, authkey, verify, search_query = "", search_url = "", ssl_cert_loc = "",search_name=None):
-
+    # todo change function name
+    def create_demisto_incident(self, result, url, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
+                                search_name=None):
         try:
-            logger.info("Do Work called")
-
-            resp = createIncident(url, authkey, self.configuration, verify, search_query, search_url, ssl_cert_loc, result,search_name)
+            # todo change the log
+            logger.info("create_demisto_incident called")
+            demisto = DemistoIncident(logger)
+            resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
+                                           ssl_cert_loc, result, search_name)
 
             if resp.status_code == 201 or resp.status_code == 200:
-                self.message('Successfully created incident in Demisto', status = 'success')
+                self.message('Successfully created incident in Demisto', status='success')
 
                 # Removing rawJSON from the response as it creates too large demistoResponse
                 resp = json.loads(resp.text)
@@ -84,174 +67,52 @@ class DemistoAction(ModularAction):
 
                 self.addevent(
                     resp,
-                    sourcetype = "demistoResponse")
+                    sourcetype="demistoResponse")
             else:
+                logger.error('Error in creating incident in Demisto, got status: ' + str(resp.status_code)
+                             + ' with response: ' + json.dumps(resp.json()))
+
                 self.message(
-                    'Error in creating incident in Demisto, got status: '  + str(resp.status_code),
-                    status = 'failure')
+                    'Error in creating incident in Demisto, got status: ' + str(resp.status_code)
+                    + ' with response: ' + json.dumps(resp.json()),
+                    status='failure')
+
                 self.addevent(
                     resp.text + "status= " + str(resp.status_code),
-                    sourcetype = "demistoResponse")
+                    sourcetype="demistoResponse")
 
-        except Exception as e:
-            logger.exception("Error in DO work, error: " + str(e))
+        except Exception as ex:
+            logger.exception("Error in create_demisto_incident, error: " + str(ex))
             self.message('Failed in creating incident in Demisto',
-                         status = 'failure')
+                         status='failure')
 
             self.addevent(
-                "Demisto Incident creation failed exception=" + str(e) + " status=2",
-                sourcetype = "demistoResponse")
-
-
-'''
-    This method is used to create incident into Demisto. It takes four arguments and all are required:
-    @url: Demisto URL, its mandatory parameter.
-    @authkey: Requires parameter, used for authentication.
-    @data: Incident information,
-    @verify: Indicates if self signed certificates are allowed or not.
-'''
-
-
-def createIncident(url, authkey, data, verify_req, search_query = "", search_url = "", ssl_cert_loc = "", result=None,search_name=None):
-    incident = {}
-    incident["details"] = data.get('details', '')
-
-    zone = time.strftime("%z")
-    timezone= zone[-5:][:3] +":" +zone[-5:][3:]
-
-    incident["occurred"] = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(int(float(data["occured"])))) + timezone
-
-    # Always pass True for create investigation
-    incident["createInvestigation"] = True
-
-    incident["name"] = data.get('incident_name', '')
-
-    incident["type"] = data.get('type', '')
-
-    ignore_labels=data.get('ignore_labels','').lower().split(",")
-
-    if "severity" in data:
-        incident["severity"] = float(data["severity"])
-
-    label = []
-    data_dir = {'type': 'SplunkSearch', 'value': search_query}
-    label.append(data_dir)
-
-    data_dir = {'type': 'SplunkURL', 'value': search_url}
-    label.append(data_dir)
-
-    if search_name:
-        data_dir = {'type': 'search_name', 'value': search_name}
-        label.append(data_dir)
-
-    logger.debug("Label::::"+str(result.keys()))
-
-    logger.debug("Ignore Label::::"+str(ignore_labels))
-
-
-    if data.get("labels"):
-        strdata = data["labels"].split(",")
-        for data_label in strdata:
-            paramData = data_label.split(":")
-            data_dir = {"type": paramData[0], "value": ":".join(paramData[1:])}
-            label.append(data_dir)
-    else:
-        for key in result.keys():
-            if key.lower() not in ignore_labels and not key.startswith("__"):
-                data_dir = {"type": key, "value": result[key]}
-                label.append(data_dir)
-
-    incident["labels"] = label
-
-
-    if "custom_field" in data:
-        strdata = data["custom_field"].split(",")
-        custom_fields = {}
-        for data in strdata:
-            paramData = data.split(":")
-            custom_fields[paramData[0]] = ":".join(paramData[1:])
-
-        incident["customFields"] = custom_fields
-
-
-    incident["rawJSON"] = json.dumps(result)
-
-    s = requests.session()
-
-    logger.debug("JSON data for the Incident=" + json.dumps(incident))
-    req = Request('POST', url + "/incident/splunkapp", data = json.dumps(incident))
-    prepped = s.prepare_request(req)
-
-    prepped.headers['Authorization'] = authkey
-    prepped.headers['Content-type'] = "application/json"
-    prepped.headers['Accept'] = "application/json"
-
-
-    if ssl_cert_loc:
-        logger.info("Setting passed certificate location as verify=" +ssl_cert_loc )
-        resp = s.send(prepped, verify = ssl_cert_loc)
-    else:
-        # logger.info("Using default value for verify = False")
-        # resp = s.send(prepped, verify = False)
-
-        logger.info("Using default value for verify = True")
-        resp = s.send(prepped, verify = True)
-        
-    return resp
-
-
-'''
-    This method is used to validate Authorisation token. It takes four arguments.:
-    @url: Demisto URL, its mandatory parameter.
-    @authkey: Requires parameter, used for authentication.
-    @verify_req: If SSC is to be used,
-    @ssl_cert_loc: Location of the public key of the SSC.
-'''
-
-
-def validate_token(url, authkey, verify_cert, ssl_cert_loc = None):
-    headers = {'Authorization': authkey, 'Content-type': 'application/json', 'Accept': 'application/json'}
-
-    if verify_cert and not ssl_cert_loc:
-        # logger.info("Passing verify = False")
-        # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
-
-        logger.info("Using default value for verify = True")
-        r = requests.get(url = url, verify = True,allow_redirects = True, headers = headers)
-    else:
-        logger.info("Passing verify="+str(ssl_cert_loc))
-        r = requests.get(url = url, verify = ssl_cert_loc or True,
-                         allow_redirects = True, headers = headers)
-
-    logger.info("Token Validation Status:" + str(r.status_code))
-    if 200 <= r.status_code < 300 and len(r.content) > 0:
-        return True, str(r.status_code)
-
-    return False, str(r.status_code)
+                "Demisto Incident creation in create_demisto_incident function failed. exception=" + str(
+                    ex) + " status=2",
+                sourcetype="demistoResponse")
 
 
 if __name__ == '__main__':
 
     modaction = None
     try:
+        # todo change this to logger.debug ?
         logger.info("In Main Method")
-        modaction = DemistoAction(sys.stdin.read(), logger1, 'demisto')
+        modaction = DemistoAction(sys.stdin.read(), modular_action_logger, 'demisto')
 
         search = ""
-
         search_name = modaction.settings.get('search_name', '')
-
         search_url = modaction.settings.get('results_link', '')
-
         search_uri = modaction.settings.get('search_uri', '')
 
         if not (not search_name):
             logger.info("For Splunk <6.4, creating search uri")
             search_app_name = modaction.settings.get('app', '')
+            # todo move api path to a global var
             search_uri = urllib.pathname2url("/services/saved/searches/" + search_name)
 
         if not (not search_uri):
-            r = splunk.rest.simpleRequest(search_uri + "?output_mode=json", modaction.session_key, method = 'GET')
+            r = splunk.rest.simpleRequest(search_uri + "?output_mode=json", modaction.session_key, method='GET')
             result_op = json.loads(r[1])
             search = ""
             if len(result_op["entry"]) > 0:
@@ -260,16 +121,17 @@ if __name__ == '__main__':
         inputargs = cli.getConfStanza('demistosetup', 'demistoenv')
 
         if not inputargs["DEMISTOURL"]:
+            # todo verify that the messages get to splunk
             modaction.message('Failed in creating incident in Demisto',
-                              status = 'failure')
+                              status='failure')
 
             modaction.addevent(
                 "Demisto URL must be set, please complete Demisto setup status=2",
-                sourcetype = "demistoResponse")
+                sourcetype="demistoResponse")
 
             logger.exception("Demisto URL must be set, please complete Demisto setup")
-            modaction.writeevents(index = "main", source = 'demisto')
-            sys.exit(3)
+            modaction.writeevents(index="main", source='demisto')
+            sys.exit(-1)
 
         else:
             url = "https://" + inputargs["DEMISTOURL"]
@@ -278,24 +140,28 @@ if __name__ == '__main__':
             url += ":" + str(inputargs["PORT"])
 
         if modaction.session_key is None:
+            # todo add sending a message to splunk
             logger.exception("Can not execute this script outside Splunk")
-            sys.exit(3)
-
+            sys.exit(-1)
+        # todo move api path to a global var
         r = splunk.rest.simpleRequest("/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json",
-                                      modaction.session_key, method = 'GET')
+                                      modaction.session_key, method='GET')
+        # todo add the check through requests
         if 200 <= int(r[0]["status"]) <= 300:
             result_op = json.loads(r[1])
             password = ""
             if len(result_op["entry"]) > 0:
                 for ele in result_op["entry"]:
-
                     if ele["content"]["realm"] == "TA-Demisto":
                         password = ele["content"]["clear_password"]
                         userName = ele["content"]["username"]
                         break
         else:
-            raise Exception("Auth key couldn't be retrived from storage/passwords, got: " + str(r[0]["status"]))
+            # todo change the error message in the exception
+            raise Exception(
+                "Authentication key couldn't be retrieved from storage/passwords, got: " + str(r[0]["status"]))
 
+        # todo move to another function
         '''
         Process the result set by opening results_file with gzip
         '''
@@ -309,20 +175,21 @@ if __name__ == '__main__':
                 result.setdefault('rid', str(num))
                 modaction.update(result)
                 modaction.invoke()
-                modaction.dowork(result, url = url, authkey = password, verify = True,
-                                 search_query = search,
-                                 search_url = search_url, ssl_cert_loc = inputargs.get("SSL_CERT_LOC",''),search_name = search_name)
+                modaction.create_demisto_incident(result, url=url, authkey=password, verify=True,
+                                                  search_query=search,
+                                                  search_url=search_url, ssl_cert_loc=inputargs.get("SSL_CERT_LOC", ''),
+                                                  search_name=search_name)
                 time.sleep(1.6)
 
-        modaction.writeevents(index = "main", source = 'demisto')
+        modaction.writeevents(index="main", source='demisto')
+
     except Exception as e:
+        # todo send e
         ## adding additional logging since adhoc search invocations do not write to stderr
         logger.exception("Error in main, error: " + str(e))
         try:
-            modaction.message(e, status = 'failure', level = logging.CRITICAL)
+            modaction.message(e, status='failure', level=logging.CRITICAL)
         except:
-            logger1.critical(e)
+            modular_action_logger.critical(e)
         logger.exception("ERROR Unexpected error")
-        sys.exit(3)
-
-
+        sys.exit(-1)

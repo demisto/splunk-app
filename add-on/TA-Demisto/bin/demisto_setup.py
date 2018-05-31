@@ -18,6 +18,15 @@ maxbytes = 2000000
 logger = get_logger("DEMISTOSETUP")
 
 
+# todo change function name to get_app_password or something like that
+# TODO MOVE REGEX EXPRESSION TO A GLOBAL VARIABLE
+# TODO move to a validate_configuration function
+# todo move api path to a global variable
+# todo add ".... Failed while checking the configuration" or something like that
+# todo move api path to a global variable
+
+# todo move to another object
+
 class ConfigApp(admin.MConfigHandler):
     def setup(self):
         if self.requestedAction == admin.ACTION_EDIT:
@@ -27,7 +36,7 @@ class ConfigApp(admin.MConfigHandler):
     def getstorage_detail(self):
         r = splunk.rest.simpleRequest(
             "/servicesNS/nobody/TA-Demisto/admin/passwords?search=TA-Demisto&output_mode=json",
-            self.getSessionKey(), method = 'GET')
+            self.getSessionKey(), method='GET')
         password = ""
 
         if 200 <= int(r[0]["status"]) < 300:
@@ -57,13 +66,13 @@ class ConfigApp(admin.MConfigHandler):
 
         exceptionRaised = False
 
-
         if self.callerArgs.data['SSL_CERT_LOC'][0] is None:
             self.callerArgs.data['SSL_CERT_LOC'] = ''
 
         if self.callerArgs.data['PORT'][0] is None:
             self.callerArgs.data['PORT'] = ''
-        elif not re.match("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$", self.callerArgs.data['PORT'][0]):
+        elif not re.match("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
+                          self.callerArgs.data['PORT'][0]):
             logger.exception("Invalid Port Number")
             raise Exception("Invalid Port Number")
 
@@ -78,8 +87,8 @@ class ConfigApp(admin.MConfigHandler):
                 "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$",
                 self.callerArgs.data['DEMISTOURL'][0]) \
                 and not re.match(
-                        "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$",
-                        self.callerArgs.data['DEMISTOURL'][0]):
+            "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$",
+            self.callerArgs.data['DEMISTOURL'][0]):
             logger.exception("Invalid URL")
             raise Exception("Invalid URL")
 
@@ -97,10 +106,10 @@ class ConfigApp(admin.MConfigHandler):
             url += "/incidenttype"
             if self.callerArgs.data['SSL_CERT_LOC']:
                 valid, status = validate_token(url, password,
-                                       verify_cert = True,
-                                       ssl_cert_loc = self.callerArgs.data['SSL_CERT_LOC'][0])
+                                               verify_cert=True,
+                                               ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0])
             else:
-                valid, status = validate_token(url, password, verify_cert = True)
+                valid, status = validate_token(url, password, verify_cert=True)
 
             if not valid:
                 logger.info("resp status: " + str(status))
@@ -109,17 +118,18 @@ class ConfigApp(admin.MConfigHandler):
                             }
 
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
-                                          postargs = postargs)
+                                          postargs=postargs)
                 exceptionRaised = True
 
                 raise Exception('Token validation Failed, got status: ' + str(status))
             else:
                 postargs = {'severity': 'info', 'name': 'Demisto',
-                            'value': 'Demisto API key was successfully validated for host ' +self.callerArgs.data['DEMISTOURL'][0]
+                            'value': 'Demisto API key was successfully validated for host ' +
+                                     self.callerArgs.data['DEMISTOURL'][0]
                             }
 
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
-                                          postargs = postargs)
+                                          postargs=postargs)
                 user_name = "demisto"
                 password = self.getstorage_detail()
                 '''
@@ -136,7 +146,7 @@ class ConfigApp(admin.MConfigHandler):
                     realm = "TA-Demisto:" + user_name + ":"
                     splunk.rest.simpleRequest(
                         "/servicesNS/nobody/" + self.appName + "/admin/passwords/" + realm + "?output_mode=json",
-                        self.getSessionKey(), postargs = postArgs, method = 'POST')
+                        self.getSessionKey(), postargs=postArgs, method='POST')
 
                 else:
                     logger.info("Password not found")
@@ -146,7 +156,7 @@ class ConfigApp(admin.MConfigHandler):
                         "realm": "TA-Demisto"
                     }
                     splunk.rest.simpleRequest("/servicesNS/nobody/TA-Demisto/admin/passwords/?output_mode=json",
-                                              self.getSessionKey(), postargs = postArgs, method = 'POST')
+                                              self.getSessionKey(), postargs=postArgs, method='POST')
 
                 '''
                     Remove AUTHKEY from custom configuration.
@@ -156,15 +166,15 @@ class ConfigApp(admin.MConfigHandler):
                 self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
         except Exception as e:
             logger.exception("Exception while createing Test incident, error: " + str(e))
-            
+
             postargs = {'severity': 'error', 'name': 'Demisto',
                         'value': 'Invalid configuration for Demisto, please update configuration for '
                                  'Splunk-Demisto integration to work, error is: ' + str(e)}
             splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
-                                      postargs = postargs)
+                                      postargs=postargs)
             raise Exception("Invalid Configuration, error: " + str(e))
 
-    def handleReload(self, confInfo = None):
+    def handleReload(self, confInfo=None):
         """
         Handles refresh/reload of the configuration options
         """
