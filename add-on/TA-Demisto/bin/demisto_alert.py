@@ -17,11 +17,15 @@ import splunk.rest
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
-version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
+from demisto_config import DemistoConfig
+from demisto_incident import DemistoIncident
+
 PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
+version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
+
 # Importing the cim_actions.py library
 # A.  Import make_splunkhome_path
-# B.  Append your library path to sys.path
+# B.  Append library path to sys.path
 # C.  Import ModularAction from cim_actions
 
 try:
@@ -34,9 +38,6 @@ except ImportError as e:
 
 sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]))
 
-from demisto_config import DemistoConfig
-from demisto_splunk import DemistoIncident
-
 try:
     from cim_actions import ModularAction
 except:
@@ -45,7 +46,9 @@ except:
 logger = DemistoConfig.get_logger("DEMISTOALERT")
 modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
+
 class DemistoAction(ModularAction):
+
     def create_demisto_incident(self, result, url, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
                                 search_name=None):
         try:
@@ -55,6 +58,7 @@ class DemistoAction(ModularAction):
                                            ssl_cert_loc, result, search_name)
 
             if resp.status_code == 201 or resp.status_code == 200:
+                # self.message logs the string to demisto_modalert.log
                 self.message('Successfully created incident in Demisto', status='success')
 
                 # Removing rawJSON from the response as it creates too large demistoResponse
@@ -62,11 +66,8 @@ class DemistoAction(ModularAction):
                 del resp["rawJSON"]
                 resp = json.dumps(resp)
 
-                logger.info("incident is: " + resp) #TODO remove
-
-                self.addevent(
-                    resp,
-                    sourcetype="demistoResponse")
+                # self.addevent sends the following message to splunk and adds it as event there
+                self.addevent(resp, sourcetype="demistoResponse")
             else:
                 logger.error('Error in creating incident in Demisto, got status: ' + str(resp.status_code)
                              + ' with response: ' + json.dumps(resp.json()))
@@ -86,8 +87,7 @@ class DemistoAction(ModularAction):
                          status='failure')
 
             self.addevent(
-                "Demisto Incident creation in create_demisto_incident function failed. exception=" + str(
-                    ex) + " status=2",
+                "Demisto Incident creation in create_demisto_incident function failed. exception=" + str(ex),
                 sourcetype="demistoResponse")
 
 
@@ -106,7 +106,6 @@ if __name__ == '__main__':
         if not (not search_name):
             logger.info("For Splunk <6.4, creating search uri")
             search_app_name = modaction.settings.get('app', '')
-            # todo move api path to a global var
             search_uri = urllib.pathname2url("/services/saved/searches/" + search_name)
 
         if not (not search_uri):
@@ -116,10 +115,9 @@ if __name__ == '__main__':
             if len(result_op["entry"]) > 0:
                 search = result_op["entry"][0]["content"]["qualifiedSearch"]
 
-        inputargs = cli.getConfStanza('demistosetup', 'demistoenv')
+        input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
-        if not inputargs["DEMISTOURL"]:
-            # todo verify that the messages get to splunk
+        if not input_args["DEMISTOURL"]:
             modaction.message('Failed in creating incident in Demisto',
                               status='failure')
 
@@ -132,10 +130,10 @@ if __name__ == '__main__':
             sys.exit(-1)
 
         else:
-            url = "https://" + inputargs["DEMISTOURL"]
+            url = "https://" + input_args["DEMISTOURL"]
 
-        if "PORT" in inputargs:
-            url += ":" + str(inputargs["PORT"])
+        if "PORT" in input_args:
+            url += ":" + str(input_args["PORT"])
 
         if modaction.session_key is None:
             logger.exception("Can not execute this script outside Splunk")
@@ -170,7 +168,7 @@ if __name__ == '__main__':
                 modaction.invoke()
                 modaction.create_demisto_incident(result, url=url, authkey=password, verify=True,
                                                   search_query=search,
-                                                  search_url=search_url, ssl_cert_loc=inputargs.get("SSL_CERT_LOC", ''),
+                                                  search_url=search_url, ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
                                                   search_name=search_name)
                 time.sleep(1.6)
 

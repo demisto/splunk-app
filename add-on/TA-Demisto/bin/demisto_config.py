@@ -1,3 +1,7 @@
+#
+# This code was written by Demisto Inc
+#
+
 import os
 import logging
 from logging.handlers import RotatingFileHandler
@@ -66,9 +70,8 @@ class DemistoConfig(object):
             self.logger.info("Passing verify=" + str(ssl_cert_loc))
             r = requests.get(url=url, verify=ssl_cert_loc or True,
                              allow_redirects=True, headers=headers)
-        # todo change the log to a more understandable message
+
         self.logger.info("Token Validation Status:" + str(r.status_code))
-        # todo change the check here
         if 200 <= r.status_code < 300 and len(r.content) > 0:
             return True, str(r.status_code)
 
