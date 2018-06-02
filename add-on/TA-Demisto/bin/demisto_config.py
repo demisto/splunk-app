@@ -58,7 +58,11 @@ class DemistoConfig(object):
         :param ssl_cert_loc: Location of the public key of the SSC
         :return:
         """
-        headers = {'Authorization': authkey, 'Content-type': 'application/json', 'Accept': 'application/json'}
+        headers = {
+            'Authorization': authkey,
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
 
         if verify_cert and ssl_cert_loc is None:
             # logger.info("Passing verify = False")

@@ -104,7 +104,7 @@ if __name__ == '__main__':
         search_uri = modaction.settings.get('search_uri', '')
 
         if not (not search_name):
-            logger.info("For Splunk <6.4, creating search uri")
+            logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
             search_uri = urllib.pathname2url("/services/saved/searches/" + search_name)
 
