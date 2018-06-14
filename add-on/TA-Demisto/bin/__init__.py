@@ -1,1 +1,1 @@
-__author__ = "Demisto Inc"
+__author__ = Demisto Inc

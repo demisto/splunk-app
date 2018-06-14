@@ -30,16 +30,30 @@ class ConfigApp(admin.MConfigHandler):
                 self.supportedArgs.addOptArg(arg)
 
     def get_app_password(self):
-        r = splunk.rest.simpleRequest(DEMISTO_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET')
         password = ""
 
-        if 200 <= int(r[0]["status"]) < 300:
-            dict_data = json.loads(r[1])
-            if len(dict_data["entry"]) > 0:
-                for ele in dict_data["entry"]:
-                    if ele["content"]["realm"] == "TA-Demisto":
-                        password = ele["content"]["clear_password"]
-                        break
+        try:
+            r = splunk.rest.simpleRequest(DEMISTO_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET')
+            if 200 <= int(r[0]["status"]) < 300:
+                dict_data = json.loads(r[1])
+                logger.info(json.dumps(dict_data))
+                if len(dict_data["entry"]) > 0:
+                    for ele in dict_data["entry"]:
+                        if ele["content"]["realm"] == "TA-Demisto":
+                            password = ele["content"]["clear_password"]
+                            break
+
+        except Exception as e:
+            logger.exception("Exception while retrieving app password. The error was: " + str(e))
+
+            post_args = {
+                'severity': 'error',
+                'name': 'Demisto',
+                'value': 'Exception while retrieving app password. error is: ' + str(e)
+            }
+            splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
+                                      postargs=post_args)
+            raise Exception("Exception while retrieving app password. error is: " + str(e))
 
         return password
 
