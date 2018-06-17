@@ -20,7 +20,7 @@ import splunk.version as ver
 from demisto_config import DemistoConfig
 from demisto_incident import DemistoIncident
 
-PASSWORDS_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
+PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
 
 # Importing the cim_actions.py library
@@ -139,7 +139,7 @@ if __name__ == '__main__':
             logger.exception("Can not execute this script outside Splunk")
             sys.exit(-1)
 
-        r = splunk.rest.simpleRequest(PASSWORDS_ENDPOINT, modaction.session_key, method='GET')
+        r = splunk.rest.simpleRequest(PASSWORD_ENDPOINT, modaction.session_key, method='GET')
         if 200 <= int(r[0]["status"]) <= 300:
             result_op = json.loads(r[1])
             password = ""
@@ -168,8 +168,7 @@ if __name__ == '__main__':
                 modaction.invoke()
                 modaction.create_demisto_incident(result, url=url, authkey=password, verify=True,
                                                   search_query=search,
-                                                  search_url=search_url,
-                                                  ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                  search_url=search_url, ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
                                                   search_name=search_name)
                 time.sleep(1.6)
 

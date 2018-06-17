@@ -11,7 +11,6 @@ import splunk.rest
 
 from demisto_config import DemistoConfig
 
-# todo delete below
 from splunk.clilib import cli_common as cli
 
 # Logging configuration
@@ -57,6 +56,7 @@ class ConfigApp(admin.MConfigHandler):
             splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                       postargs=post_args)
             raise Exception("Exception while retrieving app password. error is: " + str(e))
+
 
         return password
 
