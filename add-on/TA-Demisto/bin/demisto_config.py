@@ -64,12 +64,12 @@ class DemistoConfig(object):
             'Accept': 'application/json'
         }
 
-        if verify_cert and ssl_cert_loc is None:
+        if ssl_cert_loc is None:
+            # todo remove comments below
             # logger.info("Passing verify = False")
             # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
-            # todo change the ssl verification mechanism
-            self.logger.info("Using default value for verify = True")
-            r = requests.get(url=url, verify=True, allow_redirects=True, headers=headers)
+            self.logger.info("Using " + str(verify_cert) + " value for verify")
+            r = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers)
         else:
             self.logger.info("Passing verify=" + str(ssl_cert_loc))
             r = requests.get(url=url, verify=ssl_cert_loc or True,

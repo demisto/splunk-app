@@ -9,7 +9,6 @@ Supporting Add-on for Demisto. This application allows a user to create incident
 * Splunk version 6.3 >=
 * This application should be installed on Search Head.
 
-
 # Recommended System configuration
 * Standard Splunk configuration of Search Head.
 
@@ -21,9 +20,43 @@ Supporting Add-on for Demisto. This application allows a user to create incident
 * This app can be installed through UI using "Manage Apps" or from the command line using the following command:
 $SPLUNK_HOME/bin/splunk install app $PATH_TO_SPL/TA-Demisto.spl/
 
+# HTTPS Certificate Validation
 
-* User can directly extract SPL file  into $SPLUNK_HOME/etc/apps/ folder.
+The add-on uses secure communication with Demisto.
 
+On few occasions it would be necessary to manually set a certificate for proper verification.
+
+There are several options for adding a self-signed certificate or a certificate from internal certificate signers AFTER
+installing the app:
+
+1) Put the PEM formatted certificate bundle inside Splunk server under:
+$SPLUNK_HOME/etc/apps/TA-Demisto/local/cert_bundle.pem
+
+2) Add the certificate to the app installation tgz:
+    2.1) Extract TA-Demisto tgz
+    2.2) Create "local" directory under TA-Demisto
+    2.3) Place the certificate in that folder
+    In the end the certificate should be in the following path:
+    your-local-path/TA-Demisto/local/cert_bundle.pem
+
+Splunk Cloud users should perform option 2 and send the app installer to Splunk support for installation.
+
+Another option which applies ONLY for on-prem installations and is cannot be used for Splunk Cloud:
+
+Disabling the certificate validation entirely by POSTing to the Splunk REST API
+https://splunk-server:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv
+with the following as the request body:
+verify_ssl=0
+
+For example, via CURL:
+curl -ku 'username:password' https://splunk-server:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv\?output_mode\=json -d verify_ssl=0
+
+To re-enable certificate validation post to the same endpoint but change "verify_ssl" to 1.
+
+We recommend to use certificates, and only disabling certificate verification in development
+or test environments only. Never disable certificate verification for a production system.
+
+* User can directly extract the app's SPL file into $SPLUNK_HOME/etc/apps/ folder in order to install the app.
 
 # Application Setup
 * The user must complete the setup of the application. In order to create incident into Demisto, a user needs to provide following four parameters:
@@ -43,7 +76,9 @@ $SPLUNK_HOME/bin/splunk install app $PATH_TO_SPL/TA-Demisto.spl/
 
 #Troubleshooting
 * Environment variable SPLUNK_HOME must be set
-* To troubleshoot Demisto application, check $SPLUNK_HOME/var/log/splunk/demisto.log file.
+* Check the following logs to troubleshoot Demisto's application:
+    1) $SPLUNK_HOME/var/log/demisto/demisto.log file
+    2) $SPLUNK_HOME/var/log/splunk/demisto_modalert.log
 
 #Support
 Customers can file issues by logging into Demisto support portal (https://support.demisto.com).

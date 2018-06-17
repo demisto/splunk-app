@@ -11,6 +11,9 @@ import splunk.rest
 
 from demisto_config import DemistoConfig
 
+# todo delete below
+from splunk.clilib import cli_common as cli
+
 # Logging configuration
 maxbytes = 2000000
 
@@ -95,6 +98,12 @@ class ConfigApp(admin.MConfigHandler):
             logger.exception("Invalid URL")
             raise Exception("Invalid URL")
 
+        # checking if the user instructed not to use SSL - development environment scenario
+        input_args = cli.getConfStanza('demistosetup', 'demistoenv')
+        validate_ssl = input_args.get('validate_ssl', True)
+        if validate_ssl == 0 or validate_ssl == "0":
+            validate_ssl = False
+
         try:
 
             url = "https://" + self.callerArgs.data['DEMISTOURL'][0]
@@ -109,10 +118,10 @@ class ConfigApp(admin.MConfigHandler):
             url += "/incidenttype"
             if self.callerArgs.data['SSL_CERT_LOC']:
                 valid, status = demisto.validate_token(url, password,
-                                                       verify_cert=True,
+                                                       verify_cert=validate_ssl,
                                                        ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0])
             else:
-                valid, status = demisto.validate_token(url, password, verify_cert=True)
+                valid, status = demisto.validate_token(url, password, verify_cert=validate_ssl)
 
             if not valid:
                 logger.info("resp status: " + str(status))

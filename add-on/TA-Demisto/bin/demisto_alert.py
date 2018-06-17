@@ -115,11 +115,6 @@ if __name__ == '__main__':
             if len(result_op["entry"]) > 0:
                 search = result_op["entry"][0]["content"]["qualifiedSearch"]
 
-        # TODO delete below
-        response, content = splunk.rest.simpleRequest('/servicesNS/nobody/TA-Demisto/configs/conf-TA-Demisto', modaction.session_key, method = 'GET')
-        logger.info(json.dumps(response))
-        logger.info(json.dumps(content))
-
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
         if not input_args["DEMISTOURL"]:
@@ -173,7 +168,8 @@ if __name__ == '__main__':
                 modaction.invoke()
                 modaction.create_demisto_incident(result, url=url, authkey=password, verify=True,
                                                   search_query=search,
-                                                  search_url=search_url, ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                  search_url=search_url,
+                                                  ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
                                                   search_name=search_name)
                 time.sleep(1.6)
 
