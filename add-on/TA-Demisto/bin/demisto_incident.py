@@ -19,7 +19,8 @@ class DemistoIncident():
 
     def create_incident(self, url, authkey, data, verify_req, search_query="", search_url="", ssl_cert_loc="",
                         result=None,
-                        search_name=None):
+                        search_name=None,
+                        proxies=None):
         """
             This method is used to create incident in Demisto. It takes four arguments and all are mandatory:
             @url: Demisto URL, its mandatory parameter.
@@ -44,13 +45,13 @@ class DemistoIncident():
         # todo change the mechanism for ssl verification with the global splunk vars
         if ssl_cert_loc:
             self.logger.info("Setting passed certificate location as verify=" + ssl_cert_loc)
-            resp = s.send(prepped, verify=ssl_cert_loc)
+            resp = s.send(prepped, verify=ssl_cert_loc, proxies=proxies)
         else:
             # logger.info("Using default value for verify = False")
             # resp = s.send(prepped, verify = False)
 
             self.logger.info("Using default value for verify = True")
-            resp = s.send(prepped, verify=True)
+            resp = s.send(prepped, verify=verify_req, proxies=proxies)
 
         return resp
 
@@ -117,6 +118,3 @@ class DemistoIncident():
         incident["rawJSON"] = json.dumps(result)
 
         return incident
-
-
-

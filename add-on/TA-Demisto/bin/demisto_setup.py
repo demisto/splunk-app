@@ -28,7 +28,7 @@ demisto = DemistoConfig(logger)
 class ConfigApp(admin.MConfigHandler):
     def setup(self):
         if self.requestedAction == admin.ACTION_EDIT:
-            for arg in ['AUTHKEY', 'DEMISTOURL', 'PORT', 'SSL_CERT_LOC']:
+            for arg in ['AUTHKEY', 'DEMISTOURL', 'PORT', 'SSL_CERT_LOC', 'HTTP_PROXY', 'HTTPS_PROXY']:
                 self.supportedArgs.addOptArg(arg)
 
     def get_app_password(self):
@@ -38,7 +38,6 @@ class ConfigApp(admin.MConfigHandler):
             r = splunk.rest.simpleRequest(DEMISTO_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET')
             if 200 <= int(r[0]["status"]) < 300:
                 dict_data = json.loads(r[1])
-                logger.info(json.dumps(dict_data))
                 if len(dict_data["entry"]) > 0:
                     for ele in dict_data["entry"]:
                         if ele["content"]["realm"] == "TA-Demisto":
@@ -57,12 +56,11 @@ class ConfigApp(admin.MConfigHandler):
                                       postargs=post_args)
             raise Exception("Exception while retrieving app password. error is: " + str(e))
 
-
         return password
 
     def handleList(self, confInfo):
         config_dict = self.readConf("demistosetup")
-
+        logger.info("config dict is : " + json.dumps(config_dict))
         for stanza, settings in config_dict.items():
             for key, val in settings.items():
                 confInfo[stanza].append(key, val)
@@ -88,10 +86,25 @@ class ConfigApp(admin.MConfigHandler):
 
         if self.callerArgs.data['AUTHKEY'][0] is None:
             self.callerArgs.data['AUTHKEY'] = ''
-
         else:
             logger.info("Auth key found")
             password = self.callerArgs.data['AUTHKEY'][0]
+
+        proxies = {}
+        if self.callerArgs.data['HTTP_PROXY'][0] is None:
+            self.callerArgs.data['HTTP_PROXY'] = ''
+        else:
+            proxies['http'] = self.callerArgs.data['HTTP_PROXY'][0]
+
+        if self.callerArgs.data['HTTPS_PROXY'][0] is None:
+            self.callerArgs.data['HTTPS_PROXY'] = ''
+        else:
+            proxies['https'] = self.callerArgs.data['HTTPS_PROXY'][0]
+
+        # todo remove logging below
+        logger.info("--------- caller args-------")
+        logger.info(json.dumps(self.callerArgs.data))
+        logger.info("--------- caller args-------")
 
         if not re.match(IP_REGEX, self.callerArgs.data['DEMISTOURL'][0]) and not \
                 re.match(DOMAIN_REGEX, self.callerArgs.data['DEMISTOURL'][0]):
@@ -100,12 +113,17 @@ class ConfigApp(admin.MConfigHandler):
 
         # checking if the user instructed not to use SSL - development environment scenario
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
-        validate_ssl = input_args.get('validate_ssl', True)
+        # todo remove logging below
+        logger.info("--------- input args-------")
+        logger.info(json.dumps(input_args))
+        logger.info("--------- input args-------")
+        validate_ssl = input_args.get("validate_ssl", True)
+        # logger.info("validate ssl is : " + validate_ssl)
+
         if validate_ssl == 0 or validate_ssl == "0":
             validate_ssl = False
 
         try:
-
             url = "https://" + self.callerArgs.data['DEMISTOURL'][0]
 
             if len(self.callerArgs.data['PORT']) > 0 and self.callerArgs.data['PORT'][0] is not None:
@@ -117,24 +135,33 @@ class ConfigApp(admin.MConfigHandler):
             '''
             url += "/incidenttype"
             if self.callerArgs.data['SSL_CERT_LOC']:
-                valid, status = demisto.validate_token(url, password,
-                                                       verify_cert=validate_ssl,
-                                                       ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0])
+                valid, response = demisto.validate_token(url, password,
+                                                         verify_cert=validate_ssl,
+                                                         ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0],
+                                                         proxies=proxies)
             else:
-                valid, status = demisto.validate_token(url, password, verify_cert=validate_ssl)
+                valid, response = demisto.validate_token(url, password, verify_cert=validate_ssl, proxies=proxies)
 
+            logger.info("Response status: " + str(response.status_code))
+            logger.info("Response headers: " + str(response.headers))
+            logger.info("Response Details: " + json.dumps(response.json()))
             if not valid:
-                logger.info("resp status: " + str(status))
+                logger.info("Response status: " + str(response.status_code))
+                logger.info("Response headers: " + str(response.headers))
+                logger.info("Response Details: " + json.dumps(response.json()))
+
                 post_args = {
                     'severity': 'error',
                     'name': 'Demisto',
-                    'value': 'Token validation Failed, got status: ' + str(status)
+                    'value': 'Token validation Failed, got status: ' + str(
+                        response.status_code) + ' with the following response: ' + json.dumps(response.json())
                 }
 
                 splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                           postargs=post_args)
 
-                raise Exception('Token validation Failed, got status: ' + str(status))
+                raise Exception('Token validation Failed, got status: ' + str(
+                    response.status_code) + ' with the following response: ' + json.dumps(response.json()))
 
             else:
                 post_args = {

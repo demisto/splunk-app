@@ -50,12 +50,12 @@ modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 class DemistoAction(ModularAction):
 
     def create_demisto_incident(self, result, url, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
-                                search_name=None):
+                                search_name=None, proxies=None):
         try:
             logger.info("create_demisto_incident called")
             demisto = DemistoIncident(logger)
             resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
-                                           ssl_cert_loc, result, search_name)
+                                           ssl_cert_loc, result, search_name, proxies)
 
             if resp.status_code == 201 or resp.status_code == 200:
                 # self.message logs the string to demisto_modalert.log
@@ -139,6 +139,27 @@ if __name__ == '__main__':
             logger.exception("Can not execute this script outside Splunk")
             sys.exit(-1)
 
+        # todo remove logging below
+        logger.info("--------- input args-------")
+        logger.info(json.dumps(input_args))
+        logger.info("--------- input args-------")
+
+        proxies = {}
+        http_proxy = input_args.get('HTTP_PROXY', None)
+        https_proxy = input_args.get('HTTPS_PROXY', None)
+
+        if http_proxy is not None:
+            proxies['http'] = http_proxy
+
+        if https_proxy is not None:
+            proxies['https'] = https_proxy
+
+        validate_ssl = input_args.get("validate_ssl", True)
+        # logger.info("validate ssl is : " + validate_ssl)
+
+        if validate_ssl == 0 or validate_ssl == "0":
+            validate_ssl = False
+
         r = splunk.rest.simpleRequest(PASSWORD_ENDPOINT, modaction.session_key, method='GET')
         if 200 <= int(r[0]["status"]) <= 300:
             result_op = json.loads(r[1])
@@ -166,10 +187,11 @@ if __name__ == '__main__':
                 result.setdefault('rid', str(num))
                 modaction.update(result)
                 modaction.invoke()
-                modaction.create_demisto_incident(result, url=url, authkey=password, verify=True,
+                modaction.create_demisto_incident(result, url=url, authkey=password, verify=validate_ssl,
                                                   search_query=search,
-                                                  search_url=search_url, ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
-                                                  search_name=search_name)
+                                                  search_url=search_url,
+                                                  ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                  search_name=search_name, proxies=proxies)
                 time.sleep(1.6)
 
         modaction.writeevents(index="main", source='demisto')

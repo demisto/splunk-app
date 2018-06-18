@@ -28,7 +28,7 @@
 		$(".splButton-primary").on("click",function(e) { 
 		    $('.custom-error').remove();
 			
-			if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL")&&(ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked))
+			if(validateTextBox("DEMISTOURL") && validateNumber("PORT") && validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL")&&(ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked))
 			{
 				return true;
 			}
@@ -212,6 +212,14 @@
 	  </input>
 	  <input field="PORT">
         <label>Demisto Application Port</label>
+        <type>text</type>
+	  </input>
+      <input field="HTTP_PROXY">
+        <label>HTTP Proxy Address</label><font color="red"><b>*</b></font>
+        <type>text</type>
+	  </input>
+      <input field="HTTPS_PROXY">
+        <label>HTTPS Proxy Address</label><font color="red"><b>*</b></font>
         <type>text</type>
 	  </input>
       <input field="AUTHKEY">

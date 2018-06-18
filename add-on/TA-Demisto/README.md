@@ -63,7 +63,9 @@ or test environments only. Never disable certificate verification for a producti
     1)Demisto URL: This is mandatory parameter Url /IP address of the Demisto
     2)Demisto Port: This is an optional parameter. The user must define it if running Demisto on any other port than the default (443).
     3)Allow Self Signed Certificate: User should select this if using Self Signed certificate
-    4) Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demsito. In order to generate this parameter, a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
+    4)Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demsito. In order to generate this parameter, a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
+
+* Proxies should be entered in the following manner : http://username:password@ip:port
 
 # Custom Alert Action
 * This application will add custom alert action named Demisto Custom Alert Action. The user can configure this action on saved search. The user can pass following parameters to Demisto:
@@ -79,6 +81,7 @@ or test environments only. Never disable certificate verification for a producti
 * Check the following logs to troubleshoot Demisto's application:
     1) $SPLUNK_HOME/var/log/demisto/demisto.log file
     2) $SPLUNK_HOME/var/log/splunk/demisto_modalert.log
+* If you change the app's settings several times in a row you might need to restart Splunk for them to update
 
 #Support
 Customers can file issues by logging into Demisto support portal (https://support.demisto.com).
