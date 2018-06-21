@@ -42,7 +42,6 @@ class DemistoIncident():
         prepped.headers['Content-type'] = "application/json"
         prepped.headers['Accept'] = "application/json"
 
-        # todo change the mechanism for ssl verification with the global splunk vars
         if ssl_cert_loc:
             self.logger.info("Setting passed certificate location as verify=" + ssl_cert_loc)
             resp = s.send(prepped, verify=ssl_cert_loc, proxies=proxies)

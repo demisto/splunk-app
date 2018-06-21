@@ -20,7 +20,8 @@ import splunk.version as ver
 from demisto_config import DemistoConfig
 from demisto_incident import DemistoIncident
 
-PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
+# PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
+SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
 
 # Importing the cim_actions.py library
@@ -56,6 +57,7 @@ class DemistoAction(ModularAction):
             demisto = DemistoIncident(logger)
             resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
                                            ssl_cert_loc, result, search_name, proxies)
+            logger.info("Demisto's response is: " + json.dumps(resp.json()))
 
             if resp.status_code == 201 or resp.status_code == 200:
                 # self.message logs the string to demisto_modalert.log
@@ -160,19 +162,23 @@ if __name__ == '__main__':
         if validate_ssl == 0 or validate_ssl == "0":
             validate_ssl = False
 
-        r = splunk.rest.simpleRequest(PASSWORD_ENDPOINT, modaction.session_key, method='GET')
-        if 200 <= int(r[0]["status"]) <= 300:
-            result_op = json.loads(r[1])
+        r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
+            'output_mode': 'json'})
+        logger.info("Demisto alert: response from app password end point:" + str(r[1]))
+        # logger.info("response from app password end point in get_app_password is :" + str(r))
+        if 200 <= int(r[0]["status"]) < 300:
+            dict_data = json.loads(r[1])
             password = ""
-            if len(result_op["entry"]) > 0:
-                for ele in result_op["entry"]:
+            if len(dict_data["entry"]) > 0:
+                for ele in dict_data["entry"]:
                     if ele["content"]["realm"] == "TA-Demisto":
                         password = ele["content"]["clear_password"]
                         userName = ele["content"]["username"]
                         break
+
         else:
             raise Exception(
-                "Authentication key couldn't be retrieved from storage/passwords, got: " + str(r[0]["status"]))
+                "Authentication key couldn't be retrieved from storage/passwords, the response was: " + str(r))
 
         '''
         Process the result set by opening results_file with gzip

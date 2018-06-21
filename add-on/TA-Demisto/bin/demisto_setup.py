@@ -14,9 +14,10 @@ from demisto_config import DemistoConfig
 from splunk.clilib import cli_common as cli
 
 # Logging configuration
-maxbytes = 2000000
+maxbytes = 200000000
 
-DEMISTO_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?search=TA-Demisto&output_mode=json"
+# SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?search=TA-Demisto&output_mode=json"
+SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
 IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
 DOMAIN_REGEX = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$"
@@ -33,9 +34,11 @@ class ConfigApp(admin.MConfigHandler):
 
     def get_app_password(self):
         password = ""
-
         try:
-            r = splunk.rest.simpleRequest(DEMISTO_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET')
+            r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET', getargs={
+                'output_mode': 'json'})
+            logger.info("response from app password end point:" + str(r[1]))
+            # logger.info("response from app password end point in get_app_password is :" + str(r))
             if 200 <= int(r[0]["status"]) < 300:
                 dict_data = json.loads(r[1])
                 if len(dict_data["entry"]) > 0:
@@ -120,6 +123,7 @@ class ConfigApp(admin.MConfigHandler):
         validate_ssl = input_args.get("validate_ssl", True)
         # logger.info("validate ssl is : " + validate_ssl)
 
+
         if validate_ssl == 0 or validate_ssl == "0":
             validate_ssl = False
 
@@ -142,13 +146,13 @@ class ConfigApp(admin.MConfigHandler):
             else:
                 valid, response = demisto.validate_token(url, password, verify_cert=validate_ssl, proxies=proxies)
 
-            logger.info("Response status: " + str(response.status_code))
-            logger.info("Response headers: " + str(response.headers))
-            logger.info("Response Details: " + json.dumps(response.json()))
+            logger.info("Demisto validate token Response status: " + str(response.status_code))
+            logger.info("Demisto validate token Response headers: " + str(response.headers))
+            # logger.info("Demisto validate token Response Details: " + json.dumps(response.json()))
             if not valid:
-                logger.info("Response status: " + str(response.status_code))
-                logger.info("Response headers: " + str(response.headers))
-                logger.info("Response Details: " + json.dumps(response.json()))
+                logger.info("Demisto validate token Response status: " + str(response.status_code))
+                logger.info("Demisto validate token Response headers: " + str(response.headers))
+                logger.info("Demisto validate token Response Details: " + json.dumps(response.json()))
 
                 post_args = {
                     'severity': 'error',
@@ -164,6 +168,7 @@ class ConfigApp(admin.MConfigHandler):
                     response.status_code) + ' with the following response: ' + json.dumps(response.json()))
 
             else:
+
                 post_args = {
                     'severity': 'info',
                     'name': 'Demisto',
@@ -175,6 +180,7 @@ class ConfigApp(admin.MConfigHandler):
                                           postargs=post_args)
                 user_name = "demisto"
                 password = self.get_app_password()
+
                 '''
                 Store password into passwords.conf file. There are several scenarios:
                 1. Enter credentials for first time, use REST call to store it in passwords.conf
@@ -183,23 +189,35 @@ class ConfigApp(admin.MConfigHandler):
                 '''
                 if password:
                     post_args = {
-                        "password": self.callerArgs.data['AUTHKEY'][0]
+                        "password": self.callerArgs.data['AUTHKEY'][0],
+                        # "username": user_name,
+                        # "realm": "TA-Demisto",
+                        "output_mode": 'json'
                     }
-                    logger.info("Updating existing user password")
-                    realm = "TA-Demisto:" + user_name + ":"
-                    splunk.rest.simpleRequest(
-                        "/servicesNS/nobody/" + self.appName + "/admin/passwords/" + realm + "?output_mode=json",
+                    logger.info("Updating existing user password with the following post args: " + json.dumps(post_args))
+                    # realm = "TA-Demisto:" + user_name + ":"
+                    # splunk.rest.simpleRequest(
+                    #     "/servicesNS/nobody/" + self.appName + "/admin/passwords/" + realm + "?output_mode=json",
+                    #     self.getSessionKey(), postargs=post_args, method='POST')
+                    r = splunk.rest.simpleRequest(
+                        SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto%3Ademisto%3A",
                         self.getSessionKey(), postargs=post_args, method='POST')
+                    logger.info("response from app password end point in handleEdit for updating the password is :" + str(r))
 
                 else:
                     logger.info("Password not found")
                     post_args = {
                         "name": user_name,
                         "password": self.callerArgs.data['AUTHKEY'][0],
-                        "realm": "TA-Demisto"
+                        "realm": "TA-Demisto",
+                        "output_mode": 'json'
                     }
-                    splunk.rest.simpleRequest("/servicesNS/nobody/TA-Demisto/admin/passwords/?output_mode=json",
-                                              self.getSessionKey(), postargs=post_args, method='POST')
+                    # splunk.rest.simpleRequest("/servicesNS/nobody/TA-Demisto/admin/passwords/?output_mode=json",
+                    #                           self.getSessionKey(), postargs=post_args, method='POST')
+                    #
+                    r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT,
+                                                  self.getSessionKey(), postargs=post_args, method='POST')
+                    logger.info("response from app password end point for setting a new password in handleEdit is :" + str(r))
 
                 '''
                     Remove AUTHKEY from custom configuration.
