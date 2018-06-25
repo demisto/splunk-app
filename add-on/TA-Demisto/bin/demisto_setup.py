@@ -224,6 +224,7 @@ class ConfigApp(admin.MConfigHandler):
                 '''
                 del self.callerArgs.data['AUTHKEY']
 
+                logger.info(" caller args in demisto setup are: " + json.dumps(self.callerArgs.data))
                 self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
 
         except Exception as e:

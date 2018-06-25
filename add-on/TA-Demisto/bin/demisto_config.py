@@ -19,7 +19,7 @@ try:
 except ImportError as e:
     raise ImportError("Import splunk sub libraries failed\n")
 
-maxbytes = 20000
+maxbytes = 2000000
 
 
 class DemistoConfig(object):
