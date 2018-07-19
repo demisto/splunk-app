@@ -214,10 +214,6 @@
         <label>Demisto Application Port</label>
         <type>text</type>
 	  </input>
-      <input field="HTTP_PROXY">
-        <label>HTTP Proxy Address</label><font color="red"><b>*</b></font>
-        <type>text</type>
-	  </input>
       <input field="HTTPS_PROXY">
         <label>HTTPS Proxy Address</label><font color="red"><b>*</b></font>
         <type>text</type>

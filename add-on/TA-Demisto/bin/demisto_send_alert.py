@@ -148,11 +148,7 @@ if __name__ == '__main__':
         logger.info("--------- input args-------")
 
         proxies = {}
-        http_proxy = input_args.get('HTTP_PROXY', None)
         https_proxy = input_args.get('HTTPS_PROXY', None)
-
-        if http_proxy is not None:
-            proxies['http'] = http_proxy
 
         if https_proxy is not None:
             proxies['https'] = https_proxy
@@ -199,7 +195,7 @@ if __name__ == '__main__':
                                                   search_url=search_url,
                                                   ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
                                                   search_name=search_name, proxies=proxies)
-                time.sleep(1.6)
+                # time.sleep(1.6)
 
         modaction.writeevents(index="main", source='demisto')
 

@@ -29,7 +29,7 @@ demisto = DemistoConfig(logger)
 class ConfigApp(admin.MConfigHandler):
     def setup(self):
         if self.requestedAction == admin.ACTION_EDIT:
-            for arg in ['AUTHKEY', 'DEMISTOURL', 'PORT', 'SSL_CERT_LOC', 'HTTP_PROXY', 'HTTPS_PROXY']:
+            for arg in ['AUTHKEY', 'DEMISTOURL', 'PORT', 'SSL_CERT_LOC', 'HTTPS_PROXY']:
                 self.supportedArgs.addOptArg(arg)
 
     def get_app_password(self):
@@ -94,10 +94,6 @@ class ConfigApp(admin.MConfigHandler):
             password = self.callerArgs.data['AUTHKEY'][0]
 
         proxies = {}
-        if self.callerArgs.data['HTTP_PROXY'][0] is None:
-            self.callerArgs.data['HTTP_PROXY'] = ''
-        else:
-            proxies['http'] = self.callerArgs.data['HTTP_PROXY'][0]
 
         if self.callerArgs.data['HTTPS_PROXY'][0] is None:
             self.callerArgs.data['HTTPS_PROXY'] = ''
