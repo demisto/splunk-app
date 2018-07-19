@@ -105,12 +105,13 @@ if __name__ == '__main__':
         search_url = modaction.settings.get('results_link', '')
         search_uri = modaction.settings.get('search_uri', '')
 
-        if not (not search_name):
+        if search_name:
             logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
             search_uri = urllib.pathname2url("/services/saved/searches/" + search_name)
+            logger.info("Search uri is " + search_uri)
 
-        if not (not search_uri):
+        if search_uri:
             r = splunk.rest.simpleRequest(search_uri + "?output_mode=json", modaction.session_key, method='GET')
             result_op = json.loads(r[1])
             search = ""
@@ -119,7 +120,6 @@ if __name__ == '__main__':
 
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
-        logger.info(json.dumps(input_args))
         if not input_args["DEMISTOURL"]:
             modaction.message('Failed in creating incident in Demisto',
                               status='failure')
@@ -158,11 +158,11 @@ if __name__ == '__main__':
 
         if validate_ssl == 0 or validate_ssl == "0":
             validate_ssl = False
-
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
-            'output_mode': 'json', 'search': 'phantom'})
+            'output_mode': 'json', 'search': 'TA-Demisto'})
+        
         logger.info("Demisto alert: response from app password end point:" + str(r[1]))
-        # logger.info("response from app password end point in get_app_password is :" + str(r))
+
         if 200 <= int(r[0]["status"]) < 300:
             dict_data = json.loads(r[1])
             password = ""
