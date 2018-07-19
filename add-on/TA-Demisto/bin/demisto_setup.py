@@ -190,15 +190,14 @@ class ConfigApp(admin.MConfigHandler):
                         # "realm": "TA-Demisto",
                         "output_mode": 'json'
                     }
-                    logger.info("Updating existing user password with the following post args: " + json.dumps(post_args))
-                    # realm = "TA-Demisto:" + user_name + ":"
+                    # logger.info("Updating existing user password with the following post args: " + json.dumps(post_args))
                     # splunk.rest.simpleRequest(
                     #     "/servicesNS/nobody/" + self.appName + "/admin/passwords/" + realm + "?output_mode=json",
                     #     self.getSessionKey(), postargs=post_args, method='POST')
                     r = splunk.rest.simpleRequest(
                         SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto%3Ademisto%3A",
                         self.getSessionKey(), postargs=post_args, method='POST')
-                    logger.info("response from app password end point in handleEdit for updating the password is :" + str(r))
+                    # logger.info("response from app password end point in handleEdit for updating the password is :" + str(r))
 
                 else:
                     logger.info("Password not found")

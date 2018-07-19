@@ -57,7 +57,7 @@ class DemistoAction(ModularAction):
             demisto = DemistoIncident(logger)
             resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
                                            ssl_cert_loc, result, search_name, proxies)
-            logger.info("Demisto's response is: " + json.dumps(resp.json()))
+            # logger.info("Demisto's response is: " + json.dumps(resp.json()))
 
             if resp.status_code == 201 or resp.status_code == 200:
                 # self.message logs the string to demisto_modalert.log
@@ -105,14 +105,20 @@ if __name__ == '__main__':
         search_url = modaction.settings.get('results_link', '')
         search_uri = modaction.settings.get('search_uri', '')
 
-        if search_name:
+        logger.info("search_name is " + search_name)
+        logger.info("Search uri is " + search_uri)
+        logger.info("Manually created Search uri is " + "/services/saved/searches/" + urllib.quote(search_name))
+
+        if not search_name:
             logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
-            search_uri = urllib.pathname2url("/services/saved/searches/" + search_name)
-            logger.info("Search uri is " + search_uri)
+            search_uri = urllib.pathname2url("/services/saved/searches/" + urllib.quote(search_name))
 
-        if search_uri:
-            r = splunk.rest.simpleRequest(search_uri + "?output_mode=json", modaction.session_key, method='GET')
+        if not search_uri:
+            get_args = {
+                'output_mode': 'json',
+            }
+            r = splunk.rest.simpleRequest(search_uri, sessionKey=modaction.session_key, getargs=get_args, method='GET')
             result_op = json.loads(r[1])
             search = ""
             if len(result_op["entry"]) > 0:
@@ -143,9 +149,9 @@ if __name__ == '__main__':
             sys.exit(-1)
 
         # todo remove logging below
-        logger.info("--------- input args-------")
-        logger.info(json.dumps(input_args))
-        logger.info("--------- input args-------")
+        # logger.info("--------- input args-------")
+        # logger.info(json.dumps(input_args))
+        # logger.info("--------- input args-------")
 
         proxies = {}
         https_proxy = input_args.get('HTTPS_PROXY', None)
@@ -160,7 +166,7 @@ if __name__ == '__main__':
             validate_ssl = False
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
             'output_mode': 'json', 'search': 'TA-Demisto'})
-        
+
         logger.info("Demisto alert: response from app password end point:" + str(r[1]))
 
         if 200 <= int(r[0]["status"]) < 300:
