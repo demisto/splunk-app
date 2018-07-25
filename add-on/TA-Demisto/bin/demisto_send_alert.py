@@ -58,10 +58,11 @@ class DemistoAction(ModularAction):
             resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
                                            ssl_cert_loc, result, search_name, proxies)
             # logger.info("Demisto's response is: " + json.dumps(resp.json()))
-
+            logger.info("Demisto response code is " + str(resp.status_code))
             if resp.status_code == 201 or resp.status_code == 200:
                 # self.message logs the string to demisto_modalert.log
                 self.message('Successfully created incident in Demisto', status='success')
+                logger.info("Successfully created incident in Demisto")
 
                 # Removing rawJSON from the response as it creates too large demistoResponse
                 resp = json.loads(resp.text)
@@ -126,6 +127,10 @@ if __name__ == '__main__':
 
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
+        # todo remove logging below
+        logger.info("--------- input args-------")
+        logger.info(json.dumps(input_args))
+        logger.info("--------- input args-------")
         if not input_args["DEMISTOURL"]:
             modaction.message('Failed in creating incident in Demisto',
                               status='failure')
@@ -148,10 +153,6 @@ if __name__ == '__main__':
             logger.exception("Can not execute this script outside Splunk")
             sys.exit(-1)
 
-        # todo remove logging below
-        # logger.info("--------- input args-------")
-        # logger.info(json.dumps(input_args))
-        # logger.info("--------- input args-------")
 
         proxies = {}
         https_proxy = input_args.get('HTTPS_PROXY', None)
@@ -167,7 +168,7 @@ if __name__ == '__main__':
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
             'output_mode': 'json', 'search': 'TA-Demisto'})
 
-        logger.info("Demisto alert: response from app password end point:" + str(r[1]))
+        # logger.info("Demisto alert: response from app password end point:" + str(r[1]))
 
         if 200 <= int(r[0]["status"]) < 300:
             dict_data = json.loads(r[1])

@@ -58,7 +58,7 @@
 
 			label=document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML;
 
-			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter the full path to  Certificate if you are using Self Signed/Internal CA signed certificate</font>";
+			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate</font>";
 
 			document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 		}

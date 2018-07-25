@@ -8,6 +8,7 @@ import json
 import re
 import splunk.admin as admin
 import splunk.rest
+import requests
 
 from demisto_config import DemistoConfig
 
@@ -16,7 +17,6 @@ from splunk.clilib import cli_common as cli
 # Logging configuration
 maxbytes = 200000000
 
-# SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?search=TA-Demisto&output_mode=json"
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
 IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
@@ -37,7 +37,7 @@ class ConfigApp(admin.MConfigHandler):
         try:
             r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET', getargs={
                 'output_mode': 'json'})
-            logger.info("response from app password end point:" + str(r[1]))
+            # logger.info("response from app password end point:" + str(r[1]))
             # logger.info("response from app password end point in get_app_password is :" + str(r))
             if 200 <= int(r[0]["status"]) < 300:
                 dict_data = json.loads(r[1])
@@ -61,9 +61,187 @@ class ConfigApp(admin.MConfigHandler):
 
         return password
 
+    @staticmethod
+    def log_bad_request_details(r):
+        """
+        logs the details of a bad request
+
+        :param r: request object
+        """
+        logger.info("Response status code: " + str(r.status_code))
+        logger.info("Request headers: " + str(r.request.headers))
+        logger.info("Response Details: " + json.dumps(r.json()))
+        logger.info("History: " + str(r.history))
+        logger.info("Headers: " + str(r.headers))
+        logger.info("Cookies: " + str(requests.utils.dict_from_cookiejar(r.cookies)))
+        logger.info("URL: " + str(r.url))
+        logger.info("Links: " + str(r.links))
+
+    def validate_network(self, url, verify_cert, ssl_cert_loc=None, proxies=None):
+        """
+        This method is used to validate network connectivity with Demisto. It takes three arguments:
+
+        :param proxies: proxies
+        :param url: Demisto URL, its mandatory parameter.
+        :param verify_cert: If SSC is to be used
+        :param ssl_cert_loc: Location of the public key of the SSC
+        :return:
+        """
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        try:
+            if ssl_cert_loc is None:
+                # todo remove comments below
+                # logger.info("Passing verify = False")
+                # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
+                response = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers,
+                                        proxies=proxies)
+            else:
+                logger.info("Passing verify=" + str(ssl_cert_loc))
+                response = requests.get(url=url, verify=ssl_cert_loc or True,
+                                        allow_redirects=True, headers=headers, proxies=proxies)
+
+            logger.info("Network Validation Status:" + str(response.status_code))
+            if 200 <= response.status_code < 300 and len(response.content) > 0:
+                return True, response
+
+            # in case of an unsuccessful request - log all of the request details
+            logger.info("network was not successfully validated, we may have a connectivity issue")
+            self.log_bad_request_details(response)
+
+            raise Exception('Network validation failed. There\'s a connectivity issue with Demisto, please check your '
+                            "network settings. Got status: " + str(
+                response.status_code) + ' with the following response: ' + json.dumps(
+                response.json()))
+
+        except requests.exceptions.SSLError as err:
+            raise Exception('Network validation failed because of SSL validation error. In case you use self-signed '
+                            'certificate refer to Demisto\'s manual, got the following error: ' + str(err))
+
+    def validate_token(self, url, authkey, verify_cert, ssl_cert_loc=None, proxies=None):
+        """
+        This method is used to validate Authorization token. It takes four arguments:
+
+        :param proxies: proxies
+        :param url: Demisto URL, its mandatory parameter.
+        :param authkey: authkey for authentication.
+        :param verify_cert: If SSC is to be used
+        :param ssl_cert_loc: Location of the public key of the SSC
+        :return:
+        """
+        headers = {
+            'Authorization': authkey,
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        try:
+            if ssl_cert_loc is None:
+                # todo remove comments below
+                # logger.info("Passing verify = False")
+                # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
+                logger.info("Using " + str(verify_cert) + " value for verification")
+                response = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers,
+                                        proxies=proxies)
+            else:
+                logger.info("Passing verify=" + str(ssl_cert_loc))
+                response = requests.get(url=url, verify=ssl_cert_loc or True,
+                                        allow_redirects=True, headers=headers, proxies=proxies)
+
+            logger.info("Token Validation Status:" + str(response.status_code))
+            if 200 <= response.status_code < 300 and len(response.content) > 0:
+                return True, response
+
+            # in case of an unsuccessful request - log all of the request details
+            logger.info("Demisto\'s token was not successfully validated")
+            self.log_bad_request_details(response)
+
+            raise Exception(
+                'Demisto token validation failed, please check that you have the correct token. Got status: '
+                + str(response.status_code) + ' with the following response: ' + json.dumps(response.json()))
+
+        except requests.exceptions.SSLError as err:
+            raise Exception('Token validation failed because of SSL validation error. In case you use self-signed '
+                            'certificate refer to Demisto\'s manual, got the following error: ' + str(err))
+
+    def validate_permissions(self, url, authkey, verify_cert, ssl_cert_loc=None, proxies=None):
+        """
+        This method is used to validate that the user have sufficient permissions in Demisto. It takes four arguments:
+
+        :param proxies: proxies
+        :param url: Demisto URL, its mandatory parameter.
+        :param authkey: authkey for authentication.
+        :param verify_cert: If SSC is to be used
+        :param ssl_cert_loc: Location of the public key of the SSC
+        :return:
+        """
+        headers = {
+            'Authorization': authkey,
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        try:
+            if ssl_cert_loc is None:
+                # todo remove comments below
+                # logger.info("Passing verify = False")
+                # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
+                logger.info("Using " + str(verify_cert) + " value for permissions verification")
+                response = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers,
+                                        proxies=proxies)
+            else:
+                logger.info("Passing verify=" + str(ssl_cert_loc))
+                response = requests.get(url=url, verify=ssl_cert_loc or True,
+                                        allow_redirects=True, headers=headers, proxies=proxies)
+
+            logger.info("Permissions Validation Status:" + str(response.status_code))
+            if 200 <= response.status_code < 300 and len(response.content) > 0:
+                return True, response
+
+            # in case of an unsuccessful request - log all of the request details
+            logger.info(
+                "User don't have sufficient permissions in Demisto. Please check that you are working with " +
+                "the correct user and contact Demisto support."
+            )
+            self.log_bad_request_details(response)
+
+            raise Exception("Permissions validation failed. User don't have sufficient permissions in Demisto. "
+                            "Please check that you are working with the correct user and contact Demisto support."
+                            "got status: " + str(response.status_code) + ' with the following response: ' + json.dumps(
+                                response.json()))
+
+        except requests.exceptions.SSLError as err:
+            raise Exception(
+                'Permissions validation failed because of SSL validation error. In case you use self-signed '
+                'certificate refer to Demisto\'s manual, got the following error: ' + str(err))
+
+    def validate_demisto_connection(self, url, authkey, verify_cert, ssl_cert_loc=None, proxies=None):
+        """
+        This method is used to validate all aspects of connection with Demisto. It takes four arguments:
+
+        :param proxies: proxies
+        :param url: Demisto URL, its mandatory parameter.
+        :param authkey: authkey for authentication.
+        :param verify_cert: If SSC is to be used
+        :param ssl_cert_loc: Location of the public key of the SSC
+        :return:
+        """
+        network_url = url + "/proxyMode"
+        self.validate_network(network_url, verify_cert=verify_cert, ssl_cert_loc=ssl_cert_loc, proxies=proxies)
+
+        token_url = url + "/incidenttype"
+        self.validate_token(token_url, authkey, verify_cert=verify_cert, ssl_cert_loc=ssl_cert_loc, proxies=proxies)
+
+        permissions_url = url + "/user"
+        self.validate_permissions(permissions_url, authkey, verify_cert=verify_cert, ssl_cert_loc=ssl_cert_loc,
+                                  proxies=proxies)
+
     def handleList(self, confInfo):
         config_dict = self.readConf("demistosetup")
-        logger.info("config dict is : " + json.dumps(config_dict))
+        # logger.info("config dict is : " + json.dumps(config_dict))
         for stanza, settings in config_dict.items():
             for key, val in settings.items():
                 confInfo[stanza].append(key, val)
@@ -116,9 +294,9 @@ class ConfigApp(admin.MConfigHandler):
         logger.info("--------- input args-------")
         logger.info(json.dumps(input_args))
         logger.info("--------- input args-------")
+
         validate_ssl = input_args.get("validate_ssl", True)
         # logger.info("validate ssl is : " + validate_ssl)
-
 
         if validate_ssl == 0 or validate_ssl == "0":
             validate_ssl = False
@@ -130,111 +308,88 @@ class ConfigApp(admin.MConfigHandler):
                 url += ":" + self.callerArgs.data['PORT'][0]
 
             '''
-                Create Test Incident to demisto to verify if the configuration is correct
-                Store configuration only if create incident was successful.
+                Check connectivity with Demisto to verify that the configuration is correct.
+                Store the configuration only if it was successful.
             '''
-            url += "/incidenttype"
             if self.callerArgs.data['SSL_CERT_LOC']:
-                valid, response = demisto.validate_token(url, password,
-                                                         verify_cert=validate_ssl,
-                                                         ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0],
-                                                         proxies=proxies)
+                self.validate_demisto_connection(url, password,
+                                                 verify_cert=validate_ssl,
+                                                 ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0],
+                                                 proxies=proxies)
             else:
-                valid, response = demisto.validate_token(url, password, verify_cert=validate_ssl, proxies=proxies)
+                self.validate_demisto_connection(url, password, verify_cert=validate_ssl, proxies=proxies)
 
-            logger.info("Demisto validate token Response status: " + str(response.status_code))
-            logger.info("Demisto validate token Response headers: " + str(response.headers))
-            # logger.info("Demisto validate token Response Details: " + json.dumps(response.json()))
-            if not valid:
-                logger.info("Demisto validate token Response status: " + str(response.status_code))
-                logger.info("Demisto validate token Response headers: " + str(response.headers))
-                logger.info("Demisto validate token Response Details: " + json.dumps(response.json()))
+            post_args = {
+                'severity': 'info',
+                'name': 'Demisto',
+                'value': 'Demisto connection was successfully validated for host ' +
+                         self.callerArgs.data['DEMISTOURL'][0]
+            }
+            splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
+                                      postargs=post_args)
+            user_name = "demisto"
+            password = self.get_app_password()
 
+            '''
+            Store password into passwords.conf file. There are several scenarios:
+            1. Enter credentials for first time, use REST call to store it in passwords.conf
+            2. Update password. Use REST call to update existing password.
+            3. Update Username. Delete existing User entry and insert new entry.
+            '''
+            if password:
                 post_args = {
-                    'severity': 'error',
-                    'name': 'Demisto',
-                    'value': 'Token validation Failed, got status: ' + str(
-                        response.status_code) + ' with the following response: ' + json.dumps(response.json())
+                    "password": self.callerArgs.data['AUTHKEY'][0],
+                    "output_mode": 'json'
                 }
-
-                splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
-                                          postargs=post_args)
-
-                raise Exception('Token validation Failed, got status: ' + str(
-                    response.status_code) + ' with the following response: ' + json.dumps(response.json()))
-
-            else:
-
-                post_args = {
-                    'severity': 'info',
-                    'name': 'Demisto',
-                    'value': 'Demisto API key was successfully validated for host ' +
-                             self.callerArgs.data['DEMISTOURL'][0]
-                }
-
-                splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
-                                          postargs=post_args)
-                user_name = "demisto"
-                password = self.get_app_password()
-
-                '''
-                Store password into passwords.conf file. There are several scenarios:
-                1. Enter credentials for first time, use REST call to store it in passwords.conf
-                2. Update password. Use REST call to update existing password.
-                3. Update Username. Delete existing User entry and insert new entry.
-                '''
-                if password:
-                    post_args = {
-                        "password": self.callerArgs.data['AUTHKEY'][0],
-                        # "username": user_name,
-                        # "realm": "TA-Demisto",
-                        "output_mode": 'json'
-                    }
-                    # logger.info("Updating existing user password with the following post args: " + json.dumps(post_args))
-                    # splunk.rest.simpleRequest(
-                    #     "/servicesNS/nobody/" + self.appName + "/admin/passwords/" + realm + "?output_mode=json",
-                    #     self.getSessionKey(), postargs=post_args, method='POST')
+                try:
                     r = splunk.rest.simpleRequest(
                         SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto%3Ademisto%3A",
                         self.getSessionKey(), postargs=post_args, method='POST')
                     # logger.info("response from app password end point in handleEdit for updating the password is :" + str(r))
-
-                else:
-                    logger.info("Password not found")
-                    post_args = {
-                        "name": user_name,
-                        "password": self.callerArgs.data['AUTHKEY'][0],
-                        "realm": "TA-Demisto",
-                        "output_mode": 'json'
-                    }
-                    # splunk.rest.simpleRequest("/servicesNS/nobody/TA-Demisto/admin/passwords/?output_mode=json",
-                    #                           self.getSessionKey(), postargs=post_args, method='POST')
-                    #
+                except splunk.AuthorizationFailed:
+                    raise Exception(
+                        'User don\'t have sufficient permissions in Splunk to store the password. Make sure that this '
+                        'user has admin permissions and advice with your Splunk admin')
+            else:
+                logger.info("Password not found, setting a new password")
+                post_args = {
+                    "name": user_name,
+                    "password": self.callerArgs.data['AUTHKEY'][0],
+                    "realm": "TA-Demisto",
+                    "output_mode": 'json'
+                }
+                try:
                     r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT,
                                                   self.getSessionKey(), postargs=post_args, method='POST')
-                    logger.info("response from app password end point for setting a new password in handleEdit is :" + str(r))
+                    # logger.info(
+                    #     "response from app password end point for setting a new password in handleEdit is :" + str(
+                    #         r))
+                except splunk.AuthorizationFailed:
+                    raise Exception(
+                        'User don\'t have sufficient permissions in Splunk to store the password. Make sure that this '
+                        'user has admin permissions and advice with your Splunk admin')
 
-                '''
-                    Remove AUTHKEY from custom configuration.
-                '''
-                del self.callerArgs.data['AUTHKEY']
+            '''
+                Remove AUTHKEY from custom configuration.
+            '''
+            del self.callerArgs.data['AUTHKEY']
 
-                logger.info(" caller args in demisto setup are: " + json.dumps(self.callerArgs.data))
-                self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
+            logger.info("caller args in demisto setup are: " + json.dumps(self.callerArgs.data))
+            self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
 
         except Exception as e:
-            logger.exception("Exception while creating Test incident, perhaps something is wrong with your "
+            logger.exception("Exception while setting up Demisto Add-on, perhaps something is wrong with your "
                              "credentials. The error was: " + str(e))
 
             post_args = {
                 'severity': 'error',
                 'name': 'Demisto',
-                'value': 'Invalid configuration for Demisto, please update configuration for '
-                         'Splunk-Demisto integration to work, error is: ' + str(e)
+                'value': 'Error happened while setting up Demisto Add-on, perhaps something is wrong with your '
+                         'credentials. The error was: ' + str(e)
             }
             splunk.rest.simpleRequest('/services/messages', self.getSessionKey(),
                                       postargs=post_args)
-            raise Exception("Invalid Configuration, error: " + str(e))
+            raise Exception("Error happened while setting up Demisto Add-on , error was: " + str(e))
 
     def handleReload(self, confInfo=None):
         """
