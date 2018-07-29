@@ -20,8 +20,9 @@ import splunk.version as ver
 from demisto_config import DemistoConfig
 from demisto_incident import DemistoIncident
 
-# PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/passwords?output_mode=json"
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
+CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
+
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
 
 # Importing the cim_actions.py library
@@ -57,7 +58,7 @@ class DemistoAction(ModularAction):
             demisto = DemistoIncident(logger)
             resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
                                            ssl_cert_loc, result, search_name, proxies)
-            # logger.info("Demisto's response is: " + json.dumps(resp.json()))
+            logger.debug("Demisto's response is: " + json.dumps(resp.json()))
             logger.info("Demisto response code is " + str(resp.status_code))
             if resp.status_code == 201 or resp.status_code == 200:
                 # self.message logs the string to demisto_modalert.log
@@ -69,7 +70,7 @@ class DemistoAction(ModularAction):
                 del resp["rawJSON"]
                 resp = json.dumps(resp)
 
-                # self.addevent sends the following message to splunk and adds it as event there
+                # self.addevent sends the following message to Splunk and adds it as event there
                 self.addevent(resp, sourcetype="demistoResponse")
             else:
                 logger.error('Error in creating incident in Demisto, got status: ' + str(resp.status_code)
@@ -127,10 +128,32 @@ if __name__ == '__main__':
 
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
-        # todo remove logging below
-        logger.info("--------- input args-------")
-        logger.info(json.dumps(input_args))
-        logger.info("--------- input args-------")
+        # getting the current configuration from Splunk
+        get_args = {
+            'output_mode': 'json',
+        }
+        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, modaction.session_key, method='GET',
+                                                     getargs=get_args)
+
+        conf_dic = json.loads(content)
+        config = {}
+        if success and conf_dic:
+            for entry in conf_dic.get('entry', []):
+                val = entry.get('content', {})
+                if val:
+                    config = val
+        if '' in config:
+            config.pop('')
+        if 'config' in config:
+            config.pop('config')
+
+        validate_ssl = config.get('VALIDATE_SSL', True)
+
+        if validate_ssl == 0 or validate_ssl == "0":
+            validate_ssl = False
+        else:
+            validate_ssl = True
+
         if not input_args["DEMISTOURL"]:
             modaction.message('Failed in creating incident in Demisto',
                               status='failure')
@@ -153,22 +176,15 @@ if __name__ == '__main__':
             logger.exception("Can not execute this script outside Splunk")
             sys.exit(-1)
 
-
         proxies = {}
         https_proxy = input_args.get('HTTPS_PROXY', None)
 
         if https_proxy is not None:
             proxies['https'] = https_proxy
 
-        validate_ssl = input_args.get("validate_ssl", True)
-        # logger.info("validate ssl is : " + validate_ssl)
-
-        if validate_ssl == 0 or validate_ssl == "0":
-            validate_ssl = False
+        # getting Demisto's API key from Splunk
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
             'output_mode': 'json', 'search': 'TA-Demisto'})
-
-        # logger.info("Demisto alert: response from app password end point:" + str(r[1]))
 
         if 200 <= int(r[0]["status"]) < 300:
             dict_data = json.loads(r[1])
@@ -202,7 +218,6 @@ if __name__ == '__main__':
                                                   search_url=search_url,
                                                   ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
                                                   search_name=search_name, proxies=proxies)
-                # time.sleep(1.6)
 
         modaction.writeevents(index="main", source='demisto')
 

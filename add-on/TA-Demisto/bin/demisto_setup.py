@@ -18,6 +18,7 @@ from splunk.clilib import cli_common as cli
 maxbytes = 200000000
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
+CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
 IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
 DOMAIN_REGEX = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$"
@@ -37,8 +38,6 @@ class ConfigApp(admin.MConfigHandler):
         try:
             r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET', getargs={
                 'output_mode': 'json'})
-            # logger.info("response from app password end point:" + str(r[1]))
-            # logger.info("response from app password end point in get_app_password is :" + str(r))
             if 200 <= int(r[0]["status"]) < 300:
                 dict_data = json.loads(r[1])
                 if len(dict_data["entry"]) > 0:
@@ -93,14 +92,11 @@ class ConfigApp(admin.MConfigHandler):
         }
 
         try:
+            logger.info("In validate network, passing verify=" + str(verify_cert) + " and ssl_cert_loc= " + str(ssl_cert_loc))
             if ssl_cert_loc is None:
-                # todo remove comments below
-                # logger.info("Passing verify = False")
-                # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
                 response = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers,
                                         proxies=proxies)
             else:
-                logger.info("Passing verify=" + str(ssl_cert_loc))
                 response = requests.get(url=url, verify=ssl_cert_loc or True,
                                         allow_redirects=True, headers=headers, proxies=proxies)
 
@@ -113,13 +109,12 @@ class ConfigApp(admin.MConfigHandler):
             self.log_bad_request_details(response)
 
             raise Exception('Network validation failed. There\'s a connectivity issue with Demisto, please check your '
-                            "network settings. Got status: " + str(
-                response.status_code) + ' with the following response: ' + json.dumps(
-                response.json()))
+                            "network settings. Got status: " + str(response.status_code) + ' with the following '
+                            'response: ' + json.dumps(response.json()))
 
         except requests.exceptions.SSLError as err:
             raise Exception('Network validation failed because of SSL validation error. In case you use self-signed '
-                            'certificate refer to Demisto\'s manual, got the following error: ' + str(err))
+                            'certificate refer to Demisto\'s manual. Got the following error: ' + str(err))
 
     def validate_token(self, url, authkey, verify_cert, ssl_cert_loc=None, proxies=None):
         """
@@ -139,15 +134,12 @@ class ConfigApp(admin.MConfigHandler):
         }
 
         try:
+            logger.info("In validate token, passing verify=" + str(verify_cert) + " and ssl_cert_loc= " + str(ssl_cert_loc))
+
             if ssl_cert_loc is None:
-                # todo remove comments below
-                # logger.info("Passing verify = False")
-                # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
-                logger.info("Using " + str(verify_cert) + " value for verification")
                 response = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers,
                                         proxies=proxies)
             else:
-                logger.info("Passing verify=" + str(ssl_cert_loc))
                 response = requests.get(url=url, verify=ssl_cert_loc or True,
                                         allow_redirects=True, headers=headers, proxies=proxies)
 
@@ -165,7 +157,7 @@ class ConfigApp(admin.MConfigHandler):
 
         except requests.exceptions.SSLError as err:
             raise Exception('Token validation failed because of SSL validation error. In case you use self-signed '
-                            'certificate refer to Demisto\'s manual, got the following error: ' + str(err))
+                            'certificate refer to Demisto\'s manual. Got the following error: ' + str(err))
 
     def validate_permissions(self, url, authkey, verify_cert, ssl_cert_loc=None, proxies=None):
         """
@@ -185,15 +177,12 @@ class ConfigApp(admin.MConfigHandler):
         }
 
         try:
+            logger.info("In validate permissions, passing verify=" + str(verify_cert) + " and ssl_cert_loc= " + str(ssl_cert_loc))
+
             if ssl_cert_loc is None:
-                # todo remove comments below
-                # logger.info("Passing verify = False")
-                # r = requests.get(url = url, verify = False,allow_redirects = True, headers = headers)
-                logger.info("Using " + str(verify_cert) + " value for permissions verification")
                 response = requests.get(url=url, verify=verify_cert, allow_redirects=True, headers=headers,
                                         proxies=proxies)
             else:
-                logger.info("Passing verify=" + str(ssl_cert_loc))
                 response = requests.get(url=url, verify=ssl_cert_loc or True,
                                         allow_redirects=True, headers=headers, proxies=proxies)
 
@@ -216,7 +205,7 @@ class ConfigApp(admin.MConfigHandler):
         except requests.exceptions.SSLError as err:
             raise Exception(
                 'Permissions validation failed because of SSL validation error. In case you use self-signed '
-                'certificate refer to Demisto\'s manual, got the following error: ' + str(err))
+                'certificate refer to Demisto\'s manual. Got the following error: ' + str(err))
 
     def validate_demisto_connection(self, url, authkey, verify_cert, ssl_cert_loc=None, proxies=None):
         """
@@ -241,7 +230,7 @@ class ConfigApp(admin.MConfigHandler):
 
     def handleList(self, confInfo):
         config_dict = self.readConf("demistosetup")
-        # logger.info("config dict is : " + json.dumps(config_dict))
+        logger.debug("config dict is : " + json.dumps(config_dict))
         for stanza, settings in config_dict.items():
             for key, val in settings.items():
                 confInfo[stanza].append(key, val)
@@ -278,10 +267,7 @@ class ConfigApp(admin.MConfigHandler):
         else:
             proxies['https'] = self.callerArgs.data['HTTPS_PROXY'][0]
 
-        # todo remove logging below
-        logger.info("--------- caller args-------")
-        logger.info(json.dumps(self.callerArgs.data))
-        logger.info("--------- caller args-------")
+        logger.debug("caller args are: " + json.dumps(self.callerArgs.data))
 
         if not re.match(IP_REGEX, self.callerArgs.data['DEMISTOURL'][0]) and not \
                 re.match(DOMAIN_REGEX, self.callerArgs.data['DEMISTOURL'][0]):
@@ -289,17 +275,30 @@ class ConfigApp(admin.MConfigHandler):
             raise Exception("Invalid URL")
 
         # checking if the user instructed not to use SSL - development environment scenario
-        input_args = cli.getConfStanza('demistosetup', 'demistoenv')
-        # todo remove logging below
-        logger.info("--------- input args-------")
-        logger.info(json.dumps(input_args))
-        logger.info("--------- input args-------")
+        # getting the current configuration from Splunk
+        get_args = {
+            'output_mode': 'json',
+        }
+        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET', getargs=get_args)
 
-        validate_ssl = input_args.get("validate_ssl", True)
-        # logger.info("validate ssl is : " + validate_ssl)
+        conf_dic = json.loads(content)
+        config = {}
+        if success and conf_dic:
+            for entry in conf_dic.get('entry', []):
+                val = entry.get('content', {})
+                if val:
+                    config = val
+        if '' in config:
+            config.pop('')
+        if 'config' in config:
+            config.pop('config')
+
+        validate_ssl = config.get('VALIDATE_SSL', True)
 
         if validate_ssl == 0 or validate_ssl == "0":
             validate_ssl = False
+        else:
+            validate_ssl = True
 
         try:
             url = "https://" + self.callerArgs.data['DEMISTOURL'][0]
@@ -345,7 +344,7 @@ class ConfigApp(admin.MConfigHandler):
                     r = splunk.rest.simpleRequest(
                         SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto%3Ademisto%3A",
                         self.getSessionKey(), postargs=post_args, method='POST')
-                    # logger.info("response from app password end point in handleEdit for updating the password is :" + str(r))
+                    logger.debug("response from app password end point in handleEdit for updating the password is :" + str(r))
                 except splunk.AuthorizationFailed:
                     raise Exception(
                         'User don\'t have sufficient permissions in Splunk to store the password. Make sure that this '
@@ -361,9 +360,8 @@ class ConfigApp(admin.MConfigHandler):
                 try:
                     r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT,
                                                   self.getSessionKey(), postargs=post_args, method='POST')
-                    # logger.info(
-                    #     "response from app password end point for setting a new password in handleEdit is :" + str(
-                    #         r))
+                    logger.debug("response from app password end point for setting a new password in handleEdit is :" +
+                                 str(r))
                 except splunk.AuthorizationFailed:
                     raise Exception(
                         'User don\'t have sufficient permissions in Splunk to store the password. Make sure that this '
@@ -374,8 +372,9 @@ class ConfigApp(admin.MConfigHandler):
             '''
             del self.callerArgs.data['AUTHKEY']
 
-            logger.info("caller args in demisto setup are: " + json.dumps(self.callerArgs.data))
+            logger.debug("caller args in demisto setup are: " + json.dumps(self.callerArgs.data))
             self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
+            logger.info("Demisto's Add-on setup was successful")
 
         except Exception as e:
             logger.exception("Exception while setting up Demisto Add-on, perhaps something is wrong with your "

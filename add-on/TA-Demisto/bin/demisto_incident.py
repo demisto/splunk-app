@@ -43,13 +43,10 @@ class DemistoIncident():
         prepped.headers['Accept'] = "application/json"
 
         if ssl_cert_loc:
-            self.logger.info("Setting passed certificate location as verify=" + ssl_cert_loc)
+            self.logger.info("In create_incident, setting passed certificate location as verify=" + ssl_cert_loc)
             resp = s.send(prepped, verify=ssl_cert_loc, proxies=proxies)
         else:
-            # logger.info("Using default value for verify = False")
-            # resp = s.send(prepped, verify = False)
-
-            self.logger.info("Using default value for verify = True")
+            self.logger.info("In create_incident, using verify = " + str(verify_req))
             resp = s.send(prepped, verify=verify_req, proxies=proxies)
 
         return resp

@@ -46,12 +46,15 @@ Another option which applies ONLY for on-prem installations and is cannot be use
 Disabling the certificate validation entirely by POSTing to the Splunk REST API
 https://splunk-server:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv
 with the following as the request body:
-verify_ssl=0
+verify_ssl=false
 
 For example, via CURL:
-curl -ku 'username:password' https://splunk-server:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv\?output_mode\=json -d verify_ssl=0
+curl -ku 'username:password' https://localhost:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false
 
-To re-enable certificate validation post to the same endpoint but change "verify_ssl" to 1.
+To re-enable certificate validation post to the same endpoint but change "verify_ssl" to true.
+
+For example, via CURL:
+curl -ku 'username:password' https://localhost:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=true
 
 We recommend to use certificates, and only disabling certificate verification in development
 or test environments only. Never disable certificate verification for a production system.
@@ -62,8 +65,10 @@ or test environments only. Never disable certificate verification for a producti
 * The user must complete the setup of the application. In order to create incident into Demisto, a user needs to provide following four parameters:
     1)Demisto URL: This is mandatory parameter Url /IP address of the Demisto
     2)Demisto Port: This is an optional parameter. The user must define it if running Demisto on any other port than the default (443).
-    3)Allow Self Signed Certificate: User should select this if using Self Signed certificate
-    4)Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demsito. In order to generate this parameter, a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
+    3)HTTPS Proxy Address: This is an optional parameter. Define this if you have HTTPS proxy that should be used
+    4)Allow Self Signed Certificate: User should select this if using Self Signed certificate
+    5)Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demisto. In order to generate this parameter,
+      a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
 
 * Proxies should be entered in the following manner : http://username:password@ip:port
 

@@ -43,6 +43,5 @@ class DemistoConfig(object):
         handler.setFormatter(formatter)
         logger = logging.getLogger(logger_name)
         logger.setLevel(logging.INFO)
-
         logger.addHandler(handler)
         return logger
