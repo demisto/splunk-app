@@ -62,15 +62,15 @@ or test environments only. Never disable certificate verification for a producti
 * User can directly extract the app's SPL file into $SPLUNK_HOME/etc/apps/ folder in order to install the app.
 
 # Application Setup
-* The user must complete the setup of the application. In order to create incident into Demisto, a user needs to provide following four parameters:
+* The user must complete the setup of the application. In order to create incident into Demisto, a user needs to provide the following parameters:
     1)Demisto URL: This is mandatory parameter Url /IP address of the Demisto
     2)Demisto Port: This is an optional parameter. The user must define it if running Demisto on any other port than the default (443).
-    3)HTTPS Proxy Address: This is an optional parameter. Define this if you have HTTPS proxy that should be used
-    4)Allow Self Signed Certificate: User should select this if using Self Signed certificate
-    5)Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demisto. In order to generate this parameter,
+    3)Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demisto. In order to generate this parameter,
       a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
-
-* Proxies should be entered in the following manner : http://username:password@ip:port
+    4)Location to certificate: Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate
+    5)HTTPS Proxy Address: This is an optional parameter. Define this if you have HTTPS proxy that should be used. Should be in the format of https://ip:port
+    6)HTTPS Proxy Username: Username for the proxy
+    7)HTTPS Proxy Password: Password for the proxy
 
 # Custom Alert Action
 * This application will add custom alert action named Demisto Custom Alert Action. The user can configure this action on saved search. The user can pass following parameters to Demisto:
