@@ -21,7 +21,6 @@ from demisto_config import DemistoConfig
 from demisto_incident import DemistoIncident
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
-SPLUNK_PASSWORDS_SEARCH_ENDPOINT = "/servicesNS/nobody/search/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
@@ -179,7 +178,7 @@ if __name__ == '__main__':
 
 
         # getting https proxy from Splunk - it might not exist
-        r = splunk.rest.simpleRequest(SPLUNK_PASSWORDS_SEARCH_ENDPOINT, modaction.session_key, method='GET', getargs={
+        r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
             'output_mode': 'json', 'search': 'TA-Demisto-Proxy'})
         proxy = None
         if 200 <= int(r[0]["status"]) < 300:
@@ -190,7 +189,6 @@ if __name__ == '__main__':
                         proxy = ele["content"]["clear_password"]
                         break
         proxies = {} if proxy is None else json.loads(proxy)
-
         # getting Demisto's API key from Splunk
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
             'output_mode': 'json', 'search': 'TA-Demisto'})

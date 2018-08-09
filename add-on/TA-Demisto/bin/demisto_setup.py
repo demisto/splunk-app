@@ -18,7 +18,6 @@ from splunk.clilib import cli_common as cli
 maxbytes = 200000000
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
-SPLUNK_PASSWORDS_SEARCH_ENDPOINT = "/servicesNS/nobody/search/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
 IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
@@ -58,7 +57,7 @@ class ConfigApp(admin.MConfigHandler):
     def get_proxy_password(self):
         password = ""
         try:
-            r = splunk.rest.simpleRequest(SPLUNK_PASSWORDS_SEARCH_ENDPOINT, self.getSessionKey(), method='GET',
+            r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET',
                                           getargs={'output_mode': 'json', 'search': 'TA-Demisto-Proxy', 'count': 100})
             if 200 <= int(r[0]["status"]) < 300:
                 dict_data = json.loads(r[1])
@@ -189,7 +188,7 @@ class ConfigApp(admin.MConfigHandler):
             }
             try:
                 r = splunk.rest.simpleRequest(
-                    SPLUNK_PASSWORDS_SEARCH_ENDPOINT + "/TA-Demisto-Proxy%3Ademisto%3A",
+                    SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto-Proxy%3Ademisto%3A",
                     self.getSessionKey(), postargs=post_args, method='POST')
                 logger.debug(
                     "response from proxy password end point in handleEdit for updating the proxy password is :" + str(
@@ -207,7 +206,7 @@ class ConfigApp(admin.MConfigHandler):
                 "output_mode": 'json'
             }
             try:
-                r = splunk.rest.simpleRequest(SPLUNK_PASSWORDS_SEARCH_ENDPOINT,
+                r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT,
                                               self.getSessionKey(), postargs=post_args, method='POST')
                 logger.debug("response from app password end point for setting a new password in handleEdit is :" +
                              str(r))
@@ -460,6 +459,7 @@ class ConfigApp(admin.MConfigHandler):
                 Remove AUTHKEY from custom configuration.
             '''
             del self.callerArgs.data['AUTHKEY']
+            del self.callerArgs.data['HTTPS_PROXY_PASSWORD']
 
             self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
             logger.info("Demisto's Add-on setup was successful")
