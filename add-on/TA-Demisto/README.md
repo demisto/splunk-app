@@ -7,7 +7,7 @@ Supporting Add-on for Demisto. This application allows a user to create incident
 # REQUIREMENTS
 
 * Splunk version 6.3 >=
-* This application should be installed on Search Head.
+* This application should be installed on Search Head or Universal forwarder, Indexer, and Search Head if applicable.
 
 # Recommended System configuration
 * Standard Splunk configuration of Search Head.
