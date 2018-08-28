@@ -2,32 +2,42 @@
     <script type="text/javascript">
         
     </script>
-    <h5>Incident Settings</h5>
+    <h3>Incident Settings</h3>
     <br/>
 
     <div class="control-group">
-        <label class="control-label" for="incident_name">Name</label>
+        <label class="control-label" style="text-align: left !important;" for="incident_name">Name</label>
 
         <div class="controls">
             <input type="text" name="action.demisto.param.incident_name" id="incident_name" value="&quot;Event from Splunk for host $result.host$&quot;" required/>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="occured">Occured Time (epoch)</label>
+        <label class="control-label" style="text-align: left !important;" for="occured">Occured Time (epoch)</label>
 
         <div class="controls">
             <input type="text" name="action.demisto.param.occured" id="occured" value="$trigger_time$" />
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="type">Type</label>
+        <label class="control-label" style="text-align: left !important;" for="server_url">Demisto Server <span class="required">*</span></label>
+
+        <splunk-search-dropdown
+            name="action.demisto.param.demisto_server"
+            search="| rest /servicesNS/nobody/TA-Demisto/server_list"
+            label-field="server_url" value-field="title">
+        </splunk-search-dropdown>
+      <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">Send results to this Server.</span>
+    </div>
+    <div class="control-group">
+        <label class="control-label" style="text-align: left !important;" for="type">Type</label>
 
         <div class="controls">
             <input type="text" name="action.demisto.param.type" id="type" value="Unclassified" />
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="custom_field">Custom Fields</label>
+        <label class="control-label" style="text-align: left !important;" for="custom_field">Custom Fields</label>
 
         <div class="controls">
             <input type="text" name="action.demisto.param.custom_field" id="custom_field"  placeholder="e.g. killchain:1.1.1.1,User:john" />
@@ -35,7 +45,7 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="labels">Labels</label>
+        <label class="control-label" style="text-align: left !important;" for="labels">Labels</label>
 
         <div class="controls">
             <input type="text" name="action.demisto.param.labels" id="labels"  placeholder="e.g. IP:1.1.1.1,User:john" />
@@ -44,7 +54,7 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="labels">Ignore Labels</label>
+        <label class="control-label" style="text-align: left !important;" for="labels">Ignore Labels</label>
         <div class="controls">
             <input type="text" name="action.demisto.param.ignore_labels" id="ignore_labels"  placeholder="e.g. dest,User" />
             <span class="help-block"></span>
@@ -59,7 +69,7 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="severity">Severity</label>
+        <label class="control-label" style="text-align: left !important;" for="severity">Severity</label>
 
         <div class="controls">
             <select id="severity" name="action.demisto.param.severity">
@@ -74,7 +84,7 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="details">Details</label>
+        <label class="control-label" style="text-align: left !important;" for="details">Details</label>
 
         <div class="controls">
             

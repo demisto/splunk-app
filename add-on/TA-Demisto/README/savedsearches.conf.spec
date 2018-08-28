@@ -56,3 +56,7 @@ action.demisto.param.investigate = <int>
 
 action.demisto.param.details = <string>
     * Details column in Demisto Incident 
+
+action.demisto.param.server_url = <string>
+    * The Demisto server to send the alert to
+    * Defaults to blank

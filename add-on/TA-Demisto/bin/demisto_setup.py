@@ -9,7 +9,7 @@ import re
 import splunk.admin as admin
 import splunk.rest
 import requests
-
+import hashlib
 from demisto_config import DemistoConfig
 
 from splunk.clilib import cli_common as cli
@@ -28,28 +28,31 @@ demisto = DemistoConfig(logger)
 
 
 class ConfigApp(admin.MConfigHandler):
+
     def setup(self):
         if self.requestedAction == admin.ACTION_EDIT:
             for arg in ['AUTHKEY', 'DEMISTOURL', 'PORT', 'SSL_CERT_LOC', 'HTTPS_PROXY_ADDRESS', 'HTTPS_PROXY_USERNAME',
                         'HTTPS_PROXY_PASSWORD']:
                 self.supportedArgs.addOptArg(arg)
 
-    def get_app_password(self):
+    def get_app_password(self, save_name):
         password = ""
+
         try:
-            r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.getSessionKey(), method='GET', getargs={
-                'output_mode': 'json', 'search': 'TA-Demisto'})
+            r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT,
+                                          self.getSessionKey(), method='GET',
+                                          getargs={'output_mode': 'json', 'search': save_name})
             if 200 <= int(r[0]["status"]) < 300:
                 dict_data = json.loads(r[1])
                 if len(dict_data["entry"]) > 0:
                     for ele in dict_data["entry"]:
-                        if ele["content"]["realm"] == "TA-Demisto":
-                            password = ele["content"]["clear_password"]
+                        if ele["content"]["realm"] == "TA-Demisto" and \
+                                ele["name"] == "TA-Demisto:{}:".format(save_name):
+                            password = ele["content"].get("clear_password", '')
                             break
 
         except Exception as e:
             logger.exception("Exception while retrieving app password. The error was: " + str(e))
-
             raise Exception("Exception while retrieving app password. error is: " + str(e))
 
         return password
@@ -69,29 +72,27 @@ class ConfigApp(admin.MConfigHandler):
 
         except Exception as e:
             logger.exception("Exception while retrieving proxy password. The error was: " + str(e))
-
             raise Exception("Exception while retrieving proxy password. error is: " + str(e))
 
         return password
 
-    def set_user_password(self):
-        user_name = "demisto"
-        password = self.get_app_password()
+    def set_server_password(self, new_password, server):
+        save_name = hashlib.sha1(server).hexdigest()
+        current_password = self.get_app_password(save_name)
 
         '''
         Store password into passwords.conf file. There are several scenarios:
         1. Enter credentials for first time, use REST call to store it in passwords.conf
         2. Update password. Use REST call to update existing password.
-        3. Update Username. Delete existing User entry and insert new entry.
         '''
-        if password:
+        if current_password:
             post_args = {
-                "password": self.callerArgs.data['AUTHKEY'][0],
+                "password": new_password,
                 "output_mode": 'json'
             }
             try:
                 r = splunk.rest.simpleRequest(
-                    SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto%3Ademisto%3A",
+                    SPLUNK_PASSWORD_ENDPOINT + "/TA-Demisto%3A{}%3A".format(save_name),
                     self.getSessionKey(), postargs=post_args, method='POST')
                 logger.debug(
                     "response from app password end point in handleEdit for updating the password is :" + str(r))
@@ -102,8 +103,8 @@ class ConfigApp(admin.MConfigHandler):
         else:
             logger.info("Password not found, setting a new password")
             post_args = {
-                "name": user_name,
-                "password": self.callerArgs.data['AUTHKEY'][0],
+                "name": save_name,
+                "password": new_password,
                 "realm": "TA-Demisto",
                 "output_mode": 'json'
             }
@@ -391,6 +392,60 @@ class ConfigApp(admin.MConfigHandler):
         self.validate_permissions(permissions_url, authkey, verify_cert=verify_cert, ssl_cert_loc=ssl_cert_loc,
                                   proxies=proxies)
 
+    def create_servers_config(self, urls, ports, passwords):
+        configs_list = []
+
+        if urls:
+            splitted_urls = urls.split(',')
+        else:
+            splitted_urls = []
+
+        if ports:
+            splitted_ports = ports.split(',')
+        else:
+            splitted_ports = []
+
+        if passwords:
+            splitted_passwords = passwords.split(',')
+        else:
+            splitted_passwords = []
+
+        if len(splitted_urls) != len(splitted_passwords):
+            logger.exception("Each url should have a matching passwords. Current urls: " + str(
+                splitted_urls) + " Current passwords: " + str(splitted_passwords))
+            raise Exception("Each url should have a matching passwords. Current urls: " + str(
+                splitted_urls) + " Current passwords: " + str(splitted_passwords))
+
+        for url in splitted_urls:
+            server_url = 'https://'
+
+            if not url or (url and not re.match(IP_REGEX, url) and not re.match(DOMAIN_REGEX, url)):
+                logger.exception(
+                    "Invalid URL or missing URL, make sure you don't have https in the URL. URL was " + str(url))
+                raise Exception(
+                    "Invalid URL or missing URL, make sure you don't have https in the URL. URL was " + str(url))
+            else:
+                server_url += url
+            configs_list.append({
+                'url': url,
+                'server_url': server_url
+            })
+
+        for idx, port in enumerate(splitted_ports):
+            if port == '0' or port == 0:
+                continue
+            if port and not re.match(PORT_REGEX, port):
+                logger.exception("Invalid Port Number. Port was " + str(port))
+                raise Exception("Invalid Port Number. Port was " + str(port))
+            else:
+                configs_list[idx]['server_url'] += ":" + port
+            configs_list[idx]['port'] = port
+
+        for idx, password in enumerate(splitted_passwords):
+            configs_list[idx]['password'] = password
+
+        return configs_list
+
     def handleList(self, confInfo):
         config_dict = self.readConf("demistosetup")
         logger.debug("config dict is : " + json.dumps(config_dict))
@@ -405,61 +460,45 @@ class ConfigApp(admin.MConfigHandler):
 
     def handleEdit(self, confInfo):
 
-        password = ''
-
         if self.callerArgs.data['SSL_CERT_LOC'][0] is None:
             self.callerArgs.data['SSL_CERT_LOC'] = ''
-
-        if self.callerArgs.data['PORT'][0] is None:
-            self.callerArgs.data['PORT'] = ''
-
-        elif not re.match(PORT_REGEX, self.callerArgs.data['PORT'][0]):
-            logger.exception("Invalid Port Number")
-            raise Exception("Invalid Port Number")
-
-        if self.callerArgs.data['AUTHKEY'][0] is None:
-            self.callerArgs.data['AUTHKEY'] = ''
-        else:
-            logger.info("Auth key found")
-            password = self.callerArgs.data['AUTHKEY'][0]
 
         proxies = self.get_proxy_settings()
         logger.debug("caller args are: " + json.dumps(self.callerArgs.data))
 
-        if not re.match(IP_REGEX, self.callerArgs.data['DEMISTOURL'][0]) and not \
-                re.match(DOMAIN_REGEX, self.callerArgs.data['DEMISTOURL'][0]):
-            logger.exception("Invalid URL")
-            raise Exception("Invalid URL")
-
         # checking if the user instructed not to use SSL - development environment scenario
         # getting the current configuration from Splunk
         validate_ssl = self.get_ssl_validation_settings()
-
         try:
-            url = "https://" + self.callerArgs.data['DEMISTOURL'][0]
-
-            if len(self.callerArgs.data['PORT']) > 0 and self.callerArgs.data['PORT'][0] is not None:
-                url += ":" + self.callerArgs.data['PORT'][0]
-
+            # servers_config is a list of [{server_url,port,password,base_url},{server_url,port,password,base_url}]
+            servers_config = self.create_servers_config(self.callerArgs.data['DEMISTOURL'][0],
+                                                        self.callerArgs.data.get('PORT')[0],
+                                                        self.callerArgs.data['AUTHKEY'][0])
             '''
                 Check connectivity with Demisto to verify that the configuration is correct.
                 Store the configuration only if it was successful.
             '''
-            if self.callerArgs.data['SSL_CERT_LOC']:
-                self.validate_demisto_connection(url, password,
-                                                 verify_cert=validate_ssl,
-                                                 ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0],
-                                                 proxies=proxies)
-            else:
-                self.validate_demisto_connection(url, password, verify_cert=validate_ssl, proxies=proxies)
+            for config in servers_config:
+                if self.callerArgs.data['SSL_CERT_LOC']:
+                    self.validate_demisto_connection(config['server_url'], config['password'],
+                                                     verify_cert=validate_ssl,
+                                                     ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0],
+                                                     proxies=proxies)
+                else:
+                    self.validate_demisto_connection(config['server_url'], config['password'], verify_cert=validate_ssl,
+                                                     proxies=proxies)
 
-            self.set_user_password()
-
+                self.set_server_password(new_password=config.get('password'), server=config.get('server_url'))
             '''
                 Remove AUTHKEY from custom configuration.
             '''
+            if self.callerArgs.data['PORT'][0] is None:
+                self.callerArgs.data['PORT'] = ''
+
             del self.callerArgs.data['AUTHKEY']
             del self.callerArgs.data['HTTPS_PROXY_PASSWORD']
+
+            self.callerArgs.data['DEMISTOURL'] = ",".join([config.get('server_url') for config in servers_config])
 
             self.writeConf('demistosetup', 'demistoenv', self.callerArgs.data)
             logger.info("Demisto's Add-on setup was successful")

@@ -12,6 +12,7 @@ import csv
 import gzip
 import re
 import urllib
+import hashlib
 
 import splunk.rest
 from splunk.clilib import cli_common as cli
@@ -51,12 +52,12 @@ modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
 class DemistoAction(ModularAction):
 
-    def create_demisto_incident(self, result, url, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
+    def create_demisto_incident(self, result, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
                                 search_name=None, proxies=None):
         try:
             logger.info("create_demisto_incident called")
             demisto = DemistoIncident(logger)
-            resp = demisto.create_incident(url, authkey, self.configuration, verify, search_query, search_url,
+            resp = demisto.create_incident(authkey, self.configuration, verify, search_query, search_url,
                                            ssl_cert_loc, result, search_name, proxies)
             logger.debug("Demisto's response is: " + json.dumps(resp.json()))
             logger.info("Demisto response code is " + str(resp.status_code))
@@ -154,28 +155,9 @@ if __name__ == '__main__':
         else:
             validate_ssl = True
 
-        if not input_args["DEMISTOURL"]:
-            modaction.message('Failed in creating incident in Demisto',
-                              status='failure')
-
-            modaction.addevent(
-                "Demisto URL must be set, please complete Demisto setup status=2",
-                sourcetype="demistoResponse")
-
-            logger.exception("Demisto URL must be set, please complete Demisto setup")
-            modaction.writeevents(index="main", source='demisto')
-            sys.exit(-1)
-
-        else:
-            url = "https://" + input_args["DEMISTOURL"]
-
-        if "PORT" in input_args:
-            url += ":" + str(input_args["PORT"])
-
         if modaction.session_key is None:
             logger.exception("Can not execute this script outside Splunk")
             sys.exit(-1)
-
 
         # getting https proxy from Splunk - it might not exist
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
@@ -190,22 +172,25 @@ if __name__ == '__main__':
                         break
         proxies = {} if proxy is None else json.loads(proxy)
         # getting Demisto's API key from Splunk
+        save_name = hashlib.sha1(modaction.configuration.get('demisto_server', '')).hexdigest()
+
         r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
-            'output_mode': 'json', 'search': 'TA-Demisto'})
+            'output_mode': 'json', 'search': save_name})
+
+        password = ""
 
         if 200 <= int(r[0]["status"]) < 300:
             dict_data = json.loads(r[1])
-            password = ""
             if len(dict_data["entry"]) > 0:
                 for ele in dict_data["entry"]:
-                    if ele["content"]["realm"] == "TA-Demisto":
-                        password = ele["content"]["clear_password"]
-                        userName = ele["content"]["username"]
+                    if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(save_name):
+                        password = ele["content"].get('clear_password')
                         break
 
-        else:
+        if not password:
             raise Exception(
-                "Authentication key couldn't be retrieved from storage/passwords, the response was: " + str(r))
+                "Authentication key couldn't be retrieved from storage/passwords for server {}, the response was: ".format(
+                    modaction.configuration.get('demisto_server', '')) + str(r))
 
         '''
         Process the result set by opening results_file with gzip
@@ -220,7 +205,7 @@ if __name__ == '__main__':
                 result.setdefault('rid', str(num))
                 modaction.update(result)
                 modaction.invoke()
-                modaction.create_demisto_incident(result, url=url, authkey=password, verify=validate_ssl,
+                modaction.create_demisto_incident(result, authkey=password, verify=validate_ssl,
                                                   search_query=search,
                                                   search_url=search_url,
                                                   ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),

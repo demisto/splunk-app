@@ -17,7 +17,7 @@ class DemistoIncident():
         """
         self.logger = logger
 
-    def create_incident(self, url, authkey, data, verify_req, search_query="", search_url="", ssl_cert_loc="",
+    def create_incident(self, authkey, data, verify_req, search_query="", search_url="", ssl_cert_loc="",
                         result=None,
                         search_name=None,
                         proxies=None):
@@ -35,6 +35,7 @@ class DemistoIncident():
 
         self.logger.debug("JSON data for the Incident=" + json.dumps(incident))
 
+        url = data.get('demisto_server', '')
         req = Request('POST', url + "/incident/splunkapp", data=json.dumps(incident))
         prepped = s.prepare_request(req)
 

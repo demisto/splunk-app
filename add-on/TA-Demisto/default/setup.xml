@@ -1,19 +1,19 @@
 <setup>
   <block title="Demisto Setup Page" endpoint="demisto/demistocustomendpoint" entity="demistoenv">
   	<text>
-  		This is a setup page for Demisto Splunk app which enables end user in pushing incidents to Demisto.
+  		Demisto's Splunk app enables an end user to push incidents to Demisto.
   		<![CDATA[
     <script>
-	
+
 	$(document).ready(function(e)
-	{			
+	{
 		var app = Splunk.util.getCurrentApp();
 		var css = "/static/app/" + app + "/setup.css";
 		addStylesheet(css);
 
-		$(window).keydown(function(event){			
+		$(window).keydown(function(event){
 			if(event.keyCode == 13) {
-				if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL") && validateProxy())
+				if(validateTextBox("AUTHKEY"))
 				{
 					return true;
 				}
@@ -24,12 +24,12 @@
 				}
 			}
 		});
-		
-		$(".splButton-primary").on("click",function(e) { 
+
+		$(".splButton-primary").on("click",function(e) {
 		    $('.custom-error').remove();
 			var ele_allow_ssl = document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id')
-			if(validateTextBox("DEMISTOURL") && validateNumber("PORT") && validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL")&&
-			(ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked) && validateProxy())
+
+			if(validateTextBox("AUTHKEY") && (ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked))
 			{
 				return true;
 			}
