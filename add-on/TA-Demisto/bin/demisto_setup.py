@@ -491,9 +491,9 @@ class ConfigApp(admin.MConfigHandler):
                 if self.callerArgs.data['SSL_CERT_LOC']:
                     self.validate_demisto_connection(config['server_url'], config['password'],
                                                      verify_cert=validate_ssl,
-                                                     ssl_cert_loc=config['cert'],
+                                                     ssl_cert_loc=config.get('cert'),
                                                      proxies=proxies)
-                    server_cert_dict[config['server_url']] = config['cert']
+                    server_cert_dict[config['server_url']] = config.get('cert')
                 else:
                     self.validate_demisto_connection(config['server_url'], config['password'], verify_cert=validate_ssl,
                                                      proxies=proxies)
