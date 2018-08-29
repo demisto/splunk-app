@@ -493,7 +493,7 @@ class ConfigApp(admin.MConfigHandler):
                                                      verify_cert=validate_ssl,
                                                      ssl_cert_loc=config.get('cert'),
                                                      proxies=proxies)
-                    server_cert_dict[config['server_url']] = config.get('cert')
+                    server_cert_dict[config['server_url']] = config.get('cert', '')
                 else:
                     self.validate_demisto_connection(config['server_url'], config['password'], verify_cert=validate_ssl,
                                                      proxies=proxies)
