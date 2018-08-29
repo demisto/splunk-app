@@ -45,7 +45,6 @@ action.demisto.param.label = <string>
     * Comma separated key-value pair to be inserted into Label field of Incident
     * Key-value pair is separated by ":"
 
-
 action.demisto.param.severity= <float>
     * Incident severity
     * Defaults to Unknown
@@ -60,3 +59,7 @@ action.demisto.param.details = <string>
 action.demisto.param.server_url = <string>
     * The Demisto server to send the alert to
     * Defaults to blank
+
+action.demisto.param.send_all_servers = <bool>
+    * Send alert to all of installed Demisto's servers
+    * Defaults to false

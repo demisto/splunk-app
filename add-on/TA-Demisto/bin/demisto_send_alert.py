@@ -52,13 +52,14 @@ modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
 class DemistoAction(ModularAction):
 
-    def create_demisto_incident(self, result, authkey, verify, search_query="", search_url="", ssl_cert_loc="",
-                                search_name=None, proxies=None):
+    def create_demisto_incident(self, result, authkey, verify, search_query="", search_url="",
+                                ssl_cert_loc="", search_name=None, proxies=None, url=None):
         try:
             logger.info("create_demisto_incident called")
             demisto = DemistoIncident(logger)
+
             resp = demisto.create_incident(authkey, self.configuration, verify, search_query, search_url,
-                                           ssl_cert_loc, result, search_name, proxies)
+                                           ssl_cert_loc, result, search_name, proxies, url=url)
             logger.debug("Demisto's response is: " + json.dumps(resp.json()))
             logger.info("Demisto response code is " + str(resp.status_code))
             if resp.status_code == 201 or resp.status_code == 200:
@@ -95,6 +96,25 @@ class DemistoAction(ModularAction):
                 "Demisto Incident creation in create_demisto_incident function failed. exception=" + str(ex),
                 sourcetype="demistoResponse")
 
+    def get_password_for_server(self, save_name):
+        r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.session_key, method='GET', getargs={
+            'output_mode': 'json', 'search': save_name})
+
+        password = ""
+
+        if 200 <= int(r[0]["status"]) < 300:
+            dict_data = json.loads(r[1])
+            if len(dict_data["entry"]) > 0:
+                for ele in dict_data["entry"]:
+                    if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(save_name):
+                        password = ele["content"].get('clear_password')
+                        break
+
+        if not password:
+            raise Exception(
+                "Authentication key couldn't be retrieved from storage/passwords for server {}, the response was: ".format(
+                    modaction.configuration.get('demisto_server', '')) + str(r))
+        return password
 
 if __name__ == '__main__':
 
@@ -108,7 +128,7 @@ if __name__ == '__main__':
         search_url = modaction.settings.get('results_link', '')
         search_uri = modaction.settings.get('search_uri', '')
 
-        logger.info("search_name is " + search_name)
+        logger.info("Alert name is " + search_name)
         logger.info("Search uri is " + search_uri)
         logger.info("Manually created Search uri is " + "/services/saved/searches/" + urllib.quote(search_name))
 
@@ -148,6 +168,8 @@ if __name__ == '__main__':
         if 'config' in config:
             config.pop('config')
 
+        demisto_servers = config.get('DEMISTOURL', '').split(',')
+
         validate_ssl = config.get('VALIDATE_SSL', True)
 
         if validate_ssl == 0 or validate_ssl == "0":
@@ -171,45 +193,49 @@ if __name__ == '__main__':
                         proxy = ele["content"]["clear_password"]
                         break
         proxies = {} if proxy is None else json.loads(proxy)
-        # getting Demisto's API key from Splunk
-        save_name = hashlib.sha1(modaction.configuration.get('demisto_server', '')).hexdigest()
+        if modaction.configuration.get('send_all_servers', ''):
+            for url in demisto_servers:
+                # getting Demisto's API key from Splunk
+                save_name = hashlib.sha1(url).hexdigest()
+                password = modaction.get_password_for_server(save_name)
+                '''
+                        Process the result set by opening results_file with gzip
+                        '''
+                with gzip.open(modaction.results_file, 'rb') as fh:
+                    '''
+                    ## Iterate the result set using a dictionary reader
+                    ## We also use enumerate which provides "num" which
+                    ## can be used as the result ID (rid)
+                    '''
+                    for num, result in enumerate(csv.DictReader(fh)):
+                        result.setdefault('rid', str(num))
+                        modaction.update(result)
+                        modaction.invoke()
+                        modaction.create_demisto_incident(result, url=url, authkey=password, verify=validate_ssl,
+                                                          search_query=search, search_url=search_url,
+                                                          ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                          search_name=search_name, proxies=proxies)
+        else:
+            save_name = hashlib.sha1(modaction.configuration.get('demisto_server', '')).hexdigest()
+            password = modaction.get_password_for_server(save_name)
 
-        r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
-            'output_mode': 'json', 'search': save_name})
-
-        password = ""
-
-        if 200 <= int(r[0]["status"]) < 300:
-            dict_data = json.loads(r[1])
-            if len(dict_data["entry"]) > 0:
-                for ele in dict_data["entry"]:
-                    if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(save_name):
-                        password = ele["content"].get('clear_password')
-                        break
-
-        if not password:
-            raise Exception(
-                "Authentication key couldn't be retrieved from storage/passwords for server {}, the response was: ".format(
-                    modaction.configuration.get('demisto_server', '')) + str(r))
-
-        '''
-        Process the result set by opening results_file with gzip
-        '''
-        with gzip.open(modaction.results_file, 'rb') as fh:
             '''
-            ## Iterate the result set using a dictionary reader
-            ## We also use enumerate which provides "num" which
-            ## can be used as the result ID (rid)
+            Process the result set by opening results_file with gzip
             '''
-            for num, result in enumerate(csv.DictReader(fh)):
-                result.setdefault('rid', str(num))
-                modaction.update(result)
-                modaction.invoke()
-                modaction.create_demisto_incident(result, authkey=password, verify=validate_ssl,
-                                                  search_query=search,
-                                                  search_url=search_url,
-                                                  ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
-                                                  search_name=search_name, proxies=proxies)
+            with gzip.open(modaction.results_file, 'rb') as fh:
+                '''
+                ## Iterate the result set using a dictionary reader
+                ## We also use enumerate which provides "num" which
+                ## can be used as the result ID (rid)
+                '''
+                for num, result in enumerate(csv.DictReader(fh)):
+                    result.setdefault('rid', str(num))
+                    modaction.update(result)
+                    modaction.invoke()
+                    modaction.create_demisto_incident(result, url=url, authkey=password, verify=validate_ssl,
+                                                      search_query=search, search_url=search_url,
+                                                      ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                      search_name=search_name, proxies=proxies)
 
         modaction.writeevents(index="main", source='demisto')
 

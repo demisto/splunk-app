@@ -89,6 +89,8 @@ or test environments only. Never disable certificate verification for a producti
   Finish installation as usual.
   Afterwards, when you'll create a new alert, choose 'Create Demisto Incident' and you'll have an option 'Demisto Server' where you can choose the server to send the alert to.
 
+  If you want to send alert to all of your Demisto servers, simply click the 'send alert to all of the servers' checkbox. No need to select a server in this scenario.
+
 #Troubleshooting
 * Environment variable SPLUNK_HOME must be set
 * Check the following logs to troubleshoot Demisto's application:

@@ -54,4 +54,7 @@ param.verbose         = <bool>
    * Set modular alert action logger to verbose mode
    * Defaults to "false"
 
+param.send_all_servers = <bool>
+    * Send alert to all the Demisto servers
+    * Defaults to false
 

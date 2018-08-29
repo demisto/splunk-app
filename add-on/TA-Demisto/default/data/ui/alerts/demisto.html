@@ -20,7 +20,14 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" style="text-align: left !important;" for="server_url">Demisto Server <span class="required">*</span></label>
+        <label class="control-label" style="text-align: left !important;" for="send_all_servers">Send Alert to all the Servers</label>
+
+        <div class="controls">
+            <input type="checkbox" name="action.demisto.param.send_all_servers" id="send_all_servers" checked="false" value="true"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" style="text-align: left !important;" for="server_url">Demisto Server</label>
 
         <splunk-search-dropdown
             name="action.demisto.param.demisto_server"
