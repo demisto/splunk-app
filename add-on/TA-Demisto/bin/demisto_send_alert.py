@@ -169,7 +169,7 @@ if __name__ == '__main__':
             config.pop('config')
 
         demisto_servers = config.get('DEMISTOURL', '').split(',')
-
+        server_certs = json.loads(config.get('SERVER_CERT', ''))
         validate_ssl = config.get('VALIDATE_SSL', True)
 
         if validate_ssl == 0 or validate_ssl == "0":
@@ -192,6 +192,7 @@ if __name__ == '__main__':
                     if ele["content"]["realm"] == "TA-Demisto-Proxy":
                         proxy = ele["content"]["clear_password"]
                         break
+
         proxies = {} if proxy is None else json.loads(proxy)
         if modaction.configuration.get('send_all_servers', ''):
             for url in demisto_servers:
@@ -213,10 +214,11 @@ if __name__ == '__main__':
                         modaction.invoke()
                         modaction.create_demisto_incident(result, url=url, authkey=password, verify=validate_ssl,
                                                           search_query=search, search_url=search_url,
-                                                          ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                          ssl_cert_loc=server_certs.get(url, ''),
                                                           search_name=search_name, proxies=proxies)
         else:
-            save_name = hashlib.sha1(modaction.configuration.get('demisto_server', '')).hexdigest()
+            url = modaction.configuration.get('demisto_server', '')
+            save_name = hashlib.sha1(url).hexdigest()
             password = modaction.get_password_for_server(save_name)
 
             '''
@@ -234,7 +236,7 @@ if __name__ == '__main__':
                     modaction.invoke()
                     modaction.create_demisto_incident(result, url=url, authkey=password, verify=validate_ssl,
                                                       search_query=search, search_url=search_url,
-                                                      ssl_cert_loc=input_args.get("SSL_CERT_LOC", ''),
+                                                      ssl_cert_loc=server_certs.get(url, ''),
                                                       search_name=search_name, proxies=proxies)
 
         modaction.writeevents(index="main", source='demisto')

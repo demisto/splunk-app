@@ -83,8 +83,9 @@ or test environments only. Never disable certificate verification for a producti
 # Multiple Servers Support
 * You can send incidents from one search head to multiple Demisto servers. In the app setup page:
   1) Write the servers in a comma separated manner. For example: hostname1,hostname2,hostname3
-  2) If only some of the servers has specific ports, write '0' for the rest. For example: port1,0,port3
+  2) If only some of the servers have specific ports, write '0' for the rest. For example: port1,0,port3
   3) Write the API keys in a comma separated manner. For example: APIkey1,APIkey2,APIkey3
+  4) If only some of the servers have self-certified ssl certificates, write '0' for the rest. For example: cert1,0,cert3
 
   Finish installation as usual.
   Afterwards, when you'll create a new alert, choose 'Create Demisto Incident' and you'll have an option 'Demisto Server' where you can choose the server to send the alert to.

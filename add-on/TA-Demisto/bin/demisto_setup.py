@@ -392,7 +392,7 @@ class ConfigApp(admin.MConfigHandler):
         self.validate_permissions(permissions_url, authkey, verify_cert=verify_cert, ssl_cert_loc=ssl_cert_loc,
                                   proxies=proxies)
 
-    def create_servers_config(self, urls, ports, passwords):
+    def create_servers_config(self, urls, ports, passwords, certificates):
         configs_list = []
 
         if urls:
@@ -409,6 +409,11 @@ class ConfigApp(admin.MConfigHandler):
             splitted_passwords = passwords.split(',')
         else:
             splitted_passwords = []
+
+        if certificates:
+            splitted_certificates = certificates.split(',')
+        else:
+            splitted_certificates = []
 
         if len(splitted_urls) != len(splitted_passwords):
             logger.exception("Each url should have a matching passwords. Current urls: " + str(
@@ -444,6 +449,11 @@ class ConfigApp(admin.MConfigHandler):
         for idx, password in enumerate(splitted_passwords):
             configs_list[idx]['password'] = password
 
+        for idx, cert in enumerate(splitted_certificates):
+            if cert == '0' or cert == 0:
+                continue
+            configs_list[idx]['cert'] = cert
+
         return configs_list
 
     def handleList(self, confInfo):
@@ -460,9 +470,6 @@ class ConfigApp(admin.MConfigHandler):
 
     def handleEdit(self, confInfo):
 
-        if self.callerArgs.data['SSL_CERT_LOC'][0] is None:
-            self.callerArgs.data['SSL_CERT_LOC'] = ''
-
         proxies = self.get_proxy_settings()
         logger.debug("caller args are: " + json.dumps(self.callerArgs.data))
 
@@ -473,20 +480,24 @@ class ConfigApp(admin.MConfigHandler):
             # servers_config is a list of [{server_url,port,password,base_url},{server_url,port,password,base_url}]
             servers_config = self.create_servers_config(self.callerArgs.data['DEMISTOURL'][0],
                                                         self.callerArgs.data.get('PORT')[0],
-                                                        self.callerArgs.data['AUTHKEY'][0])
+                                                        self.callerArgs.data['AUTHKEY'][0],
+                                                        self.callerArgs.data['SSL_CERT_LOC'][0])
             '''
                 Check connectivity with Demisto to verify that the configuration is correct.
                 Store the configuration only if it was successful.
             '''
+            server_cert_dict ={}
             for config in servers_config:
                 if self.callerArgs.data['SSL_CERT_LOC']:
                     self.validate_demisto_connection(config['server_url'], config['password'],
                                                      verify_cert=validate_ssl,
-                                                     ssl_cert_loc=self.callerArgs.data['SSL_CERT_LOC'][0],
+                                                     ssl_cert_loc=config['cert'],
                                                      proxies=proxies)
+                    server_cert_dict[config['server_url']] = config['cert']
                 else:
                     self.validate_demisto_connection(config['server_url'], config['password'], verify_cert=validate_ssl,
                                                      proxies=proxies)
+
 
                 self.set_server_password(new_password=config.get('password'), server=config.get('server_url'))
             '''
@@ -495,8 +506,12 @@ class ConfigApp(admin.MConfigHandler):
             if self.callerArgs.data['PORT'][0] is None:
                 self.callerArgs.data['PORT'] = ''
 
+            if self.callerArgs.data['SSL_CERT_LOC'][0] is None:
+                self.callerArgs.data['SSL_CERT_LOC'] = ''
+
             del self.callerArgs.data['AUTHKEY']
             del self.callerArgs.data['HTTPS_PROXY_PASSWORD']
+            self.callerArgs.data['SERVER_CERT'] = json.dumps(server_cert_dict)
 
             self.callerArgs.data['DEMISTOURL'] = ",".join([config.get('server_url') for config in servers_config])
 
