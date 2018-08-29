@@ -3,7 +3,6 @@
 
 Supporting Add-on for Demisto. This application allows a user to create incident into Demisto from Splunk using custom alert action.
 
-
 # REQUIREMENTS
 
 * Splunk version 6.3 >=
@@ -80,6 +79,15 @@ or test environments only. Never disable certificate verification for a producti
     4) Labels: Comma separated values to be put in the label field.
     5) Severity: Severity of the alert
     6) Details: Details field in the incident.
+
+# Multiple Servers Support
+* You can send incidents from one search head to multiple Demisto servers. In the app setup page:
+  1) Write the servers in a comma separated manner. For example: hostname1,hostname2,hostname3
+  2) If only some of the servers has specific ports, write '0' for the rest. For example: port1,0,port3
+  3) Write the API keys in a comma separated manner. For example: APIkey1,APIkey2,APIkey3
+
+  Finish installation as usual.
+  Afterwards, when you'll create a new alert, choose 'Create Demisto Incident' and you'll have an option 'Demisto Server' where you can choose the server to send the alert to.
 
 #Troubleshooting
 * Environment variable SPLUNK_HOME must be set

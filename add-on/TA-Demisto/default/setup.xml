@@ -1,5 +1,5 @@
 <setup>
-  <block title="Demisto Setup Page" endpoint="demisto/demistocustomendpoint" entity="demistoenv">
+  <block style="font-size: 18px;" title="Demisto Setup Page" endpoint="demisto/demistocustomendpoint" entity="demistoenv">
   	<text>
   		Demisto's Splunk app enables an end user to push incidents to Demisto.
   		<![CDATA[
