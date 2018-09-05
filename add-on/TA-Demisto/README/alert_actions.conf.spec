@@ -36,16 +36,25 @@ param.investigate = <int>
 	*Indicates if investigation should be created in Demisto. 
 	*Takes either 1 or 0 
 	*Defaults to 0
+
 param.severity = <float>
 	*Drop down to define severity of the incident in Demisto
 	*Can take one of the following values 0: Unknown, 1: Low, 2: Medium, 3: High, 4: Critical
 	*Defaults to 0.
+
 param.details = <string>
     * Details field in Demisto..
+    * Defaults to blank
+
+param.server_url = <string>
+    * The Demisto server to send the alert to
     * Defaults to blank
 
 param.verbose         = <bool>
    * Set modular alert action logger to verbose mode
    * Defaults to "false"
 
+param.send_all_servers = <bool>
+    * Send alert to all the Demisto servers
+    * Defaults to false
 
