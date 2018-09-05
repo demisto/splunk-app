@@ -97,24 +97,27 @@ class DemistoAction(ModularAction):
                 sourcetype="demistoResponse")
 
     def get_password_for_server(self, save_name):
-        r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.session_key, method='GET', getargs={
-            'output_mode': 'json', 'search': save_name})
+        try:
+            r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.session_key, method='GET', getargs={
+                'output_mode': 'json', 'search': save_name})
 
-        password = ""
+            password = ""
 
-        if 200 <= int(r[0]["status"]) < 300:
-            dict_data = json.loads(r[1])
-            if len(dict_data["entry"]) > 0:
-                for ele in dict_data["entry"]:
-                    if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(save_name):
-                        password = ele["content"].get('clear_password')
-                        break
+            if 200 <= int(r[0]["status"]) < 300:
+                dict_data = json.loads(r[1])
+                if len(dict_data["entry"]) > 0:
+                    for ele in dict_data["entry"]:
+                        if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(save_name):
+                            password = ele["content"].get('clear_password')
+                            break
 
-        if not password:
-            raise Exception(
-                "Authentication key couldn't be retrieved from storage/passwords for server {}, the response was: ".format(
-                    modaction.configuration.get('demisto_server', '')) + str(r))
-        return password
+            if not password:
+                raise Exception(
+                    "Authentication key couldn't be retrieved from storage/passwords for server with hash {},"
+                    " the response was: ".format(save_name) + str(r))
+            return password
+        except Exception as ex:
+            logger.exception("Error in create_demisto_incident, error: " + str(ex))
 
 if __name__ == '__main__':
 
@@ -168,7 +171,7 @@ if __name__ == '__main__':
         if 'config' in config:
             config.pop('config')
 
-        demisto_servers = config.get('DEMISTOURL', '').split(',')
+        demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         server_certs = json.loads(config.get('SERVER_CERT', ''))
         validate_ssl = config.get('VALIDATE_SSL', True)
 

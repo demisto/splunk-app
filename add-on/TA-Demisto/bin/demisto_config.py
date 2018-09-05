@@ -76,7 +76,7 @@ class ServerList(BaseRestHandler):
         if 'config' in config:
             config.pop('config')
 
-        servers = config.get('DEMISTOURL', '').split(',')
+        servers = config.get('DEMISTOURL', '').strip().split(',')
 
         return servers
 

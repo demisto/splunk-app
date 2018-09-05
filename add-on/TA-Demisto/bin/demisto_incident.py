@@ -24,16 +24,12 @@ class DemistoIncident():
             @url: Demisto URL, its mandatory parameter.
             @authkey: Requires parameter, used for authentication.
             @data: Incident information,
-            @verify: Indicates if self signed certificates are allowed or not.
+            @verify_req: Indicates if we should use SSL
         """
 
         incident = self.create_incident_dictionary(data, search_query, search_url, result, search_name)
 
         s = requests.session()
-
-        # url is either the selected Demisto server, or sending to all of the available servers
-        if not url:
-            url = data.get('demisto_server', '')
 
         self.logger.debug("JSON data for the Incident=" + json.dumps(incident))
 
@@ -44,7 +40,7 @@ class DemistoIncident():
         prepped.headers['Content-type'] = "application/json"
         prepped.headers['Accept'] = "application/json"
 
-        if ssl_cert_loc:
+        if ssl_cert_loc and verify_req:
             self.logger.info("In create_incident, setting passed certificate location as verify=" + ssl_cert_loc)
             resp = s.send(prepped, verify=ssl_cert_loc, proxies=proxies)
         else:
@@ -71,7 +67,7 @@ class DemistoIncident():
 
         incident["type"] = data.get('type', '')
 
-        ignore_labels = data.get('ignore_labels', '').lower().split(",")
+        ignore_labels = data.get('ignore_labels', '').strip().lower().split(",")
 
         if "severity" in data:
             incident["severity"] = float(data["severity"])
@@ -91,7 +87,7 @@ class DemistoIncident():
         self.logger.debug("Ignore Label::::" + str(ignore_labels))
 
         if data.get("labels"):
-            str_data = data["labels"].split(",")
+            str_data = data["labels"].strip().split(",")
             for data_label in str_data:
                 param_data = data_label.split(":")
                 data_dir = {"type": param_data[0], "value": ":".join(param_data[1:])}
@@ -105,7 +101,7 @@ class DemistoIncident():
         incident["labels"] = labels
 
         if "custom_field" in data:
-            str_data = data["custom_field"].split(",")
+            str_data = data["custom_field"].strip().split(",")
             custom_fields = {}
             for data in str_data:
                 param_data = data.split(":")

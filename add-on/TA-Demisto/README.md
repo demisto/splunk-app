@@ -40,7 +40,7 @@ $SPLUNK_HOME/etc/apps/TA-Demisto/local/cert_bundle.pem
 
 Splunk Cloud users should perform option 2 and send the app installer to Splunk support for installation.
 
-Another option which applies ONLY for on-prem installations and is cannot be used for Splunk Cloud:
+Another option which applies ONLY for on-prem installations and cannot be used for Splunk Cloud:
 
 Disabling the certificate validation entirely by POSTing to the Splunk REST API
 https://splunk-server:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv
@@ -55,6 +55,8 @@ To re-enable certificate validation post to the same endpoint but change "verify
 For example, via CURL:
 curl -ku 'username:password' https://localhost:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=true
 
+If you used version below 2.0.0 and disabled SSL you would need to execute the process above.
+
 We recommend to use certificates, and only disabling certificate verification in development
 or test environments only. Never disable certificate verification for a production system.
 
@@ -62,14 +64,14 @@ or test environments only. Never disable certificate verification for a producti
 
 # Application Setup
 * The user must complete the setup of the application. In order to create incident into Demisto, a user needs to provide the following parameters:
-    1)Demisto URL: This is mandatory parameter Url /IP address of the Demisto
-    2)Demisto Port: This is an optional parameter. The user must define it if running Demisto on any other port than the default (443).
-    3)Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demisto. In order to generate this parameter,
+    1) Demisto URL: This is mandatory parameter Url /IP address of the Demisto
+    2) Demisto Port: This is an optional parameter. The user must define it if running Demisto on any other port than the default (443).
+    3) Authentication key: This is a mandatory parameter. This parameter is used for authorization with Demisto. In order to generate this parameter,
       a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
-    4)Location to certificate: Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate
-    5)HTTPS Proxy Address: This is an optional parameter. Define this if you have HTTPS proxy that should be used. Should be in the format of https://ip:port
-    6)HTTPS Proxy Username: Username for the proxy
-    7)HTTPS Proxy Password: Password for the proxy
+    4) Location to certificate: Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate
+    5) HTTPS Proxy Address: This is an optional parameter. Define this if you have HTTPS proxy that should be used. Should be in the format of https://ip:port
+    6) HTTPS Proxy Username: Username for the proxy
+    7) HTTPS Proxy Password: Password for the proxy
 
 # Custom Alert Action
 * This application will add custom alert action named Demisto Custom Alert Action. The user can configure this action on saved search. The user can pass following parameters to Demisto:
@@ -92,13 +94,14 @@ or test environments only. Never disable certificate verification for a producti
 
   If you want to send alert to all of your Demisto servers, simply click the 'send alert to all of the servers' checkbox. No need to select a server in this scenario.
 
-#Troubleshooting
+# Troubleshooting
 * Environment variable SPLUNK_HOME must be set
 * Check the following logs to troubleshoot Demisto's application:
     1) $SPLUNK_HOME/var/log/demisto/demisto.log file
-    2) $SPLUNK_HOME/var/log/splunk/demisto_modalert.log
+    2) $SPLUNK_HOME/var/log/splunk/splunkd.log
+    3) $SPLUNK_HOME/var/log/splunk/demisto_modalert.log
 * If you change the app's settings several times in a row you might need to restart Splunk for them to update
 
-#Support
+# Support
 Customers can file issues by logging into Demisto support portal (https://support.demisto.com).
 Documentation on our support process is available in the support portal. 

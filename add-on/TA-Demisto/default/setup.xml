@@ -13,7 +13,7 @@
 
 		$(window).keydown(function(event){
 			if(event.keyCode == 13) {
-				if(validateTextBox("AUTHKEY"))
+				if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
 				{
 					return true;
 				}
@@ -128,31 +128,27 @@
 
 	function validateNumber(name) 
 	{
-
 		var patt = /^[0-9]*$/i;
 		var errMsg = "";
 		var _errid = name+'_err';
 		var errid = '#'+_errid;
 		var fieldval = "";
 		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
-
 		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
-
-		if (!patt.test(fieldval) || fieldval <0 || fieldval > 65535 )
-		{
-			var div = $(''+errid+'');
-	    	if (div.length ==0 )
-	    	{
-				errMsg="Please enter valid " +label;
-				$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
-			}
-			return false;
-		}
-		else
-		{
-			$(errid).hide();
-			return true;
-		}
+        var fieldval_array = fieldval.split(",");
+        for (var i = 0; i < fieldval_array; i++) {
+            if (!patt.test(fieldval_array[i]) || fieldval_array[i] <0 || fieldval_array[i] > 65535 ) {
+                var div = $(''+errid+'');
+                if (div.length ==0 )
+                {
+                    errMsg="Please enter valid " +label;
+                    $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
+                }
+                return false;
+            }
+        }
+        $(errid).hide();
+        return true;
 	}
 
     function validateProxy()
@@ -233,26 +229,29 @@
 		
 		if(fieldval.length>0)
 		{
-        	if(fieldval.match(ipRegex) || fieldval.match(hostRegex))
-			{
-		    	$(errid).hide();
-		    	return true;		
-			}
-			else
-			{
-		    	errMsg="Please enter valid Host Name/IP Address";
-		    	var div = $(''+errid+'');
-		    	if (div.length ==0)
-		    	{
-					$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>")
-				}
-				else if (div.length >0)
-				{
-					div[0].innerHTML = errMsg;
-					div[0].style = 'display:inline';
-				}
-				return false;
-			}
+            var fieldval_array = fieldval.split(",");
+            for (var i = 0; i < fieldval_array; i++) {
+        	    if(!fieldval_array[i].match(ipRegex) && !fieldval_array[i].match(hostRegex)){
+                    var div = $(''+errid+'');
+                    if (div.length ==0 )
+                    {
+                        errMsg="Please enter valid Host Name/IP Address";
+                        var div = $(''+errid+'');
+                        if (div.length ==0)
+                        {
+                            $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>")
+                        }
+                        else if (div.length >0)
+                        {
+                            div[0].innerHTML = errMsg;
+                            div[0].style = 'display:inline';
+                        }
+                        return false;
+                    }
+                }
+            }
+          	$(errid).hide();
+	    	return true;
 		}
 		else
 		{
