@@ -140,22 +140,18 @@ if __name__ == '__main__':
             search_app_name = modaction.settings.get('app', '')
             search_uri = urllib.pathname2url("/services/saved/searches/" + urllib.quote(search_name))
 
-        if not search_uri:
-            get_args = {
-                'output_mode': 'json',
-            }
-            r = splunk.rest.simpleRequest(search_uri, sessionKey=modaction.session_key, getargs=get_args, method='GET')
-            result_op = json.loads(r[1])
-            search = ""
-            if len(result_op["entry"]) > 0:
-                search = result_op["entry"][0]["content"]["qualifiedSearch"]
+        get_args = {
+            'output_mode': 'json',
+        }
+        r = splunk.rest.simpleRequest(search_uri, sessionKey=modaction.session_key, getargs=get_args, method='GET')
+        result_op = json.loads(r[1])
+        search = ""
+        if len(result_op["entry"]) > 0:
+            search = result_op["entry"][0]["content"]["qualifiedSearch"]
 
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
         # getting the current configuration from Splunk
-        get_args = {
-            'output_mode': 'json',
-        }
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, modaction.session_key, method='GET',
                                                      getargs=get_args)
 
