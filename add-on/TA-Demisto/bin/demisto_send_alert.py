@@ -145,7 +145,6 @@ if __name__ == '__main__':
         }
         r = splunk.rest.simpleRequest(search_uri, sessionKey=modaction.session_key, getargs=get_args, method='GET')
         result_op = json.loads(r[1])
-        search = ""
         if len(result_op["entry"]) > 0:
             search = result_op["entry"][0]["content"]["qualifiedSearch"]
 
