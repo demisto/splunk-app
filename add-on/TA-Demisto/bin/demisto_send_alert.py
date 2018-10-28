@@ -167,6 +167,12 @@ if __name__ == '__main__':
             config.pop('config')
 
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
+        try:
+            server_certs = json.loads(config.get('SERVER_CERT', ''))
+        except:
+            server_certs = {
+                demisto_servers[0]: ''
+            }
         server_certs = json.loads(config.get('SERVER_CERT', ''))
         validate_ssl = config.get('VALIDATE_SSL', True)
 
@@ -192,7 +198,7 @@ if __name__ == '__main__':
                         break
 
         proxies = {} if proxy is None else json.loads(proxy)
-        if modaction.configuration.get('send_all_servers', ''):
+        if modaction.configuration.get('send_all_servers', '') == '1':
             for url in demisto_servers:
                 # getting Demisto's API key from Splunk
                 save_name = hashlib.sha1(url).hexdigest()
@@ -240,7 +246,7 @@ if __name__ == '__main__':
         modaction.writeevents(index="main", source='demisto')
 
     except Exception as e:
-        ## adding additional logging since adhoc search invocations do not write to stderr
+        # adding additional logging since adhoc search invocations do not write to stderr
         logger.exception("Error in main, error: " + str(e))
         try:
             modaction.message(e, status='failure', level=logging.CRITICAL)
