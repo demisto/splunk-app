@@ -41,10 +41,10 @@ $SPLUNK_HOME/bin/splunk install app $PATH_TO_SPL/TA-Demisto.spl/
     5) Severity: Severity of the alert
     6) Details: Details field in the incident.
 
-#Troubleshooting
+# Troubleshooting
 * Environment variable SPLUNK_HOME must be set
 * To troubleshoot Demisto application, check $SPLUNK_HOME/var/log/splunk/demisto.log file.
 
-#Support
+# Support
 Customers can file issues by logging into Demisto support portal (https://support.demisto.com).
 Documentation on our support process is available in the support portal. 
