@@ -57,12 +57,15 @@ class DemistoAction(ModularAction):
         try:
             logger.info("create_demisto_incident called")
             demisto = DemistoIncident(logger)
+            logger.info("Splunk search query is: " + search_query)
+            logger.info("Splunk search result is: " + json.dumps(result))
 
             resp = demisto.create_incident(authkey, self.configuration, verify, search_query, search_url,
                                            ssl_cert_loc, result, search_name, proxies, url=url)
-            logger.debug("Demisto's response is: " + json.dumps(resp.json()))
-            logger.info("Demisto response code is " + str(resp.status_code))
-            if resp.status_code == 201 or resp.status_code == 200:
+
+            logger.info("Demisto response code is: " + str(resp.status_code))
+            if resp.status_code == 201:
+                logger.info("Demisto's response is: " + resp.text)
                 # self.message logs the string to demisto_modalert.log
                 self.message('Successfully created incident in Demisto', status='success')
                 logger.info("Successfully created incident in Demisto")
@@ -74,10 +77,15 @@ class DemistoAction(ModularAction):
 
                 # self.addevent sends the following message to Splunk and adds it as event there
                 self.addevent(resp, sourcetype="demistoResponse")
+            elif resp.status_code == 200:
+                self.message('Successfully created incident in Demisto', status='success')
+                logger.info("Successfully created incident in Demisto")
+                self.addevent('Successfully created incident in Demisto', sourcetype="demistoResponse")
             else:
                 logger.error('Error in creating incident in Demisto, got status: ' + str(resp.status_code)
                              + ' with response: ' + json.dumps(resp.json()))
 
+                logger.error("Demisto's response was: " + resp.text)
                 self.message(
                     'Error in creating incident in Demisto, got status: ' + str(resp.status_code)
                     + ' with response: ' + json.dumps(resp.json()),

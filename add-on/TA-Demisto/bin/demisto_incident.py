@@ -31,7 +31,7 @@ class DemistoIncident():
 
         s = requests.session()
 
-        self.logger.debug("JSON data for the Incident=" + json.dumps(incident))
+        self.logger.info("JSON data for the Incident=" + json.dumps(incident))
 
         req = Request('POST', url + "/incident/splunkapp", data=json.dumps(incident))
         prepped = s.prepare_request(req)
