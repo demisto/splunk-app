@@ -115,7 +115,8 @@ class DemistoAction(ModularAction):
                 dict_data = json.loads(r[1])
                 if len(dict_data["entry"]) > 0:
                     for ele in dict_data["entry"]:
-                        if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(save_name):
+                        if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(
+                                save_name):
                             password = ele["content"].get('clear_password')
                             break
 
@@ -126,6 +127,7 @@ class DemistoAction(ModularAction):
             return password
         except Exception as ex:
             logger.exception("Error in create_demisto_incident, error: " + str(ex))
+
 
 if __name__ == '__main__':
 
@@ -147,6 +149,10 @@ if __name__ == '__main__':
             logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
             search_uri = urllib.pathname2url("/services/saved/searches/" + urllib.quote(search_name))
+        # pipe in the alert name breaks Splunk's ability to send us the alert data correctly
+        elif '|' in search_name:
+            raise Exception(
+                "The Alert name must not have pipe (|) char in its name - it causes Splunk to send incomplete data")
 
         get_args = {
             'output_mode': 'json',
