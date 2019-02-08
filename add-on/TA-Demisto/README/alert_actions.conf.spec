@@ -46,7 +46,7 @@ param.details = <string>
     * Details field in Demisto..
     * Defaults to blank
 
-param.server_url = <string>
+param.demisto_server = <string>
     * The Demisto server to send the alert to
     * Defaults to blank
 
