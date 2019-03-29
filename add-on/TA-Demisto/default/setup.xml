@@ -101,7 +101,7 @@
 		
 		if (name == "DEMISTOURL")
 		{
-			label="Host Name/IP Address";
+			label="URL/Hostname/IP Address";
 		}
 		else if( name == "AUTHKEY")
 		{
@@ -221,6 +221,7 @@
 		var fieldLabel = "";
 		var ipRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
 		var hostRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])*\/{0,1}[A-Za-z0-9][A-Za-z0-9\-]*\_{0,1}[A-Za-z0-9][A-Za-z0-9\-]*$";
+        var urlRegex = "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/ig";
 
 		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
 
@@ -231,11 +232,11 @@
 		{
             var fieldval_array = fieldval.split(",");
             for (var i = 0; i < fieldval_array; i++) {
-        	    if(!fieldval_array[i].match(ipRegex) && !fieldval_array[i].match(hostRegex)){
+        	    if(!fieldval_array[i].match(ipRegex) && !fieldval_array[i].match(hostRegex) && !fieldval_array[i].match(urlRegex)){
                     var div = $(''+errid+'');
                     if (div.length ==0 )
                     {
-                        errMsg="Please enter valid Host Name/IP Address";
+                        errMsg="Please enter valid URL/Host Name/IP Address";
                         var div = $(''+errid+'');
                         if (div.length ==0)
                         {
@@ -265,7 +266,7 @@
   ]]></text>
 
   	  <input field="DEMISTOURL">
-        <label>Demisto Host Name/IP Address</label><font color="red"><b>*</b></font>
+        <label>Demisto URL/Hostname/IP Address</label><font color="red"><b>*</b></font>
         <type>text</type>
 	  </input>
 	  <input field="PORT">
