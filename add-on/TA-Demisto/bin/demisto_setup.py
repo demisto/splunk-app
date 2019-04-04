@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 #
 # This code was written by Demisto Inc
@@ -21,7 +22,8 @@ SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
 IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
-DOMAIN_REGEX = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])*\/{0,1}[A-Za-z0-9][A-Za-z0-9\-]*\_{0,1}[A-Za-z0-9][A-Za-z0-9\-]*$"
+DOMAIN_REGEX = "(?i)(?:[-A-Z0-9]+\[?\.\]?)+[-A-Z0-9]+(?::[0-9]+)?(?:(?:\/|\?)[-A-Z0-9+&@#\/%=~_$?!\-:,.\(\);]*[A-Z0-9+&@#\/%=~_$\(\);])?|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
+URL_REGEX = "(?i)(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})"
 
 logger = DemistoConfig.get_logger("DEMISTOSETUP")
 demisto = DemistoConfig(logger)
@@ -422,15 +424,17 @@ class ConfigApp(admin.MConfigHandler):
                 splitted_urls) + " Current passwords: " + str(splitted_passwords))
 
         for url in splitted_urls:
-            server_url = 'https://'
-
-            if not url or (url and not re.match(IP_REGEX, url) and not re.match(DOMAIN_REGEX, url)):
+            if not url or (url and not re.match(IP_REGEX, url) and not re.match(DOMAIN_REGEX, url)
+                           and not re.match(URL_REGEX, url)):
                 logger.exception(
-                    "Invalid URL or missing URL, make sure you don't have https in the URL. URL was " + str(url))
+                    "Invalid URL/IP/Domain, please check your server address. Address was " + str(url))
                 raise Exception(
-                    "Invalid URL or missing URL, make sure you don't have https in the URL. URL was " + str(url))
+                    "Invalid URL/IP/Domain, please check your server address. Address was " + str(url))
+
+            if not re.match(URL_REGEX, url):  # adding https prefix if needed
+                server_url = 'https://' + url
             else:
-                server_url += url
+                server_url = url
             configs_list.append({
                 'url': url,
                 'server_url': server_url
@@ -486,7 +490,7 @@ class ConfigApp(admin.MConfigHandler):
                 Check connectivity with Demisto to verify that the configuration is correct.
                 Store the configuration only if it was successful.
             '''
-            server_cert_dict ={}
+            server_cert_dict = {}
             for config in servers_config:
                 if self.callerArgs.data['SSL_CERT_LOC']:
                     self.validate_demisto_connection(config['server_url'], config['password'],
@@ -497,7 +501,6 @@ class ConfigApp(admin.MConfigHandler):
                 else:
                     self.validate_demisto_connection(config['server_url'], config['password'], verify_cert=validate_ssl,
                                                      proxies=proxies)
-
 
                 self.set_server_password(new_password=config.get('password'), server=config.get('server_url'))
             '''
