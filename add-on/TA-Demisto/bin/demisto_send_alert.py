@@ -65,7 +65,12 @@ class DemistoAction(ModularAction):
 
             logger.info("Demisto response code is: " + str(resp.status_code))
             if resp.status_code == 201:
-                logger.info("Demisto's response is: " + resp.text)
+                # Removing rawJSON from the response as it creates too large demistoResponse
+                resp = json.loads(resp.text)
+                del resp["rawJSON"]
+                resp = json.dumps(resp)
+
+                logger.info("Demisto's response is: " + resp)
                 # self.message logs the string to demisto_modalert.log
                 self.message('Successfully created incident in Demisto', status='success')
                 logger.info("Successfully created incident in Demisto")
