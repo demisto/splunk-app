@@ -70,17 +70,9 @@ class DemistoAction(ModularAction):
                 self.message('Successfully created incident in Demisto', status='success')
                 logger.info("Successfully created incident in Demisto")
 
-                # Removing rawJSON from the response as it creates too large demistoResponse
-                resp = json.loads(resp.text)
-                del resp["rawJSON"]
-                resp = json.dumps(resp)
-
-                # self.addevent sends the following message to Splunk and adds it as event there
-                self.addevent(resp, sourcetype="demistoResponse")
             elif resp.status_code == 200:
                 self.message('Successfully created incident in Demisto', status='success')
                 logger.info("Successfully created incident in Demisto")
-                self.addevent('Successfully created incident in Demisto', sourcetype="demistoResponse")
             else:
                 logger.error('Error in creating incident in Demisto, got status: ' + str(resp.status_code)
                              + ' with response: ' + json.dumps(resp.json()))
@@ -91,18 +83,10 @@ class DemistoAction(ModularAction):
                     + ' with response: ' + json.dumps(resp.json()),
                     status='failure')
 
-                self.addevent(
-                    resp.text + "status= " + str(resp.status_code),
-                    sourcetype="demistoResponse")
-
         except Exception as ex:
-            logger.exception("Error in create_demisto_incident, error: " + str(ex))
+            logger.exception("Demisto Incident creation in create_demisto_incident function failed, error was: " + str(ex))
             self.message('Failed in creating incident in Demisto',
                          status='failure')
-
-            self.addevent(
-                "Demisto Incident creation in create_demisto_incident function failed. exception=" + str(ex),
-                sourcetype="demistoResponse")
 
     def get_password_for_server(self, save_name):
         try:
