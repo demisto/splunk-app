@@ -137,11 +137,9 @@ if __name__ == '__main__':
         if not search_name:
             logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
+            if '|' in search_name:
+                search_name = '//|'.join(search_name.split('|'))
             search_uri = urllib.pathname2url("/services/saved/searches/" + urllib.quote(search_name))
-        # pipe in the alert name breaks Splunk's ability to send us the alert data correctly
-        elif '|' in search_name:
-            raise Exception(
-                "The Alert name must not have pipe (|) char in its name - it causes Splunk to send incomplete data")
 
         get_args = {
             'output_mode': 'json',
