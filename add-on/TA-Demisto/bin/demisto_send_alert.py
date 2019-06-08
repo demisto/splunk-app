@@ -171,12 +171,11 @@ if __name__ == '__main__':
 
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         try:
-            server_certs = json.loads(config.get('SERVER_CERT', ''))
+            server_certs = json.loads(config.get('SERVER_CERT', '{}'))
         except:
             server_certs = {
                 demisto_servers[0]: ''
             }
-        server_certs = json.loads(config.get('SERVER_CERT', ''))
         validate_ssl = config.get('VALIDATE_SSL', True)
 
         if validate_ssl == 0 or validate_ssl == "0":
