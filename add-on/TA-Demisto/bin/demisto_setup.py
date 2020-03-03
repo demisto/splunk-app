@@ -419,9 +419,9 @@ class ConfigApp(admin.MConfigHandler):
 
         if len(splitted_urls) != len(splitted_passwords):
             logger.exception("Each url should have a matching passwords. Current urls: " + str(
-                splitted_urls) + " Current passwords: " + str(splitted_passwords))
+                splitted_urls))
             raise Exception("Each url should have a matching passwords. Current urls: " + str(
-                splitted_urls) + " Current passwords: " + str(splitted_passwords))
+                splitted_urls))
 
         for url in splitted_urls:
             if not url or (url and not re.match(IP_REGEX, url) and not re.match(DOMAIN_REGEX, url)
@@ -435,6 +435,12 @@ class ConfigApp(admin.MConfigHandler):
                 server_url = 'https://' + url
             else:
                 server_url = url
+
+            if server_url.startswith('http://'):
+                logger.exception("Server url must be start with https or be a hostname/IP. Current url: " +
+                                 str(server_url))
+                raise Exception("Server url must be start with https or be a hostname/IP. Current url: " +
+                                str(server_url))
             configs_list.append({
                 'url': url,
                 'server_url': server_url
