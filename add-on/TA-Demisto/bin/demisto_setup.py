@@ -437,9 +437,9 @@ class ConfigApp(admin.MConfigHandler):
                 server_url = url
 
             if server_url.startswith('http://'):
-                logger.exception("Server url must be start with https or be a hostname/IP. Current url: " +
+                logger.exception("Server url must start with https or be a hostname/IP. Current url: " +
                                  str(server_url))
-                raise Exception("Server url must be start with https or be a hostname/IP. Current url: " +
+                raise Exception("Server url must start with https or be a hostname/IP. Current url: " +
                                 str(server_url))
             configs_list.append({
                 'url': url,
