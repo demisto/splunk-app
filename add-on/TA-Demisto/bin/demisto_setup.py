@@ -11,7 +11,7 @@ import splunk.admin as admin
 import splunk.rest
 import requests
 import hashlib
-from demisto_config import DemistoConfig
+from .demisto_config import DemistoConfig
 
 from splunk.clilib import cli_common as cli
 
@@ -469,8 +469,8 @@ class ConfigApp(admin.MConfigHandler):
     def handleList(self, confInfo):
         config_dict = self.readConf("demistosetup")
         logger.debug("config dict is : " + json.dumps(config_dict))
-        for stanza, settings in config_dict.items():
-            for key, val in settings.items():
+        for stanza, settings in list(config_dict.items()):
+            for key, val in list(settings.items()):
                 confInfo[stanza].append(key, val)
 
     '''

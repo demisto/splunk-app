@@ -11,15 +11,15 @@ import time
 import csv
 import gzip
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import hashlib
 
 import splunk.rest
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
-from demisto_config import DemistoConfig
-from demisto_incident import DemistoIncident
+from .demisto_config import DemistoConfig
+from .demisto_incident import DemistoIncident
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
@@ -132,14 +132,14 @@ if __name__ == '__main__':
 
         logger.info("Alert name is " + search_name)
         logger.info("Search uri is " + search_uri)
-        logger.info("Manually created Search uri is " + "/services/saved/searches/" + urllib.quote(search_name))
+        logger.info("Manually created Search uri is " + "/services/saved/searches/" + urllib.parse.quote(search_name))
 
         if not search_name:
             logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
             if '|' in search_name:
                 search_name = '//|'.join(search_name.split('|'))
-            search_uri = urllib.pathname2url("/services/saved/searches/" + urllib.quote(search_name))
+            search_uri = urllib.request.pathname2url("/services/saved/searches/" + urllib.parse.quote(search_name))
 
         get_args = {
             'output_mode': 'json',
