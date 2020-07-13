@@ -18,8 +18,8 @@ import splunk.rest
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
-from .demisto_config import DemistoConfig
-from .demisto_incident import DemistoIncident
+from demisto_config import DemistoConfig
+from demisto_incident import DemistoIncident
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
