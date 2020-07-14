@@ -17,14 +17,11 @@ import splunk.rest
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
-from demisto_config import DemistoConfig
-from demisto_incident import DemistoIncident
+from .demisto_config import DemistoConfig
+from .demisto_incident import DemistoIncident
 
-try:
-    from urllib.request import pathname2url
-    from urllib.parse import quote
-except ImportError:
-    from urllib import pathname2url, quote
+from six.moves.urllib.parse import quote
+from six.moves.urllib.request import pathname2url
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
