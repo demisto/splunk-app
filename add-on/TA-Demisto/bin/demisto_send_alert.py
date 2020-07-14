@@ -137,14 +137,14 @@ if __name__ == '__main__':
 
         logger.info("Alert name is " + search_name)
         logger.info("Search uri is " + search_uri)
-        logger.info("Manually created Search uri is " + "/services/saved/searches/" + urllib.parse.quote(search_name))
+        logger.info("Manually created Search uri is " + "/services/saved/searches/" + quote(search_name))
 
         if not search_name:
             logger.info("Creating search uri")
             search_app_name = modaction.settings.get('app', '')
             if '|' in search_name:
                 search_name = '//|'.join(search_name.split('|'))
-            search_uri = urllib.request.pathname2url("/services/saved/searches/" + urllib.parse.quote(search_name))
+            search_uri = pathname2url("/services/saved/searches/" + quote(search_name))
 
         get_args = {
             'output_mode': 'json',
