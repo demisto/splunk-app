@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 #
 # This code was written by Demisto Inc.
@@ -11,8 +11,6 @@ import time
 import csv
 import gzip
 import re
-import urllib.request
-import urllib.parse
 import hashlib
 
 import splunk.rest
@@ -21,6 +19,12 @@ import splunk.version as ver
 
 from demisto_config import DemistoConfig
 from demisto_incident import DemistoIncident
+
+try:
+    from urllib.request import pathname2url
+    from urllib.parse import quote
+except ImportError:
+    from urllib import pathname2url, quote
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
