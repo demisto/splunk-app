@@ -11,7 +11,8 @@ import time
 import csv
 import gzip
 import re
-import urllib
+import urllib.request
+import urllib.parse
 import hashlib
 
 import splunk.rest
