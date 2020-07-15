@@ -11,6 +11,9 @@ import re
 import splunk.rest as rest
 import splunk.version as ver
 
+from io import open
+from six.moves import range
+
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
 
@@ -76,7 +79,7 @@ class ModularAction(object):
 
     def __init__(self, settings, logger, action_name = 'unknown'):
         """ Initialize ModularAction class.
-        
+
         @param settings:    A modular action payload in JSON format.
         @param logger:      A logging instance.
                             Recommend using ModularAction.setup_logger.
@@ -98,7 +101,7 @@ class ModularAction(object):
         except:
             pass
 
-        ## rid_ntuple is a named tuple that represents 
+        ## rid_ntuple is a named tuple that represents
         ## the three variables that change on a per-result basis
         self.rid_ntuple = collections.namedtuple('ID', ['orig_sid', 'rid', 'orig_rid'])
         ## rids is a list of rid_ntuple values
@@ -144,13 +147,13 @@ class ModularAction(object):
             del self.settings['result']
         except Exception:
             pass
-        ## events        
+        ## events
         self.events = []
 
     def addinfo(self):
         """ The purpose of this method is to populate the
         modular action info variable with the contents of info.csv.
-        
+
         @raise Exception: raises Exception if self.info_file could not be opened
                           or if there were problems parsing the info.csv data
         """
@@ -164,9 +167,9 @@ class ModularAction(object):
     def addjobinfo(self):
         """ The purpose of this method is to populate the job variable
         with the contents from REST (/services/search/jobs/<sid>)
-        
+
         SPL-112815 - sendalert - not all $job.<param>$ parameters come through
-        
+
         @raise Exception: raises Exception if search job information could not
                           be retrieved via REST (search/jobs) based on self.sid
         """
@@ -187,7 +190,7 @@ class ModularAction(object):
 
     def message(self, signature, status = None, rids = None, level = logging.INFO, **kwargs):
         """ The purpose of this method is to provide a common messaging interface.
-        
+
         @param signature: A string representing the message we want to log.
         @param status:    An optional status that we want to log.
                           Defaults to None.
@@ -199,7 +202,7 @@ class ModularAction(object):
         @param kwargs:    Additional keyword arguments to be included with the
                           message.
                           Defaults to "no arguments".
-        
+
         @return message:  This method logs the message; however, for
                           backwards compatibility we also return the message.
         """
@@ -257,13 +260,13 @@ class ModularAction(object):
     def update(self, result):
         """ The purpose of this method is to update the ModularAction instance
         identifiers based on the current result being operated on.
-            
+
         This is the most important method in the library as it sets up
         rid, orig_sid, and orig_rid to be used by subsequent class methods.
-        
+
         Not calling update() immediately for each result before doing additional
         work can have adverse affects.
-        
+
         @param signature: A string representing the message we want to log.
         @param status:    An optional status that we want to log.
                           Defaults to None.
@@ -275,7 +278,7 @@ class ModularAction(object):
         @param kwargs:    Additional keyword arguments to be included with the
                           message.
                           Defaults to "no arguments".
-        
+
         @return message:  This method logs the message; however, for
                           backwards compatiblity we also return the message.
         """
@@ -295,15 +298,15 @@ class ModularAction(object):
     def invoke(self):
         """ The purpose of this method is to generate per-result invocation messages.
         This method is used to identify that an action is being attempted on a per-result basis.
-        
+
         Remember to call update() prior to invoke() to ensure that the invocation message
-        reflects the appropriate identifiers. 
+        reflects the appropriate identifiers.
         """
         self.message('Invoking modular action')
 
     def result2stash(self, result, dropexp = DEFAULT_DROPEXP, mapexp = DEFAULT_MAPEXP, addinfo = False):
         """ The purpose of this method is to formulate an event in stash format
-        
+
         @param result:  The result dictionary to generate a stash event for.
         @param dropexp: A lambda expression used to determine whether a field
                         should be dropped or not.
@@ -316,9 +319,9 @@ class ModularAction(object):
                         and info_search_time fields.
                         Requires that information was loaded into the ModularAction
                         instance via addinfo()
-                        
+
         @return _raw:   Returns a string which represents the result in stash format.
-        
+
         The following example has been broken onto multiple lines for readability:
         06/21/2016 10:00:00 -0700,
         search_name="Access - Brute Force Access Behavior Detected - Rule",
@@ -383,15 +386,15 @@ class ModularAction(object):
     def addevent(self, raw, sourcetype, cam_header = True):
         """ The purpose of this method is to add a properly constructed event
         to the events list in the ModularAction instance.  This ensures events
-        are created with the appropriate index-time header.  
-        
-        The index-time header is responsible for setting sourcetype, 
+        are created with the appropriate index-time header.
+
+        The index-time header is responsible for setting sourcetype,
         orig_action_name, orig_sid, and orig_rid.  The index-time header will
         not be present in the _raw of generated events.
-        
+
         Remember to call update() prior to addevent() to ensure that the events
-        reflect the appropriate orig_sid and orig_rid identifiers. 
-        
+        reflect the appropriate orig_sid and orig_rid identifiers.
+
         @param raw:        The text of the event you want to generate.
         @param sourcetype: The sourcetype of the event you want to generate.
         @param cam_header: Optionally exclude the inclusion of the index-time header.
@@ -417,10 +420,10 @@ class ModularAction(object):
     def writeevents(self, index = 'summary', host = None, source = None, fext = 'common_action_model'):
         """ The purpose of this method is to create arbitrary splunk events
         from the list of events in the ModularAction instance.
-        
+
         Please use addevent() for populating the list of events in
         the ModularAction instance.
-        
+
         @param index:  The index to write the events to.
                        Defaults to "summary".
         @param host:   The value of host the events should take on.
@@ -435,7 +438,7 @@ class ModularAction(object):
                        Defaults to "common_action_model" ("stash_common_action_model").
                        Only override if you've set up a corresponding props.conf
                        stanza to handle the extension.
-        
+
         @return bool:  Returns True if all events were successfully written
                        Returns False if any errors were encountered
         """
@@ -471,7 +474,7 @@ class ModularAction(object):
                     fn = '%s_%s.stash_demisto_%s' % (mktimegm(time.gmtime()), random.randint(0, 100000), fext)
                     # fp = make_splunkhome_path(['var', 'spool', 'splunk', fn])
                     fp = make_splunkhome_path(["var", "spool","splunk", fn])
-                    ## obtain fh    
+                    ## obtain fh
                     with open(fp, 'w') as fh:
                         fh.write(fout)
                 except:
@@ -487,7 +490,7 @@ class ModularAction(object):
         """ This method serves as an illustration stub.
         Serves as a container for operations which satisfy the nature of the action.
         For instance, the third party API call.
-        
+
         For cleanliness it is recommended that you subclass ModularAction
         and implement your own dowork() method.
         """
@@ -502,7 +505,7 @@ class ModularAction(object):
         @param level:       The logging level.
         @param maxBytes:    The maximum log file size before rollover.
         @param backupCount: The number of log files to retain.
-        
+
         @return logger:     Returns an instance of logger
         """
         logfile = make_splunkhome_path(['var', 'log', 'splunk', name + '.log'])
