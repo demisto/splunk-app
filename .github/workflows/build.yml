@@ -5,10 +5,6 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    env:
-      SPL_PATH: ${{ github.workspace }}/artifact/demisto-add-on-for-splunk.tgz
-
     steps:
       - uses: actions/checkout@v2
         name: Checkout to repository
@@ -24,9 +20,15 @@ jobs:
         run: |
           flake8 ./add-on/TA-Demisto
       - name: Compress Add-on
+        env:
+          SPL_PATH: '${{ GITHUB_WORKSPACE }}/artifact/demisto-add-on-for-splunk.tgz'
         run: |
-          tar -cvzf ${{ SPL_PATH }} add-on/TA-Demisto
+          mkdir artifact
+          tar -cvzf $SPL_PATH add-on/TA-Demisto
       - name: Run AppInspect
+        env:
+          SPLUNK_USERNAME: ${{ secrets.SPLUNK_USERNAME }}
+          SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
-          python3 .github/appinspect.py '${{ secrets.splunk_username }}' '${{ secrets.splunk_password }}' '${{ SPL_PATH }}'
+          python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
 
