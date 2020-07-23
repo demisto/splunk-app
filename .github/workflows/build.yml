@@ -1,0 +1,32 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SPL_PATH: ${{ github.workspace }}/artifact/demisto-add-on-for-splunk.tgz
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout to repository
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+      - name: Install dependencies
+        run: |
+          python3 -m pip install flake8
+          python3 -m pip install requests
+      - name: Run Flake8
+        run: |
+          flake8 ./add-on/TA-Demisto
+      - name: Compress Add-on
+        run: |
+          tar -cvzf ${{ SPL_PATH }} add-on/TA-Demisto
+      - name: Run AppInspect
+        run: |
+          python3 .github/appinspect.py '${{ secrets.splunk_username }}' '${{ secrets.splunk_password }}' '${{ SPL_PATH }}'
+
