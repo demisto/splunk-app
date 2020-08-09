@@ -5,15 +5,36 @@
 # This code was written by Demisto Inc
 #
 
+import sys
 import json
 import re
 import splunk.admin as admin
 import splunk.rest
 import requests
 import hashlib
-from .demisto_config import DemistoConfig
+import splunk.version as ver
 
-from splunk.clilib import cli_common as cli
+# Importing the demisto_config library
+# A.  Import make_splunkhome_path
+# B.  Append library path to sys.path
+# C.  Import DemistoConfig from demisto_config
+
+version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
+
+try:
+    if version >= 6.4:
+        from splunk.clilib.bundle_paths import make_splunkhome_path
+    else:
+        from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+except ImportError as e:
+    raise ImportError("Import splunk sub libraries failed\n")
+
+sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]))
+
+try:
+    from demisto_config import DemistoConfig
+except:
+    sys.exit(3)
 
 # Logging configuration
 maxbytes = 200000000

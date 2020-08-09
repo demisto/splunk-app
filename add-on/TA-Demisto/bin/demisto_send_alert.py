@@ -7,7 +7,6 @@
 import json
 import logging
 import sys
-import time
 import csv
 import gzip
 import re
@@ -17,9 +16,6 @@ import splunk.rest
 from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
-from .demisto_config import DemistoConfig
-from .demisto_incident import DemistoIncident
-
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 
@@ -28,10 +24,10 @@ CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demis
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
 
-# Importing the cim_actions.py library
+# Importing the cim_actions demisto_config and demisto_incident libraries
 # A.  Import make_splunkhome_path
 # B.  Append library path to sys.path
-# C.  Import ModularAction from cim_actions
+# C.  Import ModularAction, DemistoConfig, DemistoIncident from libraries
 
 try:
     if version >= 6.4:
@@ -45,6 +41,8 @@ sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]
 
 try:
     from cim_actions import ModularAction
+    from demisto_config import DemistoConfig
+    from demisto_incident import DemistoIncident
 except:
     sys.exit(3)
 
