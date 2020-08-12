@@ -20,6 +20,9 @@ jobs:
         run: |
           flake8 ./add-on/TA-Demisto
       - name: Compress Add-on
+        env:
+          SPLUNK_USERNAME: ${{ secrets.SPLUNK_USERNAME }}
+          SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
           echo ::set-env name=SPL_PATH::"$GITHUB_WORKSPACE/artifacts/demisto-add-on-for-splunk.tgz"
           mkdir $GITHUB_WORKSPACE/artifacts
@@ -29,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tar-file
-          path: $SPL_PATH
+          path: ${{ env.SPL_PATH }}
       - name: Run AppInspect
         env:
           SPLUNK_USERNAME: ${{ secrets.SPLUNK_USERNAME }}
