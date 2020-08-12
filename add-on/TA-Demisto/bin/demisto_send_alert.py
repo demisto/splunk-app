@@ -34,7 +34,7 @@ try:
         from splunk.clilib.bundle_paths import make_splunkhome_path
     else:
         from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
-except ImportError as e:
+except ImportError:
     raise ImportError("Import splunk sub libraries failed\n")
 
 sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]))
@@ -181,7 +181,7 @@ if __name__ == '__main__':
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         try:
             server_certs = json.loads(config.get('SERVER_CERT', '{}'))
-        except Exception as e:
+        except Exception:
             server_certs = {
                 demisto_servers[0]: ''
             }

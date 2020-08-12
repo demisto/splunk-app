@@ -17,7 +17,7 @@ try:
         from splunk.clilib.bundle_paths import make_splunkhome_path
     else:
         from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
-except ImportError as e:
+except ImportError:
     raise ImportError("Import splunk sub libraries failed\n")
 
 maxbytes = 2000000

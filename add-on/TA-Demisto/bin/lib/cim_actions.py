@@ -160,7 +160,7 @@ class ModularAction(object):
             try:
                 with open(self.info_file, 'rU') as fh:
                     self.info = next(csv.DictReader(fh))
-            except Exception as e:
+            except Exception:
                 self.message('Could not retrieve info.csv', level=logging.WARN)
 
     def addjobinfo(self):
@@ -184,7 +184,7 @@ class ModularAction(object):
                     self.logger.debug(self.job)
                 else:
                     self.message('Could not retrieve search job info', level=logging.WARN)
-            except Exception as e:
+            except Exception:
                 self.message('Could not retrieve search job info', level=logging.WARN)
 
     def message(self, signature, status=None, rids=None, level=logging.INFO, **kwargs):
