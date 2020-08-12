@@ -25,11 +25,11 @@ jobs:
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
           mkdir $GITHUB_WORKSPACE/artifacts
+
           export SPL_PATH="$GITHUB_WORKSPACE/artifacts/demisto-add-on-for-splunk.tgz"
-          echo "::set-env name=SPL_PATH::$SPL_PATH"
-          echo "SPL_PATH=$SPL_PATH"
+          echo ::set-env name=SPL_PATH::$SPL_PATH
+
           tar -cvzf $SPL_PATH --one-file-system ./add-on/TA-Demisto
-          python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
       - name: Upload tar file to artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -39,6 +39,7 @@ jobs:
         env:
           SPLUNK_USERNAME: ${{ secrets.SPLUNK_USERNAME }}
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
+          SPL_PATH: ${{ env.SPL_PATH }}
         run: |
           python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
 

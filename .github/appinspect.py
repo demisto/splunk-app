@@ -39,9 +39,9 @@ class AppInspector:
 
         response = self.http_request('POST', url, files=files)
 
-        print('Successfully submitted add-on to to AppInspect.')
-
         self.request_id = response.json().get('request_id')
+
+        print(f'Successfully submitted add-on to to AppInspect.\nRequest ID: {self.request_id}')
 
     def wait_for_submission_report(self):
         while True:
@@ -52,7 +52,8 @@ class AppInspector:
             if response.status_code == 404 or response.json().get('status') in ['PREPARING', 'PROCESSING']:
                 time.sleep(5)  # report is not ready - do nothing
             elif response.status_code == 200:
-                break  # report is ready!
+                print('Report is ready!')
+                break
             else:
                 response.raise_for_status()
 
