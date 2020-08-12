@@ -27,7 +27,8 @@ jobs:
           mkdir $GITHUB_WORKSPACE/artifacts
           export SPL_PATH="$GITHUB_WORKSPACE/artifacts/demisto-add-on-for-splunk.tgz"
           echo "::set-env name=SPL_PATH::$SPL_PATH"
-          echo "SPL_PATH=${{ env.SPL_PATH }}"
+          echo "SPL_PATH=$SPL_PATH"
+          echo "SPL_PATH=${SPL_PATH}"
           tar -cvzf ${{ env.SPL_PATH }} --one-file-system ./add-on/TA-Demisto
           python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD ${{ env.SPL_PATH }}
       - name: Upload tar file to artifacts
