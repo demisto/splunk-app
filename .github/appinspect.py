@@ -49,11 +49,12 @@ class AppInspector:
             print('Checking if submission report is ready...')
             response = self.http_request('GET', url, raise_errors=False)
 
-            if response.status_code == 404 or response.json().get('status') in ['PENDING', 'PREPARING', 'PROCESSING']:
+            status = response.json().get('status').upper()
+
+            if response.status_code == 404 or status in ['PENDING', 'PREPARING', 'PROCESSING']:
                 time.sleep(5)  # report is not ready - do nothing
             elif response.status_code == 200:
-                print(response.json().get('status'))
-                print('Report is ready!')
+                print(f'Report is ready! Status: {status}')
                 break
             else:
                 response.raise_for_status()

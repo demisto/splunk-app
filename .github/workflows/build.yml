@@ -29,7 +29,7 @@ jobs:
           export SPL_PATH="$GITHUB_WORKSPACE/artifacts/demisto-add-on-for-splunk.tgz"
           echo ::set-env name=SPL_PATH::$SPL_PATH
 
-          tar -cvzf $SPL_PATH --one-file-system ./add-on/TA-Demisto
+          tar -cvzf $SPL_PATH ./add-on/TA-Demisto
       - name: Upload tar file to artifacts
         uses: actions/upload-artifact@v2
         with:
