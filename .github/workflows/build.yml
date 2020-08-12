@@ -23,7 +23,7 @@ jobs:
         run: |
           echo ::set-env name=SPL_PATH::"$GITHUB_WORKSPACE/artifact/demisto-add-on-for-splunk.tgz"
           mkdir $GITHUB_WORKSPACE/artifact
-          tar -cvzf $SPL_PATH ./add-on/TA-Demisto
+          tar -cvzf $SPL_PATH --one-file-system /add-on/TA-Demisto
       - name: Run AppInspect
         env:
           SPLUNK_USERNAME: ${{ secrets.SPLUNK_USERNAME }}
