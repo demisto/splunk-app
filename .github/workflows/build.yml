@@ -22,8 +22,7 @@ jobs:
       - name: Compress Add-on
         run: |
           echo ::set-env name=SPL_PATH::"$GITHUB_WORKSPACE/artifact/demisto-add-on-for-splunk.tgz"
-          cd $GITHUB_WORKSPACE
-          mkdir artifact
+          mkdir $GITHUB_WORKSPACE/artifact
           tar -cvzf $SPL_PATH ./add-on/TA-Demisto
       - name: Run AppInspect
         env:
