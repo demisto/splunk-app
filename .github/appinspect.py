@@ -52,6 +52,7 @@ class AppInspector:
             if response.status_code == 404 or response.json().get('status') in ['PREPARING', 'PROCESSING']:
                 time.sleep(5)  # report is not ready - do nothing
             elif response.status_code == 200:
+                print(response.json().get('status'))
                 print('Report is ready!')
                 break
             else:

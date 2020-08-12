@@ -33,7 +33,7 @@ jobs:
       - name: Upload tar file to artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: tar-file
+          name: demisto-add-on-for-splunk.tgz
           path: ${{ env.SPL_PATH }}
       - name: Run AppInspect
         env:
