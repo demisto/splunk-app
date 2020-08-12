@@ -25,7 +25,7 @@ jobs:
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
           mkdir $GITHUB_WORKSPACE/artifacts
-          echo ::set-env name=SPL_PATH::"${GITHUB_WORKSPACE}/artifacts/demisto-add-on-for-splunk.tgz"
+          echo "::set-env name=SPL_PATH::${GITHUB_WORKSPACE}/artifacts/demisto-add-on-for-splunk.tgz"
           echo "SPL_PATH=${{ env.SPL_PATH }}"
           tar -cvzf ${{ env.SPL_PATH }} --one-file-system ./add-on/TA-Demisto
           echo "SPL_PATH=${SPL_PATH}"
