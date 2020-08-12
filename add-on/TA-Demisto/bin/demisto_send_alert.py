@@ -22,7 +22,7 @@ from six.moves.urllib.request import pathname2url
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
-version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
+version = float(re.search(r"(\d+.\d+)", ver.__version__).group(1))
 
 # Importing the cim_actions demisto_config and demisto_incident libraries
 # A.  Import make_splunkhome_path
@@ -43,7 +43,7 @@ try:
     from cim_actions import ModularAction
     from demisto_config import DemistoConfig
     from demisto_incident import DemistoIncident
-except:
+except BaseException:
     sys.exit(3)
 
 logger = DemistoConfig.get_logger("DEMISTOALERT")
@@ -52,8 +52,17 @@ modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
 class DemistoAction(ModularAction):
 
-    def create_demisto_incident(self, result, authkey, verify, search_query="", search_url="",
-                                ssl_cert_loc="", search_name=None, proxies=None, url=None):
+    def create_demisto_incident(
+            self,
+            result,
+            authkey,
+            verify,
+            search_query="",
+            search_url="",
+            ssl_cert_loc="",
+            search_name=None,
+            proxies=None,
+            url=None):
         try:
             logger.info("create_demisto_incident called")
             demisto = DemistoIncident(logger)
@@ -89,7 +98,9 @@ class DemistoAction(ModularAction):
                     status='failure')
 
         except Exception as ex:
-            logger.exception("Demisto Incident creation in create_demisto_incident function failed, error was: " + str(ex))
+            logger.exception(
+                "Demisto Incident creation in create_demisto_incident function failed, error was: " +
+                str(ex))
             self.message('Failed in creating incident in Demisto',
                          status='failure')
 

@@ -19,7 +19,7 @@ import splunk.version as ver
 # B.  Append library path to sys.path
 # C.  Import DemistoConfig from demisto_config
 
-version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
+version = float(re.search(r"(\d+.\d+)", ver.__version__).group(1))
 
 try:
     if version >= 6.4:
@@ -33,7 +33,7 @@ sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]
 
 try:
     from demisto_config import DemistoConfig
-except:
+except BaseException:
     sys.exit(3)
 
 # Logging configuration
@@ -42,9 +42,9 @@ maxbytes = 200000000
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 PORT_REGEX = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
-IP_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
-DOMAIN_REGEX = "(?i)(?:[-A-Z0-9]+\[?\.\]?)+[-A-Z0-9]+(?::[0-9]+)?(?:(?:\/|\?)[-A-Z0-9+&@#\/%=~_$?!\-:,.\(\);]*[A-Z0-9+&@#\/%=~_$\(\);])?|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
-URL_REGEX = "(?i)(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})"
+IP_REGEX = r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+DOMAIN_REGEX = r"(?i)(?:[-A-Z0-9]+\[?\.\]?)+[-A-Z0-9]+(?::[0-9]+)?(?:(?:\/|\?)[-A-Z0-9+&@#\/%=~_$?!\-:,.\(\);]*[A-Z0-9+&@#\/%=~_$\(\);])?|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
+URL_REGEX = r"(?i)(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})"
 
 logger = DemistoConfig.get_logger("DEMISTOSETUP")
 demisto = DemistoConfig(logger)
@@ -291,7 +291,7 @@ class ConfigApp(admin.MConfigHandler):
             raise Exception('Network validation failed. There\'s a connectivity issue with Demisto, please check your '
                             "network settings. Got status: " + str(response.status_code) + ' with the following '
                                                                                            'response: ' + json.dumps(
-                response.json()))
+                                response.json()))
 
         except requests.exceptions.SSLError as err:
             raise Exception('Network validation failed because of SSL validation error. In case you use self-signed '

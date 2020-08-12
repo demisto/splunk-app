@@ -10,7 +10,7 @@ import re
 import splunk.version as ver
 
 
-version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
+version = float(re.search(r"(\d+.\d+)", ver.__version__).group(1))
 
 try:
     if version >= 6.4:
@@ -47,4 +47,3 @@ class DemistoConfig(object):
         logger.setLevel(logging.INFO)
         logger.addHandler(handler)
         return logger
-
