@@ -170,7 +170,7 @@ if __name__ == '__main__':
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         try:
             server_certs = json.loads(config.get('SERVER_CERT', '{}'))
-        except:
+        except Exception as e:
             server_certs = {
                 demisto_servers[0]: ''
             }
