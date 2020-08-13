@@ -77,7 +77,8 @@ jobs:
           echo "First-time password setting"
           CONTAINER_ID=$(docker ps -aqf "name=splunk")
           docker exec $CONTAINER_ID bash
-          source /opt/splunk/bin/setSplunkEnv
+          ls
+          source ./bin/setSplunkEnv
           splunk start
           splunk edit user admin -password admin -role admin -auth admin:changeme
           exit
