@@ -46,9 +46,9 @@ jobs:
           echo "do nothing"
       - name: Create Splunk Container with Add-on
         env:
-          ADD_ON_DIR: ./add-on/TA-Demisto
+          ADD_ON_DIR: add-on/TA-Demisto
         run: |
-          docker run -it --mount type=bind,source="$ADD_ON_DIR",target=/opt/splunk/etc/apps/Demisto-TA/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
+          docker run -it --mount type=bind,source=$GITHUB_WORKSPACE/"$ADD_ON_DIR",target=/opt/splunk/etc/apps/Demisto-TA/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
 
           IS_CONTAINER_HEALTHY=false
           TRY_COUNT=1
