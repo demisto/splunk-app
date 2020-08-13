@@ -75,9 +75,8 @@ jobs:
           DEMISTO_API_KEY: test_api_key
         run: |
           echo "First-time password setting"
-
           CONTAINER_ID=$(docker ps -aqf "name=splunk")
-          docker exec -it $CONTAINER_ID bash
+          docker exec $CONTAINER_ID bash
           sudo ./splunk edit user admin -password admin -role admin -auth admin:changeme
           exit
 
