@@ -51,15 +51,18 @@ jobs:
           SPL_PATH: ${{ env.SPL_PATH }}
         run: |
           docker run -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
-          IS_CONTAINER_HEALTHY=1
-          while [ "$IS_CONTAINER_HEALTHY" = 1 ]
-          do
+
+          IS_CONTAINER_HEALTHY=false
+          TRY_COUNT=1
+          MAX_TRIES=10
+
+          while [ "$IS_CONTAINER_HEALTHY" = false ] && [[ $TRY_COUNT -le $MAX_TRIES ]]; do
              echo "waiting for container to be ready..."
              sleep 5
              CONTAINER_STATUS=$(docker inspect --format='{{.State.Health.Status}}' splunk)
              echo $CONTAINER_STATUS
-             [ "$CONTAINER_STATUS" = "healthy" ] ; IS_CONTAINER_HEALTHY=$?
-             echo IS_CONTAINER_HEALTHY
+             [ "$CONTAINER_STATUS" = "healthy" ] && IS_CONTAINER_HEALTHY=true || IS_CONTAINER_HEALTHY=false
+             echo $IS_CONTAINER_HEALTHY
           done
           echo "Container is ready!"
           pytest --splunk-type=external --splunk-app=$SPL_PATH --splunk-host=$SPLUNK_HOST --splunk-port=$SPLUNK_PORT --splunk-user=admin --splunk-password=changeme
