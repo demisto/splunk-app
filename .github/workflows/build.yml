@@ -63,7 +63,7 @@ jobs:
           echo "Container is ready!"
 
           ADD_ON_PATH=https://localhost:8089/servicesNS/nobody/TA-Demisto
-          echo ::set-env name=ADD_ON_PATH::ADD_ON_PATH
+          echo ::set-env name=ADD_ON_PATH::$ADD_ON_PATH
       - name: Setup Add-on
         env:
           ADD_ON_PATH: ${{ env.ADD_ON_PATH }}
