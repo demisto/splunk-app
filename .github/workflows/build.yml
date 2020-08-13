@@ -54,6 +54,7 @@ jobs:
           IS_CONTAINER_HEALTHY=1
           while [ "$IS_CONTAINER_HEALTHY" = 1 ]
           do
+             echo "waiting for container to be ready..."
              sleep 5
              CONTAINER_STATUS=$(docker inspect --format='{{.State.Health.Status}}' splunk)
              [ "$CONTAINER_STATUS" = "healthy" ] ; IS_CONTAINER_HEALTHY=$?
