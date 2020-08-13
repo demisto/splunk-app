@@ -61,9 +61,17 @@ jobs:
              [ "$CONTAINER_STATUS" = "healthy" ] && IS_CONTAINER_HEALTHY=true || IS_CONTAINER_HEALTHY=false
           done
           echo "Container is ready!"
+
+          ADD_ON_PATH=https://localhost:8089/servicesNS/nobody/TA-Demisto
+          echo ::set-env name=ADD_ON_PATH::ADD_ON_PATH
       - name: Setup Add-on
         env:
-          SPL_PATH: ${{ env.SPL_PATH }}
+          ADD_ON_PATH: ${{ env.ADD_ON_PATH }}
+          DEMISTO_URL: https://test.com
+          DEMISTO_API_KEY: test_api_key
         run: |
+          echo "Setting up Demisto client credentials"
+          curl -k -u admin:changeme "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false DEMISTOURL=$DEMISTO_URL AUTHKEY=$DEMISTO_API_KEY
+
           CONTAINER_ID=$(docker ps -aqf "name=splunk")
           echo $CONTAINER_ID
