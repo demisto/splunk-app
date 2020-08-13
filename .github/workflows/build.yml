@@ -62,19 +62,19 @@ jobs:
           done
           echo "Container is ready!"
 
-          SERVICE_URL=https://localhost:8089
-          ADD_ON_PATH=$SERVICE_URL/servicesNS/nobody/TA-Demisto
-          echo ::set-env name=SERVICE_URL::SERVICE_URL
+          HOST=https://localhost:8089
+          echo ::set-env name=HOST::$HOST
+          ADD_ON_PATH=$HOST/servicesNS/nobody/TA-Demisto
           echo ::set-env name=ADD_ON_PATH::$ADD_ON_PATH
 
       - name: Setup Add-on
         env:
-          SERVICE_URL: ${{ env.SERVICE_URL }}
+          HOST: ${{ env.HOST }}
           ADD_ON_PATH: ${{ env.ADD_ON_PATH }}
           DEMISTO_URL: https://test.com
           DEMISTO_API_KEY: test_api_key
         run: |
-          curl -k "$SERVICE_URL"/services/auth/login -d username=admin -d password=changeme
+          curl -k "$HOST"/services/auth/login -d username=admin -d password=changeme
 
           echo "Setting up Demisto client credentials"
           curl -k -u admin:changeme "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
