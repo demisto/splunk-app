@@ -77,7 +77,8 @@ jobs:
           echo "First-time password setting"
           CONTAINER_ID=$(docker ps -aqf "name=splunk")
           docker exec $CONTAINER_ID bash
-          sudo ./bin/splunk edit user admin -password admin -role admin -auth admin:changeme
+          cd bin
+          sudo ./splunk edit user admin -password admin -role admin -auth admin:changeme
           exit
 
           echo "Setting up Demisto client credentials"
