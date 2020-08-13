@@ -44,13 +44,11 @@ jobs:
         run: |
           # python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
           echo "do nothing"
-      - name: Setup Splunk Environment
+      - name: Create Splunk Container with Add-on
         env:
-          SPLUNK_HOST: https://localhost
-          SPLUNK_PORT: 8000
-          SPL_PATH: ${{ env.SPL_PATH }}
+          ADD_ON_DIR: ./add-on/TA-Demisto
         run: |
-          docker run -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
+          docker run -it --mount type=bind,source="$(ADD_ON_DIR)",target=/opt/splunk/etc/apps/Demisto-TA/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
 
           IS_CONTAINER_HEALTHY=false
           TRY_COUNT=1
@@ -63,11 +61,9 @@ jobs:
              [ "$CONTAINER_STATUS" = "healthy" ] && IS_CONTAINER_HEALTHY=true || IS_CONTAINER_HEALTHY=false
           done
           echo "Container is ready!"
-      - name: Test
+      - name: Setup Add-on
+        env:
+          SPL_PATH: ${{ env.SPL_PATH }}
         run: |
-          echo "test"
-          CONTAINER_STATUS=$(docker inspect --format='{{.State.Health.Status}}' splunk)
-          echo $CONTAINER_STATUS
-          echo "test"
-          # pytest --splunk-type=external --splunk-app=$SPL_PATH --splunk-host=$SPLUNK_HOST --splunk-port=$SPLUNK_PORT --splunk-user=admin --splunk-password=changeme
-
+          CONTAINER_ID=$(docker ps -aqf "name=splunk")
+          echo $CONTAINER_ID
