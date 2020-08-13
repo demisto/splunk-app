@@ -67,6 +67,8 @@ jobs:
           ADD_ON_PATH=$HOST/servicesNS/nobody/TA-Demisto
           echo ::set-env name=ADD_ON_PATH::$ADD_ON_PATH
 
+          # todo - it's possible to install an app using docker exec and the tgz file
+
       - name: Setup Add-on
         env:
           HOST: ${{ env.HOST }}
@@ -75,7 +77,7 @@ jobs:
           DEMISTO_API_KEY: test_api_key
         run: |
           echo "First-time password setting"
-          docker exec splunk /opt/splunk/bin/splunk edit user admin -password admin -role admin -auth admin:changeme
+          docker exec splunk sudo /opt/splunk/bin/splunk edit user admin -password admin -role admin -auth admin:changeme
 
           echo "Setting up Demisto client credentials"
           curl -k -u admin:admin "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
