@@ -75,7 +75,7 @@ jobs:
           DEMISTO_API_KEY: test_api_key
         run: |
           echo "First-time password setting"
-          curl -k "$HOST"/services/authentication/users -d username=admin -d password=admin -d roles=admin
+          curl -k -u admin:changeme "$HOST"/services/authentication/users -d name=admin -d password=admin -d roles=admin
 
           echo "Setting up Demisto client credentials"
           curl -k -u admin:admin "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
