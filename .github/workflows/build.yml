@@ -58,11 +58,9 @@ jobs:
 
           while [ "$IS_CONTAINER_HEALTHY" = false ] && [[ $TRY_COUNT -le $MAX_TRIES ]]; do
              echo "waiting for container to be ready..."
-             sleep 5
+             sleep 30
              CONTAINER_STATUS=$(docker inspect --format='{{.State.Health.Status}}' splunk)
-             echo $CONTAINER_STATUS
              [ "$CONTAINER_STATUS" = "healthy" ] && IS_CONTAINER_HEALTHY=true || IS_CONTAINER_HEALTHY=false
-             echo $IS_CONTAINER_HEALTHY
           done
           echo "Container is ready!"
           pytest --splunk-type=external --splunk-app=$SPL_PATH --splunk-host=$SPLUNK_HOST --splunk-port=$SPLUNK_PORT --splunk-user=admin --splunk-password=changeme
