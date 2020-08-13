@@ -76,7 +76,7 @@ jobs:
         run: |
           echo "First-time password setting"
           CONTAINER_ID=$(docker ps -aqf "name=splunk")
-          docker exec $CONTAINER_ID bash
+          docker exec -i $CONTAINER_ID bash
           ls
           source ./bin/setSplunkEnv
           splunk start
