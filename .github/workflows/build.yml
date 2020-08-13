@@ -42,7 +42,7 @@ jobs:
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           SPL_PATH: ${{ env.SPL_PATH }}
         run: |
-          python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
+          # python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
       - name: Setup Splunk Environment
       - env:
           SPLUNK_HOST: https://localhost
