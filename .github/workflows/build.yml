@@ -48,7 +48,7 @@ jobs:
         env:
           ADD_ON_DIR: add-on/TA-Demisto
         run: |
-          docker run -it --mount type=bind,source=$GITHUB_WORKSPACE/"$ADD_ON_DIR",target=/opt/splunk/etc/apps/Demisto-TA/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
+          docker run -it --mount type=bind,source=$GITHUB_WORKSPACE/"$ADD_ON_DIR",target=/opt/splunk/etc/apps/TA-Demisto/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
 
           IS_CONTAINER_HEALTHY=false
           TRY_COUNT=1
@@ -78,9 +78,6 @@ jobs:
         run: |
           echo "First-time password setting"
           docker exec splunk sudo /opt/splunk/bin/splunk edit user admin -password passw0rd -role admin -auth admin:changeme
-
-          echo "Test - login"
-          curl -k https://localhost:8089/services/auth/login --data-urlencode username=admin --data-urlencode password=passw0rd
 
           echo "Setting up Demisto client credentials"
           curl -k -u admin:passw0rd https://localhost:8089/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
