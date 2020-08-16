@@ -28,7 +28,13 @@ jobs:
           export SPL_PATH="$GITHUB_WORKSPACE/artifacts/demisto-add-on-for-splunk.tgz"
           echo ::set-env name=SPL_PATH::$SPL_PATH
 
-          tar -cvzf $SPL_PATH "./add-on/TA-Demisto"
+          cd add-on
+          tar -cvzf $SPL_PATH TA-Demisto
+      - name: Upload tar file to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: demisto-add-on-for-splunk.tgz
+          path: ${{ env.SPL_PATH }}
       - name: Run AppInspect
         env:
           SPLUNK_USERNAME: ${{ secrets.SPLUNK_USERNAME }}
@@ -74,8 +80,3 @@ jobs:
 
           echo "Setting up Demisto client credentials"
           curl -k -u admin:passw0rd "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
-      - name: Upload tar file to artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: demisto-add-on-for-splunk.tgz
-          path: ${{ env.SPL_PATH }}
