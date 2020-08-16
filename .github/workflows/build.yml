@@ -70,7 +70,7 @@ jobs:
           # todo - it's possible to install an app using docker exec and the tgz file
 
       - name: Setup Add-on
-        if: !${{ failure() }}
+        if: ${{ !failure() }}
         env:
           HOST: ${{ env.HOST }}
           ADD_ON_PATH: ${{ env.ADD_ON_PATH }}
