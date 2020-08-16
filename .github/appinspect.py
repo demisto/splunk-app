@@ -24,14 +24,10 @@ class AppInspector:
 
         return response.json().get('data').get('token')
 
-    def http_request(self, method, url, headers=None, data=None, raise_errors=True):
-        auth_header = {'Authorization': f'Bearer {self.token}'}
-        if headers:
-            headers.update(auth_header)
-        else:
-            headers = auth_header
+    def http_request(self, method, url, data=None, files=None, raise_errors=True):
+        headers = {'Authorization': f'Bearer {self.token}'}
 
-        response = requests.request(method, url, headers=headers, data=data)
+        response = requests.request(method, url, headers=headers, data=data, files=files)
 
         if raise_errors:
             response.raise_for_status()
@@ -40,16 +36,9 @@ class AppInspector:
 
     def submit_file(self):
         url = 'https://appinspect.splunk.com/v1/app/validate'
-        file_path = self.spl_path
-        app_name = os.path.basename(file_path)
-        fields = {'app_package': (app_name, open(self.spl_path, 'rb'))}
-        payload = MultipartEncoder(fields=fields)
-        headers = {
-            'Content-Type': payload.content_type,
-            'max-messages': 'all'
-        }
+        files = {'app_package': open(self.spl_path, 'rb')}
 
-        response = self.http_request('POST', url, headers=headers, data=payload)
+        response = self.http_request('POST', url, files=files)
 
         self.request_id = response.json().get('request_id')
 
