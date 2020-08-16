@@ -44,6 +44,7 @@ jobs:
           echo "Running AppInspect on add-on"
           python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
       - name: Create Splunk Container with Add-on
+        if: ${{ always() }}
         env:
           ADD_ON_DIR: add-on/TA-Demisto
         run: |
@@ -69,6 +70,7 @@ jobs:
           # todo - it's possible to install an app using docker exec and the tgz file
 
       - name: Setup Add-on
+        if: !${{ failure() }}
         env:
           HOST: ${{ env.HOST }}
           ADD_ON_PATH: ${{ env.ADD_ON_PATH }}
