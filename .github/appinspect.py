@@ -2,10 +2,8 @@ import requests
 import time
 import json
 import argparse
-import os
 
 from requests.auth import HTTPBasicAuth
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 
 class AppInspector:
