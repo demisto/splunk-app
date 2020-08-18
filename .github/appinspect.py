@@ -35,8 +35,9 @@ class AppInspector:
     def submit_file(self):
         url = 'https://appinspect.splunk.com/v1/app/validate'
         files = {'app_package': open(self.spl_path, 'rb')}
+        data = {'excluded_tags': 'cloud'}
 
-        response = self.http_request('POST', url, files=files)
+        response = self.http_request('POST', url, data=data, files=files)
 
         self.request_id = response.json().get('request_id')
 
