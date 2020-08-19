@@ -144,15 +144,7 @@ class ConfigApp(admin.MConfigHandler):
                     'User don\'t have sufficient permissions in Splunk to store the password. Make sure that this '
                     'user has admin permissions and advice with your Splunk admin')
 
-    def get_ssl_validation_settings(self):
-        # checking if the user instructed not to use SSL - development environment scenario
-        # getting the current configuration from Splunk
-        get_args = {
-            'output_mode': 'json'
-        }
-        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET',
-                                                     getargs=get_args)
-
+    def get_validate_ssl_value_from_response(self, success, content):
         conf_dic = json.loads(content)
         config = {}
         if success and conf_dic:
@@ -167,12 +159,18 @@ class ConfigApp(admin.MConfigHandler):
 
         validate_ssl = config.get('VALIDATE_SSL', True)
 
-        if validate_ssl == 0 or validate_ssl == "0":
-            validate_ssl = False
-        else:
-            validate_ssl = True
+        return not (validate_ssl == 0 or validate_ssl == "0")
 
-        return validate_ssl
+    def get_ssl_validation_settings(self):
+        # checking if the user instructed not to use SSL - development environment scenario
+        # getting the current configuration from Splunk
+        get_args = {
+            'output_mode': 'json'
+        }
+        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET',
+                                                     getargs=get_args)
+
+        return self.get_validate_ssl_value_from_response(success, content)
 
     def get_proxy_settings(self):
         proxies = {}
@@ -191,12 +189,12 @@ class ConfigApp(admin.MConfigHandler):
         else:
             proxy_username = True
 
-        if (proxy_address and proxy_username and proxy_password):
+        if proxy_address and proxy_username and proxy_password:
             proxy = "https://" + self.callerArgs.data['HTTPS_PROXY_USERNAME'][0] + ":" + \
                     self.callerArgs.data['HTTPS_PROXY_PASSWORD'][0] + "@" + \
                     self.callerArgs.data['HTTPS_PROXY_ADDRESS'][0].split("//")[1]
             proxies['https'] = proxy
-        elif (proxy_address and not (proxy_username and proxy_password)):
+        elif proxy_address and not (proxy_username and proxy_password):
             proxy = self.callerArgs.data['HTTPS_PROXY_ADDRESS'][0]
             proxies['https'] = proxy
 

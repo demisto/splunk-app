@@ -81,5 +81,7 @@ jobs:
           curl -k -u admin:passw0rd "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
       - name: Run unit-tests
         if: ${{ always() }}
-        run: pytest -vv
+        run: |
+          echo ::set-env name=PYTHONPATH::"/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin:$PYTHONPATH"
+          pytest -vv
 

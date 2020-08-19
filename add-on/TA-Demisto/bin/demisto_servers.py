@@ -14,14 +14,7 @@ class ServerList(BaseRestHandler):
     def __init__(self, *args):
         BaseRestHandler.__init__(self, *args)
 
-    def get_configured_servers(self):
-        get_args = {
-            'output_mode': 'json'
-        }
-
-        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.sessionKey, method='GET',
-                                                     getargs=get_args)
-
+    def get_servers_from_response(self, success, content):
         conf_dic = json.loads(content)
         config = {}
         if success and conf_dic:
@@ -34,9 +27,17 @@ class ServerList(BaseRestHandler):
         if 'config' in config:
             config.pop('config')
 
-        servers = config.get('DEMISTOURL', '').strip().split(',')
+        return config.get('DEMISTOURL', '').strip().split(',')
 
-        return servers
+    def get_configured_servers(self):
+        get_args = {
+            'output_mode': 'json'
+        }
+
+        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.sessionKey, method='GET',
+                                                     getargs=get_args)
+
+        return self.get_servers_from_response(success, content)
 
     def handle_GET(self):
         try:

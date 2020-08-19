@@ -50,6 +50,22 @@ logger = DemistoConfig.get_logger("DEMISTOALERT")
 modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
 
+def get_config_from_response(success, content):
+    conf_dic = json.loads(content)
+    config = {}
+    if success and conf_dic:
+        for entry in conf_dic.get('entry', []):
+            val = entry.get('content', {})
+            if val:
+                config = val
+    if '' in config:
+        config.pop('')
+    if 'config' in config:
+        config.pop('config')
+
+    return config
+
+
 class DemistoAction(ModularAction):
 
     def create_demisto_incident(
@@ -166,17 +182,7 @@ if __name__ == '__main__':
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, modaction.session_key, method='GET',
                                                      getargs=get_args)
 
-        conf_dic = json.loads(content)
-        config = {}
-        if success and conf_dic:
-            for entry in conf_dic.get('entry', []):
-                val = entry.get('content', {})
-                if val:
-                    config = val
-        if '' in config:
-            config.pop('')
-        if 'config' in config:
-            config.pop('config')
+        config = get_config_from_response(success, content)
 
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         try:
