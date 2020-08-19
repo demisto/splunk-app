@@ -10,24 +10,25 @@ from splunk.rest import BaseRestHandler
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
 
+def get_servers_from_response(success, content):
+    conf_dic = json.loads(content)
+    config = {}
+    if success and conf_dic:
+        for entry in conf_dic.get('entry', []):
+            val = entry.get('content', {})
+            if val:
+                config = val
+    if '' in config:
+        config.pop('')
+    if 'config' in config:
+        config.pop('config')
+
+    return config.get('DEMISTOURL', '').strip().split(',')
+
+
 class ServerList(BaseRestHandler):
     def __init__(self, *args):
         BaseRestHandler.__init__(self, *args)
-
-    def get_servers_from_response(self, success, content):
-        conf_dic = json.loads(content)
-        config = {}
-        if success and conf_dic:
-            for entry in conf_dic.get('entry', []):
-                val = entry.get('content', {})
-                if val:
-                    config = val
-        if '' in config:
-            config.pop('')
-        if 'config' in config:
-            config.pop('config')
-
-        return config.get('DEMISTOURL', '').strip().split(',')
 
     def get_configured_servers(self):
         get_args = {
@@ -37,7 +38,7 @@ class ServerList(BaseRestHandler):
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.sessionKey, method='GET',
                                                      getargs=get_args)
 
-        return self.get_servers_from_response(success, content)
+        return get_servers_from_response(success, content)
 
     def handle_GET(self):
         try:

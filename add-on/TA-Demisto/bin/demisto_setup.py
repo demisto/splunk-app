@@ -53,6 +53,24 @@ logger = DemistoConfig.get_logger("DEMISTOSETUP")
 demisto = DemistoConfig(logger)
 
 
+def get_validate_ssl_value_from_response(success, content):
+    conf_dic = json.loads(content)
+    config = {}
+    if success and conf_dic:
+        for entry in conf_dic.get('entry', []):
+            val = entry.get('content', {})
+            if val:
+                config = val
+    if '' in config:
+        config.pop('')
+    if 'config' in config:
+        config.pop('config')
+
+    validate_ssl = config.get('VALIDATE_SSL', True)
+
+    return not (validate_ssl == 0 or validate_ssl == "0")
+
+
 class ConfigApp(admin.MConfigHandler):
 
     def setup(self):
@@ -144,23 +162,6 @@ class ConfigApp(admin.MConfigHandler):
                     'User don\'t have sufficient permissions in Splunk to store the password. Make sure that this '
                     'user has admin permissions and advice with your Splunk admin')
 
-    def get_validate_ssl_value_from_response(self, success, content):
-        conf_dic = json.loads(content)
-        config = {}
-        if success and conf_dic:
-            for entry in conf_dic.get('entry', []):
-                val = entry.get('content', {})
-                if val:
-                    config = val
-        if '' in config:
-            config.pop('')
-        if 'config' in config:
-            config.pop('config')
-
-        validate_ssl = config.get('VALIDATE_SSL', True)
-
-        return not (validate_ssl == 0 or validate_ssl == "0")
-
     def get_ssl_validation_settings(self):
         # checking if the user instructed not to use SSL - development environment scenario
         # getting the current configuration from Splunk
@@ -170,7 +171,7 @@ class ConfigApp(admin.MConfigHandler):
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET',
                                                      getargs=get_args)
 
-        return self.get_validate_ssl_value_from_response(success, content)
+        return get_validate_ssl_value_from_response(success, content)
 
     def get_proxy_settings(self):
         proxies = {}
