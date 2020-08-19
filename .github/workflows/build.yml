@@ -82,6 +82,6 @@ jobs:
       - name: Run unit-tests
         if: ${{ always() }}
         run: |
-          echo ::set-env name=PYTHONPATH::"/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin:$PYTHONPATH"
+          echo ::set-env name=PATH::"/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin:$PATH"
           pytest -vv
 
