@@ -2,6 +2,15 @@ import sys
 from unittest.mock import Mock
 
 sys.modules['splunk'] = Mock()
+sys.modules['splunk.rest'] = Mock()
+sys.modules['splunk.clilib'] = Mock()
+# sys.modules['splunk.clilib.bundle_paths.make_splunkhome_path'] = Mock()
+sys.modules['splunk.appserver.mrsparkle.lib.util.make_splunkhome_path'] = Mock()
+# sys.modules['splunk.clilib.cli_common'] = Mock()
+sys.modules['splunk.version'] = Mock()
+sys.modules['splunk.util'] = Mock()
+# sys.modules['splunk.util.mktimegm'] = Mock()
+# sys.modules['splunk.util.normalizeBoolean'] = Mock()
 
 
 def test_demisto_servers():
