@@ -1,5 +1,5 @@
 import sys
-import unittest
+import pytest
 from unittest.mock import Mock, patch, PropertyMock
 
 
@@ -19,19 +19,18 @@ sys.modules['splunk.util'] = Mock()
 sys.modules['splunk.version'] = Mock()
 
 
-class TestAddon(unittest.TestCase):
-    splunk_version_mock = Mock(return_value="6.5.0")
+def test_demisto_servers():
+    from demisto_servers import get_servers_from_response
+    pass
 
-    def test_demisto_servers(self):
-        from demisto_servers import get_servers_from_response
-        pass
 
-    @patch(target='splunk.version.__version__', new=splunk_version_mock)
-    def test_demisto_action(self):
-        from demisto_send_alert import get_config_from_response
-        pass
+def test_demisto_action(mocker):
+    mocker.patch('splunk.version.__version__', return_value="6.5.0", create=True)
+    from demisto_send_alert import get_config_from_response
+    pass
 
-    @patch(target='splunk.version.__version__', new=splunk_version_mock)
-    def test_get_validate_ssl_value_from_response(self):
-        from demisto_setup import get_validate_ssl_value_from_response
-        pass
+
+def test_get_validate_ssl_value_from_response(mocker):
+    mocker.patch('splunk.version.__version__', return_value="6.5.0", create=True)
+    from demisto_setup import get_validate_ssl_value_from_response
+    pass
