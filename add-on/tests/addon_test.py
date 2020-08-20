@@ -26,12 +26,12 @@ class TestAddon(unittest.TestCase):
         from demisto_servers import get_servers_from_response
         pass
 
-    @patch(target='ver.__version__', new=splunk_version_mock)
+    @patch(target='splunk.version.__version__', new=splunk_version_mock)
     def test_demisto_action(self):
         from demisto_send_alert import get_config_from_response
         pass
 
-    @patch(target='ver.__version__', new=splunk_version_mock)
+    @patch(target='splunk.version.__version__', new=splunk_version_mock)
     def test_get_validate_ssl_value_from_response(self):
         from demisto_setup import get_validate_ssl_value_from_response
         pass
