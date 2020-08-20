@@ -4,8 +4,8 @@ from demisto_helpers import get_config_from_response
 
 
 def test_get_config_from_response_good_response():
-    with open('add-on/tests/test_data/config_response.json', 'r') as resp:
-        # resp = json.dumps(json_file)
+    with open('add-on/tests/test_data/config_response.json', 'r') as f:
+        resp = f.read()
         config = get_config_from_response(success=True, content=resp)
         assert config.get('DEMISTOURL') == 'https://test.com'
         assert '' not in config
