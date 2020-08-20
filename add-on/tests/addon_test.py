@@ -13,6 +13,6 @@ def test_get_config_from_response_good_response():
 
 
 def test_get_config_from_response_bad_response():
-    resp = {'msg': 'bad_resp'}
+    resp = json.dumps({'msg': 'bad_resp'})
     config = get_config_from_response(success=False, content=resp)
     assert len(config.items()) == 0
