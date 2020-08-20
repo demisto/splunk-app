@@ -25,14 +25,14 @@ def test_demisto_servers(mocker):
 
 
 def test_demisto_action():
-    with patch('ver') as patched_version:
+    with patch('splunk.version') as patched_version:
         type(patched_version.return_value).__version__ = PropertyMock(return_value="6.5.0")
         from demisto_send_alert import get_config_from_response
     pass
 
 
 def test_get_validate_ssl_value_from_response():
-    with patch('ver') as patched_version:
+    with patch('splunk.version') as patched_version:
         type(patched_version.return_value).__version__ = PropertyMock(return_value="6.5.0")
         from demisto_setup import get_validate_ssl_value_from_response
     pass
