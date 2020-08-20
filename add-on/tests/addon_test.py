@@ -1,7 +1,7 @@
 import json
 
 from demisto_helpers import get_config_from_response
-from demisto_incident import DemistoIncident
+from lib.demisto_incident import DemistoIncident
 
 
 class MockLogger:
