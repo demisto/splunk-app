@@ -19,6 +19,8 @@ import splunk.version as ver
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 
+from demisto_helpers import get_config_from_response
+
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
@@ -48,22 +50,6 @@ except BaseException:
 
 logger = DemistoConfig.get_logger("DEMISTOALERT")
 modular_action_logger = ModularAction.setup_logger('demisto_modalert')
-
-
-def get_config_from_response(success, content):
-    conf_dic = json.loads(content)
-    config = {}
-    if success and conf_dic:
-        for entry in conf_dic.get('entry', []):
-            val = entry.get('content', {})
-            if val:
-                config = val
-    if '' in config:
-        config.pop('')
-    if 'config' in config:
-        config.pop('config')
-
-    return config
 
 
 class DemistoAction(ModularAction):

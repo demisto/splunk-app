@@ -14,6 +14,8 @@ import requests
 import hashlib
 import splunk.version as ver
 
+from demisto_helpers import get_config_from_response
+
 # Importing the demisto_config library
 # A.  Import make_splunkhome_path
 # B.  Append library path to sys.path
@@ -51,24 +53,6 @@ URL_REGEX = r"(?i)(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-
 
 logger = DemistoConfig.get_logger("DEMISTOSETUP")
 demisto = DemistoConfig(logger)
-
-
-def get_validate_ssl_value_from_response(success, content):
-    conf_dic = json.loads(content)
-    config = {}
-    if success and conf_dic:
-        for entry in conf_dic.get('entry', []):
-            val = entry.get('content', {})
-            if val:
-                config = val
-    if '' in config:
-        config.pop('')
-    if 'config' in config:
-        config.pop('config')
-
-    validate_ssl = config.get('VALIDATE_SSL', True)
-
-    return not (validate_ssl == 0 or validate_ssl == "0")
 
 
 class ConfigApp(admin.MConfigHandler):
@@ -171,7 +155,11 @@ class ConfigApp(admin.MConfigHandler):
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET',
                                                      getargs=get_args)
 
-        return get_validate_ssl_value_from_response(success, content)
+        config = get_config_from_response(success, content)
+
+        validate_ssl = config.get('VALIDATE_SSL', True)
+
+        return not (validate_ssl == 0 or validate_ssl == "0")
 
     def get_proxy_settings(self):
         proxies = {}

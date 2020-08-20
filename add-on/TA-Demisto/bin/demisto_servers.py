@@ -6,6 +6,7 @@
 import json
 import splunk
 from splunk.rest import BaseRestHandler
+from demisto_helpers import get_config_from_response
 
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
@@ -38,7 +39,9 @@ class ServerList(BaseRestHandler):
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.sessionKey, method='GET',
                                                      getargs=get_args)
 
-        return get_servers_from_response(success, content)
+        config = get_config_from_response(success, content)
+
+        return config.get('DEMISTOURL', '').strip().split(',')
 
     def handle_GET(self):
         try:
