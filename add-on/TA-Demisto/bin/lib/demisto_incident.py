@@ -83,7 +83,8 @@ class DemistoIncident:
             data_dir = {'type': 'search_name', 'value': search_name}
             labels.append(data_dir)
 
-        self.logger.debug("Label::::" + str(list(result.keys())))
+        if isinstance(result, dict):
+            self.logger.debug("Label::::" + str(list(result.keys())))
         self.logger.debug("Ignore Label::::" + str(ignore_labels))
 
         if data.get("labels"):
@@ -92,7 +93,7 @@ class DemistoIncident:
                 param_data = data_label.split(":")
                 data_dir = {"type": param_data[0], "value": ":".join(param_data[1:])}
                 labels.append(data_dir)
-        else:
+        elif isinstance(result, dict):
             for key in list(result.keys()):
                 if key.lower() not in ignore_labels and not key.startswith("__"):
                     data_dir = {"type": key, "value": result[key]}

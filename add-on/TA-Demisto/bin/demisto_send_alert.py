@@ -19,7 +19,7 @@ import splunk.version as ver
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 
-from demisto_helpers import get_config_from_response
+from demisto_helpers import get_demisto_config_from_response
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
@@ -168,7 +168,7 @@ if __name__ == '__main__':
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, modaction.session_key, method='GET',
                                                      getargs=get_args)
 
-        config = get_config_from_response(success, content)
+        config = get_demisto_config_from_response(success, content)
 
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         try:

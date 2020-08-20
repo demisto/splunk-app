@@ -14,7 +14,7 @@ import requests
 import hashlib
 import splunk.version as ver
 
-from demisto_helpers import get_config_from_response
+from demisto_helpers import get_demisto_config_from_response
 
 # Importing the demisto_config library
 # A.  Import make_splunkhome_path
@@ -155,7 +155,7 @@ class ConfigApp(admin.MConfigHandler):
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET',
                                                      getargs=get_args)
 
-        config = get_config_from_response(success, content)
+        config = get_demisto_config_from_response(success, content)
 
         validate_ssl = config.get('VALIDATE_SSL', True)
 

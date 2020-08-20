@@ -1,7 +1,7 @@
 import json
 
 
-def get_config_from_response(success, content):
+def get_demisto_config_from_response(success, content):
     conf_dic = json.loads(content)
     config = {}
     if success and conf_dic:
