@@ -19,7 +19,8 @@ sys.modules['splunk.util'] = Mock()
 sys.modules['splunk.version'] = Mock()
 
 
-def test_demisto_servers(mocker):from demisto_servers import get_servers_from_response
+def test_demisto_servers(mocker):
+    from demisto_servers import get_servers_from_response
     pass
 
 
