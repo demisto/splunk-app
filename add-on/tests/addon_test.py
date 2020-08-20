@@ -1,6 +1,5 @@
 import sys
-import pytest
-from unittest.mock import Mock, patch, PropertyMock
+from unittest.mock import Mock, patch
 
 
 class MockSplunkCliLib:
@@ -24,13 +23,13 @@ def test_demisto_servers():
     pass
 
 
-def test_demisto_action(mocker):
-    mocker.patch('splunk.version.__version__', return_value="6.5.0", create=True)
+def test_demisto_action():
+    patch('splunk.version.__version__', return_value="6.5.0", create=True)
     from demisto_send_alert import get_config_from_response
     pass
 
 
-def test_get_validate_ssl_value_from_response(mocker):
-    mocker.patch('splunk.version.__version__', return_value="6.5.0", create=True)
+def test_get_validate_ssl_value_from_response():
+    patch('splunk.version.__version__', return_value="6.5.0", create=True)
     from demisto_setup import get_validate_ssl_value_from_response
     pass
