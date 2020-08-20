@@ -3,28 +3,11 @@
 # This code was written by Demisto Inc
 #
 
-import json
 import splunk
 from splunk.rest import BaseRestHandler
 from demisto_helpers import get_config_from_response
 
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
-
-
-def get_servers_from_response(success, content):
-    conf_dic = json.loads(content)
-    config = {}
-    if success and conf_dic:
-        for entry in conf_dic.get('entry', []):
-            val = entry.get('content', {})
-            if val:
-                config = val
-    if '' in config:
-        config.pop('')
-    if 'config' in config:
-        config.pop('config')
-
-    return config.get('DEMISTOURL', '').strip().split(',')
 
 
 class ServerList(BaseRestHandler):

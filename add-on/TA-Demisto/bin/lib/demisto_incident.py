@@ -10,7 +10,7 @@ import requests
 from requests import Request
 
 
-class DemistoIncident():
+class DemistoIncident:
     def __init__(self, logger):
         """
         :rtype: object
