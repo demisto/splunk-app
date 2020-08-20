@@ -14,8 +14,6 @@ import requests
 import hashlib
 import splunk.version as ver
 
-from demisto_helpers import get_demisto_config_from_response
-
 # Importing the demisto_config library
 # A.  Import make_splunkhome_path
 # B.  Append library path to sys.path
@@ -34,6 +32,7 @@ except ImportError:
 sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]))
 
 try:
+    import demisto_utils
     from demisto_config import DemistoConfig
 except BaseException:
     sys.exit(3)
@@ -155,7 +154,7 @@ class ConfigApp(admin.MConfigHandler):
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, self.getSessionKey(), method='GET',
                                                      getargs=get_args)
 
-        config = get_demisto_config_from_response(success, content)
+        config = demisto_utils.get_demisto_config_from_response(success, content)
 
         validate_ssl = config.get('VALIDATE_SSL', True)
 

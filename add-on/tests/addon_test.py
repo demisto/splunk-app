@@ -1,7 +1,6 @@
 import json
-import time
 
-from demisto_helpers import get_demisto_config_from_response
+from lib.demisto_utils import get_demisto_config_from_response
 from lib.demisto_incident import DemistoIncident
 
 

@@ -19,8 +19,6 @@ import splunk.version as ver
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 
-from demisto_helpers import get_demisto_config_from_response
-
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
@@ -29,7 +27,7 @@ version = float(re.search(r"(\d+.\d+)", ver.__version__).group(1))
 # Importing the cim_actions demisto_config and demisto_incident libraries
 # A.  Import make_splunkhome_path
 # B.  Append library path to sys.path
-# C.  Import ModularAction, DemistoConfig, DemistoIncident from libraries
+# C.  Import demisto_utils, ModularAction, DemistoConfig, DemistoIncident from libraries
 
 try:
     if version >= 6.4:
@@ -42,6 +40,7 @@ except ImportError:
 sys.path.append(make_splunkhome_path(["etc", "apps", "TA-Demisto", "bin", "lib"]))
 
 try:
+    import demisto_utils
     from cim_actions import ModularAction
     from demisto_config import DemistoConfig
     from demisto_incident import DemistoIncident
@@ -168,7 +167,7 @@ if __name__ == '__main__':
         success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, modaction.session_key, method='GET',
                                                      getargs=get_args)
 
-        config = get_demisto_config_from_response(success, content)
+        config = demisto_utils.get_demisto_config_from_response(success, content)
 
         demisto_servers = config.get('DEMISTOURL', '').strip().split(',')
         try:
