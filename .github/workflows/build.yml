@@ -20,7 +20,7 @@ jobs:
       - name: Run unit-tests
         if: ${{ always() }}
         run: |
-          export PYTHONPATH=$PYTHONPATH:/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin
+          export PYTHONPATH=$PYTHONPATH:/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin/lib
           echo ::set-env name=PYTHONPATH::$PYTHONPATH
           pytest -vv
       - name: Run Flake8
