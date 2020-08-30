@@ -1,4 +1,4 @@
-"""Demisto send alert class and methods."""
+# !/usr/bin/env python
 from __future__ import absolute_import
 
 import json
@@ -17,15 +17,20 @@ from splunk.clilib import cli_common as cli
 import splunk.version as ver
 
 from demisto_config import DemistoConfig
-from demisto_incident import DemistoIncident
+from demisto_indicator import DemistoIndicator
 
 SPLUNK_PASSWORD_ENDPOINT = "/servicesNS/nobody/TA-Demisto/storage/passwords"
 CONFIG_ENDPOINT = "/servicesNS/nobody/TA-Demisto/configs/conf-demistosetup/demistoenv/"
 
-version = float(re.search(r"(\d+.\d+)", ver.__version__).group(1))
+VERSION = float(re.search(r"(\d+.\d+)", ver.__version__).group(1))
+
+# Importing the cim_actions.py library
+# A.  Import make_splunkhome_path
+# B.  Append library path to sys.path
+# C.  Import ModularAction from cim_actions
 
 try:
-    if version >= 6.4:
+    if VERSION >= 6.4:
         from splunk.clilib.bundle_paths import make_splunkhome_path
     else:
         from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
@@ -39,106 +44,81 @@ try:
 except Exception:
     sys.exit(3)
 
-logger = DemistoConfig.get_logger("DEMISTOALERT")
+logger = DemistoConfig.get_logger("DEMISTOINDICATOR")
 modular_action_logger = ModularAction.setup_logger('demisto_modalert')
 
 
 class DemistoAction(ModularAction):
-    """Demisto action class used when invoking the splunk modular alert functions."""
 
-    def create_demisto_incident(
-        self,
-        result,
-        authkey,
-        verify,
-        search_query="",
-        search_url="",
-        ssl_cert_loc="",
-        search_name=None,
-        proxies=None,
-        url=None,
-        beyond_corp_key="",
-        beyond_corp_secret="",
-        beyond_corp_api=""
-    ):
+    def create_demisto_indicator(
+            self,
+            result,
+            authkey,
+            verify,
+            indicator,
+            indicator_type,
+            reputation,
+            comment,
+            ssl_cert_loc="",
+            search_name=None,
+            proxies=None,
+            url=None):
         """Function to package object matching what Demisto expects."""
         try:
-            logger.info("create_demisto_incident called")
-            demisto = DemistoIncident(logger)
-            logger.info("Splunk search query is: " + search_query)
-            logger.info("search_url is: %s", search_url)
-            logger.info("Splunk search result is: " + json.dumps(result))
+            logger.info("create_demisto_indicator called")
+            demisto = DemistoIndicator(logger)
+            logger.info("indicator is: %s", indicator)
+            logger.info("indicator type is: %s", indicator_type)
+            logger.info("reputation is: %s", reputation)
 
-            resp = demisto.create_incident(
+            resp = demisto.create_indicator(
                 authkey,
-                self.configuration,
+                indicator,
+                indicator_type,
+                reputation,
+                comment,
                 verify,
-                search_query,
-                search_url,
                 ssl_cert_loc,
-                result,
-                search_name,
                 proxies,
-                url=url,
-                beyond_corp_key=beyond_corp_key,
-                beyond_corp_secret=beyond_corp_secret,
-                beyond_corp_api=beyond_corp_api
-            )
+                url=url)
 
-            logger.info("Demisto response code is: " + str(resp.status_code))
+            logger.info("Demisto response code is: %s", resp.status_code)
             if resp.status_code == 201 or resp.status_code == 200:
-                # Removing rawJSON from the response as it creates too large demistoResponse
-                logger.debug("Demisto's response is: %s", resp.text)
-                # self.message logs the string to demisto_modalert.log
-                self.message('Successfully created incident in Demisto', status='success')
-                logger.info("Successfully created incident in Demisto")
+                if resp.json() is None:
+                    self.message('Indicator not created. NULL value was returned.  Please check that this indicator is not whitelisted', status='failure')
+                    logger.info("In create_indicator.  NULL value was returned.  Please check that this indicator is not whitelisted")
+                else:
+                    logger.debug("Demisto's response is: %s", resp.text)
+                    # self.message logs the string to demisto_modalert.log
+                    self.message('Successfully created indicator in Demisto', status='success')
+                    logger.info("Successfully created indicator in Demisto")
 
-                # Removing rawJSON from the response as it creates too large demistoResponse
                 resp = json.loads(resp.text)
-                del resp["rawJSON"]
                 resp = json.dumps(resp)
 
                 # self.addevent sends the following message to Splunk and adds it as event there
                 self.addevent(resp, sourcetype="demistoResponse")
             else:
                 logger.error(
-                    'Error in creating incident in Demisto, got status: ' +
-                    str(resp.status_code) + ' with response: ' + json.dumps(resp.json())
+                    'Error in creating indicator in Demisto, got status: ' + str(resp.status_code) + ' with response: ' + json.dumps(resp.json())
                 )
 
                 logger.error("Demisto's response was: %s", resp.text)
                 self.message(
-                    'Error in creating incident in Demisto, got status: ' +
-                    str(resp.status_code) + ' with response: ' + json.dumps(resp.json()),
-                    status='failure')
-                self.addevent(
-                    resp.text +
-                    "status= " +
-                    str(resp.status_code),
-                    sourcetype="demistoResponse"
-                )
-
+                    'Error in creating indicator in Demisto, got status: ' + str(resp.status_code) + ' with response: ' + json.dumps(resp.json()), status='failure')
+                self.addevent(resp.text + "status= " + str(resp.status_code), sourcetype="demistoResponse")
         except Exception as ex:
-            logger.exception("Error in create_demisto_incident, error: %s", ex)
-            self.message('Failed in creating incident in Demisto', status='failure')
+            logger.exception("Error in create_demisto_indicator, error: %s", ex)
+            self.message('Failed in creating indicator in Demisto', status='failure')
 
             self.addevent(
-                "Demisto Incident creation in create_demisto_incident function failed. " +
-                "exception=" + str(ex), sourcetype="demistoResponse"
+                "Demisto Indicator creation in create_demisto_indicator function failed. Exception=" + str(ex), sourcetype="demistoResponse"
             )
 
     def get_password_for_server(self, save_name):
-        """Function to read Splunk Demisto app endpoints for setup data."""
         try:
-            r = splunk.rest.simpleRequest(
-                SPLUNK_PASSWORD_ENDPOINT,
-                self.session_key,
-                method='GET',
-                getargs={
-                    'output_mode': 'json',
-                    'search': save_name
-                }
-            )
+            r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.session_key, method='GET', getargs={
+                'output_mode': 'json', 'search': save_name})
 
             password = ""
 
@@ -157,55 +137,8 @@ class DemistoAction(ModularAction):
                     " the response was: ".format(save_name) + str(r))
             return password
         except Exception as ex:
-            logger.exception("Error in create_demisto_incident, error: " + str(ex))
+            logger.exception("Error in create_demisto_indicator, error: " + str(ex))
 
-    def get_beyondcorp_passwords(self):
-        """Retrieve Key and Secret."""
-        beyond_corp_secret_clear = ""
-        beyond_corp_key_clear = ""
-
-        try:
-            beyond_corp_key = splunk.rest.simpleRequest(
-                SPLUNK_PASSWORD_ENDPOINT,
-                self.session_key,
-                method='GET',
-                getargs={'output_mode': 'json', 'search': 'TA-Demisto-BeyondCorp-Key'}
-            )
-
-            beyond_corp_secret = splunk.rest.simpleRequest(
-                SPLUNK_PASSWORD_ENDPOINT,
-                self.session_key,
-                method='GET',
-                getargs={'output_mode': 'json', 'search': 'TA-Demisto-BeyondCorp-Secret'}
-            )
-
-            if 200 <= int(beyond_corp_key[0]["status"]) < 300:
-                dict_data = json.loads(beyond_corp_key[1])
-                if dict_data["entry"]:
-                    for ele in dict_data["entry"]:
-                        if ele["content"]["realm"] == "TA-Demisto-BeyondCorp":
-                            beyond_corp_key_clear = ele["content"]["clear_password"]
-                            break
-
-            if 200 <= int(beyond_corp_secret[0]["status"]) < 300:
-                dict_data = json.loads(beyond_corp_secret[1])
-                if dict_data["entry"]:
-                    for ele in dict_data["entry"]:
-                        if ele["content"]["realm"] == "TA-Demisto-BeyondCorp":
-                            beyond_corp_secret_clear = ele["content"]["clear_password"]
-                            break
-
-            return beyond_corp_key_clear, beyond_corp_secret_clear
-
-        except Exception as e:
-            self.logger.exception(
-                "Exception while retrieving BeyondCorp key or secret. " +
-                "The error was: " + str(e)
-            )
-            raise Exception(
-                "Exception while retrieving BeyondCorp key or secret. error is: " +
-                str(e)
-            )
 
 if __name__ == '__main__':
 
@@ -229,17 +162,13 @@ if __name__ == '__main__':
             search_uri = six.moves.urllib.request.pathname2url("/services/saved/searches/" + six.moves.urllib.parse.quote(search_name))
         # pipe in the alert name breaks Splunk's ability to send us the alert data correctly
         elif '|' in search_name:
-            raise Exception("The Alert name must not have pipe (|) char in its name - it causes Splunk to send incomplete data")
+            raise Exception(
+                "The Alert name must not have pipe (|) char in its name - it causes Splunk to send incomplete data")
 
         get_args = {
             'output_mode': 'json',
         }
-        r = splunk.rest.simpleRequest(
-            search_uri,
-            sessionKey=modaction.session_key,
-            getargs=get_args,
-            method='GET'
-        )
+        r = splunk.rest.simpleRequest(search_uri, sessionKey=modaction.session_key, getargs=get_args, method='GET')
         result_op = json.loads(r[1])
         if len(result_op["entry"]) > 0:
             search = result_op["entry"][0]["content"]["qualifiedSearch"]
@@ -247,12 +176,8 @@ if __name__ == '__main__':
         input_args = cli.getConfStanza('demistosetup', 'demistoenv')
 
         # getting the current configuration from Splunk
-        success, content = splunk.rest.simpleRequest(
-            CONFIG_ENDPOINT,
-            modaction.session_key,
-            method='GET',
-            getargs=get_args
-        )
+        success, content = splunk.rest.simpleRequest(CONFIG_ENDPOINT, modaction.session_key, method='GET',
+                                                     getargs=get_args)
 
         conf_dic = json.loads(content)
         config = {}
@@ -286,18 +211,9 @@ if __name__ == '__main__':
             sys.exit(-1)
 
         # getting https proxy from Splunk - it might not exist
-        r = splunk.rest.simpleRequest(
-            SPLUNK_PASSWORD_ENDPOINT,
-            modaction.session_key,
-            method='GET',
-            getargs={
-                'output_mode': 'json',
-                'search': 'TA-Demisto-Proxy'
-            }
-        )
-
+        r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, modaction.session_key, method='GET', getargs={
+            'output_mode': 'json', 'search': 'TA-Demisto-Proxy'})
         proxy = None
-
         if 200 <= int(r[0]["status"]) < 300:
             dict_data = json.loads(r[1])
             if len(dict_data["entry"]) > 0:
@@ -307,11 +223,6 @@ if __name__ == '__main__':
                         break
 
         proxies = {} if proxy is None else json.loads(proxy)
-
-        # BEYONDCORP
-        beyond_corp_key, beyond_corp_secret = modaction.get_beyondcorp_passwords()
-        beyond_corp_api = config.get('BEYOND_CORP_API', '')
-
         if modaction.configuration.get('send_all_servers', '') == '1':
 
             # check exclusion list
@@ -325,59 +236,63 @@ if __name__ == '__main__':
 
             for url in demisto_servers:
                 # getting Demisto's API key from Splunk
-                save_name = hashlib.sha1(url.strip()).hexdigest()
+                save_name = hashlib.sha1(url).hexdigest()
                 password = modaction.get_password_for_server(save_name)
-                # Process the result set by opening results_file with gzip
+                '''
+                Process the result set by opening results_file with gzip
+                '''
                 with gzip.open(modaction.results_file, 'rb') as fh:
-                    # Iterate the result set using a dictionary reader
-                    # We also use enumerate which provides "num" which
-                    # can be used as the result ID (rid)
+                    '''
+                    ## Iterate the result set using a dictionary reader
+                    ## We also use enumerate which provides "num" which
+                    ## can be used as the result ID (rid)
+                    '''
                     for num, result in enumerate(csv.DictReader(fh)):
                         result.setdefault('rid', str(num))
                         modaction.update(result)
                         modaction.invoke()
-                        modaction.create_demisto_incident(
+                        modaction.create_demisto_indicator(
                             result,
                             url=url,
                             authkey=password,
                             verify=validate_ssl,
-                            search_query=search,
-                            search_url=search_url,
+                            indicator=modaction.configuration.get('indicator'),
+                            indicator_type=modaction.configuration.get('indicator_type'),
+                            reputation=modaction.configuration.get('reputation'),
+                            comment=modaction.configuration.get('comment'),
                             ssl_cert_loc=server_certs.get(url, ''),
                             search_name=search_name,
-                            proxies=proxies,
-                            beyond_corp_key=beyond_corp_key,
-                            beyond_corp_secret=beyond_corp_secret,
-                            beyond_corp_api=beyond_corp_api
-                        )
+                            proxies=proxies)
         else:
             url = modaction.configuration.get('demisto_server', '')
             save_name = hashlib.sha1(url).hexdigest()
             password = modaction.get_password_for_server(save_name)
 
-            # Process the result set by opening results_file with gzip
+            '''
+            Process the result set by opening results_file with gzip
+            '''
             with gzip.open(modaction.results_file, 'rb') as fh:
-                # Iterate the result set using a dictionary reader
-                # We also use enumerate which provides "num" which
-                # can be used as the result ID (rid)
+                '''
+                ## Iterate the result set using a dictionary reader
+                ## We also use enumerate which provides "num" which
+                ## can be used as the result ID (rid)
+                '''
                 for num, result in enumerate(csv.DictReader(fh)):
                     result.setdefault('rid', str(num))
                     modaction.update(result)
                     modaction.invoke()
-                    modaction.create_demisto_incident(
+                    modaction.create_demisto_indicator(
                         result,
                         url=url,
                         authkey=password,
                         verify=validate_ssl,
-                        search_query=search,
-                        search_url=search_url,
+                        indicator=modaction.configuration.get('indicator'),
+                        indicator_type=modaction.configuration.get('indicator_type'),
+                        reputation=modaction.configuration.get('reputation'),
+                        comment=modaction.configuration.get('comment'),
                         ssl_cert_loc=server_certs.get(url, ''),
                         search_name=search_name,
-                        proxies=proxies,
-                        beyond_corp_key=beyond_corp_key,
-                        beyond_corp_secret=beyond_corp_secret,
-                        beyond_corp_api=beyond_corp_api
-                    )
+                        proxies=proxies)
 
         modaction.writeevents(index="main", source='demisto')
 

@@ -1,147 +1,137 @@
 <setup>
-  <block style="font-size: 18px;" title="Demisto Setup Page" endpoint="demisto/demistocustomendpoint" entity="demistoenv">
-  	<text>
-  		Demisto's Splunk app enables an end user to push incidents to Demisto.
-  		<![CDATA[
+    <block style="font-size: 18px;" title="Demisto Setup Page" endpoint="demisto/demistocustomendpoint" entity="demistoenv">
+        <text>
+        Demisto's Splunk app enables an end user to push incidents to Demisto.
+                    <![CDATA[
     <script>
 
-	$(document).ready(function(e)
-	{
-		var app = Splunk.util.getCurrentApp();
-		var css = "/static/app/" + app + "/setup.css";
-		addStylesheet(css);
+    $(document).ready(function(e)
+    {
+        var app = Splunk.util.getCurrentApp();
+        var css = "/static/app/" + app + "/setup.css";
+        addStylesheet(css);
 
-		$(window).keydown(function(event){
-			if(event.keyCode == 13) {
-				if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
-				{
-					return true;
-				}
-				else
-				{
-					event.preventDefault();
-					return false;
-				}
-			}
-		});
+        $(window).keydown(function(event){
+            if(event.keyCode == 13) {
+                if(validateTextBox("DEMISTOURL") && validateNumber("PORT") &&  validateTextBox("AUTHKEY") && validateHostName("DEMISTOURL"))
+                {
+                    return true;
+                }
+                else
+                {
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
 
-		$(".splButton-primary").on("click",function(e) {
-		    $('.custom-error').remove();
-			var ele_allow_ssl = document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id')
+        $(".splButton-primary").on("click",function(e) {
+            $('.custom-error').remove();
+            var ele_allow_ssl = document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id')
 
-			if(validateTextBox("AUTHKEY") && (ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked))
-			{
-				return true;
-			}
-			else 
-			{
-				e.preventDefault();
-			}
-		});
+            if(validateTextBox("AUTHKEY") && (ele_allow_ssl.checked && validateTextBox("SSL_CERT_LOC") || !ele_allow_ssl.checked))
+            {
+                return true;
+            }
+            else 
+            {
+                e.preventDefault();
+            }
+        });
 
-		var label=document.getElementById('/demisto/demistocustomendpoint/demistoenv/DEMISTOURL_id').parentElement.parentElement.firstElementChild.innerHTML;
-		
+        var label=document.getElementById('/demisto/demistocustomendpoint/demistoenv/DEMISTOURL_id').parentElement.parentElement.firstElementChild.innerHTML;
+        
 
-		if (!label.includes("*"))
-		{
+        if (!label.includes("*"))
+        {
 
-			label = label +"<font color=\"red\"><b>*</b></font>";
-			document.getElementById('/demisto/demistocustomendpoint/demistoenv/DEMISTOURL_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+            label = label +"<font color=\"red\"><b>*</b></font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/DEMISTOURL_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 
-			label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML;
-			label = label +"<font color=\"red\"><b>*</b></font>";
-			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> To generate new API key, login to Demisto application, go to Settings-->Integrations-->API Keys(Get Your Key)</font>";
-			document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+            label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML;
+            label = label +"<font color=\"red\"><b>*</b></font>";
+            label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> To generate new API key, login to Demisto application, go to Settings-->Integrations-->API Keys(Get Your Key)</font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/AUTHKEY_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 
-			label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML;
-			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate</font>";
-			document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+            label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML;
+            label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate</font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/SSL_CERT_LOC_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 
             label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_ADDRESS_id').parentElement.parentElement.firstElementChild.innerHTML;
-			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter HTTPS Proxy address in the following format - https://ip:port </font>";
-			document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_ADDRESS_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+            label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter HTTPS Proxy address in the following format - https://[hostname]:[port] </font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_ADDRESS_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 
             label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_USERNAME_id').parentElement.parentElement.firstElementChild.innerHTML;
-			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter HTTPS Proxy Username here if applicable </font>";
-			document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_USERNAME_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+            label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter HTTPS Proxy Username here if applicable </font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_USERNAME_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 
             label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_PASSWORD_id').parentElement.parentElement.firstElementChild.innerHTML;
-			label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter HTTPS Proxy Password here if applicable </font>";
-			document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_PASSWORD_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
-		}
+            label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> Enter HTTPS Proxy Password here if applicable </font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/HTTPS_PROXY_PASSWORD_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
 
-	});
-	
-	function addStylesheet( filename )
-	{
-		if( document.createStyleSheet )
-		{
-			document.createStyleSheet(filename);
-		}
-		else
-		{
-			var link = $("<link>");
-			link.attr({type: 'text/css',rel: 'stylesheet', href: filename});
-			$("head").append( link );
-		}
-	}
+            label = document.getElementById('/demisto/demistocustomendpoint/demistoenv/EXCLUSION_LIST_id').parentElement.parentElement.firstElementChild.innerHTML;
+            label = label + "<br><font color=\"#a5acb7\" face=\"verdana\"> This is a comma delimited list of host names (https://[hostname]:[port]).  If a trigger action has Send to all Servers, an incident will not be created for anything in this list.</font>"; document.getElementById('/demisto/demistocustomendpoint/demistoenv/EXCLUSION_LIST_id').parentElement.parentElement.firstElementChild.innerHTML=label ;
+        }
 
-	function validateTextBox(name) 
-	{
-		var errMsg = "";
-		var _errid = name+'_err';
-		var errid = '#'+_errid;
-		var fieldval = "";
-		var fieldLabel = "";
-		
+    });
+    
+    function addStylesheet( filename )
+    {
+        if( document.createStyleSheet )
+        {
+            document.createStyleSheet(filename);
+        }
+        else
+        {
+            var link = $("<link>");
+            link.attr({type: 'text/css',rel: 'stylesheet', href: filename});
+            $("head").append( link );
+        }
+    }
 
-		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
+    function validateTextBox(name) 
+    {
+        var errMsg = "";
+        var _errid = name+'_err';
+        var errid = '#'+_errid;
+        var fieldval = "";
+        var fieldLabel = "";
+        
 
-		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
-		
-		if (name == "DEMISTOURL")
-		{
-			label="URL/Hostname/IP Address";
-		}
-		else if( name == "AUTHKEY")
-		{
-			label="API Key";
-		}
-       	if(fieldval.length<=0)
-		{
-	   			
-	    	errMsg="Please enter " +label+" in the textbox";
-	    	var div = $(''+errid+'');
-	    	if (div.length ==0 )
-	    	{
-	    		$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>")
-			
-	    	}
-			return false;
-		}
-		else
-		{
-			$(errid).hide();
-			return true;
-		}
-	}
+        fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
 
-	function validateNumber(name) 
-	{
-		var patt = /^[0-9]*$/i;
-		var errMsg = "";
-		var _errid = name+'_err';
-		var errid = '#'+_errid;
-		var fieldval = "";
-		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
-		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
+        label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
+        
+        if (name == "DEMISTOURL") { label="URL/Hostname/IP Address";
+        }
+        else if( name == "AUTHKEY") { label="API Key";
+        }
+        if(fieldval.length<=0)
+        { errMsg="Please enter " +label+" in the textbox";
+            var div = $(''+errid+'');
+            if (div.length ==0 )
+            {
+                $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>")
+            
+            }
+            return false;
+        }
+        else
+        {
+            $(errid).hide();
+            return true;
+        }
+    }
+
+    function validateNumber(name) 
+    {
+        var patt = /^[0-9]*$/i;
+        var errMsg = "";
+        var _errid = name+'_err';
+        var errid = '#'+_errid;
+        var fieldval = "";
+        fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
+        label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
         var fieldval_array = fieldval.split(",");
         for (var i = 0; i < fieldval_array; i++) {
             if (!patt.test(fieldval_array[i]) || fieldval_array[i] <0 || fieldval_array[i] > 65535 ) {
                 var div = $(''+errid+'');
                 if (div.length ==0 )
-                {
-                    errMsg="Please enter valid " +label;
+                { errMsg="Please enter valid " +label;
                     $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+name+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
                 }
                 return false;
@@ -149,94 +139,88 @@
         }
         $(errid).hide();
         return true;
-	}
+    }
 
     function validateProxy()
-	{
+    {
 
-		var patt = /^[0-9]*$/i;
-		var errMsg = "";
-		var _errid = name+'_err';
-		var errid = '#'+_errid;
-		var fieldval = "";
+        var patt = /^[0-9]*$/i;
+        var errMsg = "";
+        var _errid = name+'_err';
+        var errid = '#'+_errid;
+        var fieldval = "";
         var portRegex = "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$";
         var ipRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
         var httpsRegex = "(^https?:)";
 
-		var proxyAddress = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + 'HTTPS_PROXY_ADDRESS' + '_id').val())
-		var proxyUsername = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + 'HTTPS_PROXY_USERNAME' + '_id').val());
-		var proxyPassword = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + 'HTTPS_PROXY_PASSWORD' + '_id').val());
+        var proxyAddress = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + 'HTTPS_PROXY_ADDRESS' + '_id').val())
+        var proxyUsername = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + 'HTTPS_PROXY_USERNAME' + '_id').val());
+        var proxyPassword = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + 'HTTPS_PROXY_PASSWORD' + '_id').val());
 
         if (proxyAddress === "" && proxyUsername === "" && proxyPassword === "") {
             return true;
         }
-        else if (proxyAddress === ""){
-            errMsg="Please enter a valid proxy address in the form of https://ip:port";
+        else if (proxyAddress === ""){ errMsg="Please enter a valid proxy address in the form of https://ip:port";
             $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_ADDRESS'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
-			return false;
-        } else if (proxyUsername === "" && proxyPassword !== "") {
-            errMsg="Please enter a proxy username";
+            return false;
+        } else if (proxyUsername === "" && proxyPassword !== "") { errMsg="Please enter a proxy username";
             $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_USERNAME'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
-			return false;
-        } else if (proxyPassword === "" && proxyUsername !== "" ) {
-            errMsg="Please enter a proxy password";
+            return false;
+        } else if (proxyPassword === "" && proxyUsername !== "" ) { errMsg="Please enter a proxy password";
             $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_PASSWORD'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
-			return false;
+            return false;
         }
 
         var httpsPart = proxyAddress.split("//")[0];
 
         if (!httpsPart.match(httpsRegex)){
             var div = $(''+errid+'');
-	    	if (div.length ==0) {
-				errMsg="Please enter a valid proxy address in the form of https://ip:port";
-				$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_ADDRESS'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
-			}
-			return false;
+            if (div.length ==0) { errMsg="Please enter a valid proxy address in the form of https://ip:port";
+                $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_ADDRESS'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
+            }
+            return false;
         }
         proxyAddress = proxyAddress.split("//")[1].split(":");
 
-		var proxyIP = proxyAddress[0];
-		var proxyPort = proxyAddress[1];
+        var proxyIP = proxyAddress[0];
+        var proxyPort = proxyAddress[1];
         // verifying that the user didn't put username and password in the https proxy url
         if (proxyIP === undefined || proxyPort === undefined || !proxyIP.match(ipRegex) || !proxyPort.match(portRegex)){
             var div = $(''+errid+'');
-	    	if (div.length ==0) {
-				errMsg="Please enter a valid proxy address in the form of https://ip:port";
-				$('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_ADDRESS'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
-			}
-			return false;
+            if (div.length ==0) { errMsg="Please enter a valid proxy address in the form of https://ip:port";
+                $('#item-\\/demisto\\/demistocustomendpoint\\/demistoenv\\/'+'HTTPS_PROXY_ADDRESS'+' > div').append("<div id='"+_errid+"' class='custom-error' style='display:inline'> "+errMsg+ "</div>");
+            }
+            return false;
         }
 
- 		return true
-	}
+        return true
+    }
 
-	function validateHostName(name) 
-	{
-		
-		var errMsg = "";
-		var _errid = name+'_err';
-		var errid = '#'+_errid;
-		var fieldval = "";
-		var fieldLabel = "";
-		var ipRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
-		var hostRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])*\/{0,1}[A-Za-z0-9][A-Za-z0-9\-]*\_{0,1}[A-Za-z0-9][A-Za-z0-9\-]*$";
+    function validateHostName(name) 
+    {
+        
+        var errMsg = "";
+        var _errid = name+'_err';
+        var errid = '#'+_errid;
+        var fieldval = "";
+        var fieldLabel = "";
+        var ipRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+        var hostRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])*\/{0,1}[A-Za-z0-9][A-Za-z0-9\-]*\_{0,1}[A-Za-z0-9][A-Za-z0-9\-]*$";
         var urlRegex = "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/ig";
 
-		fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
+        fieldval = $.trim($('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id').val());
 
-		label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
-		
-		
-		if(fieldval.length>0)
-		{
+        label = $('#\\/demisto\\/demistocustomendpoint\\/demistoenv\\/' + name + '_id')[0].parentElement.parentElement.firstElementChild.innerHTML;
+        
+        
+        if(fieldval.length>0)
+        {
             var fieldval_array = fieldval.split(",");
             for (var i = 0; i < fieldval_array; i++) {
-        	    if(!fieldval_array[i].match(ipRegex) && !fieldval_array[i].match(hostRegex) && !fieldval_array[i].match(urlRegex)){
+                if(!fieldval_array[i].match(ipRegex) && !fieldval_array[i].match(hostRegex) && !fieldval_array[i].match(urlRegex)){
                     var div = $(''+errid+'');
                     if (div.length ==0 )
-                    {
-                        errMsg="Please enter valid URL/Host Name/IP Address";
+                    { errMsg="Please enter valid URL/Host Name/IP Address";
                         var div = $(''+errid+'');
                         if (div.length ==0)
                         {
@@ -251,48 +235,79 @@
                     }
                 }
             }
-          	$(errid).hide();
-	    	return true;
-		}
-		else
-		{
-			
-			return true;
-		}
-		
-	}
-	
-	</script>
-  ]]></text>
+            $(errid).hide();
+            return true;
+        }
+        else
+        {
+            
+            return true;
+        }
+        
+    }
+    
+    </script>
+  ]]>       </text>
 
-  	  <input field="DEMISTOURL">
-        <label>Demisto URL/Hostname/IP Address</label><font color="red"><b>*</b></font>
-        <type>text</type>
-	  </input>
-	  <input field="PORT">
-        <label>Demisto Application Port</label>
-        <type>text</type>
-	  </input>
-      <input field="AUTHKEY">
-        <label>API Key</label>
-        <type>text</type>
-	  </input>
-	  <input field="SSL_CERT_LOC" >
-        <label>Location to Certificate</label>
-        <type>text</type>
-	  </input>
-      <input field="HTTPS_PROXY_ADDRESS">
-        <label>HTTPS Proxy Address</label><font color="red"><b>*</b></font>
-        <type>text</type>
-	  </input>
-      <input field="HTTPS_PROXY_USERNAME">
-        <label>HTTPS Proxy Username</label><font color="red"><b>*</b></font>
-        <type>text</type>
-	  </input>
-      <input field="HTTPS_PROXY_PASSWORD">
-        <label>HTTPS Proxy Address Password</label><font color="red"><b>*</b></font>
-        <type>text</type>
-	  </input>
-  </block>
+        <input field="DEMISTOURL">
+            <label>XSOAR URL/Hostname/IP Address</label>
+            <font color="red">
+                <b>*</b>
+            </font>
+            <type>text</type>
+        </input>
+        <input field="PORT">
+            <label>XSOAR Application Port</label>
+            <type>text</type>
+        </input>
+        <input field="AUTHKEY">
+            <label>API Key</label>
+            <type>text</type>
+        </input>
+        <input field="SSL_CERT_LOC">
+            <label>Location to Certificate (only used in non-ZeroTrust configurations)</label>
+            <type>text</type>
+        </input>
+        <input field="HTTPS_PROXY_ADDRESS">
+            <label>(Optional) HTTPS Proxy Address</label>
+            <font color="red">
+                <b>*</b>
+            </font>
+            <type>text</type>
+        </input>
+        <input field="HTTPS_PROXY_USERNAME">
+            <label>(Optional) HTTPS Proxy Username</label>
+            <font color="red">
+                <b>*</b>
+            </font>
+            <type>text</type>
+        </input>
+        <input field="HTTPS_PROXY_PASSWORD">
+            <label>(Optional) HTTPS Proxy Address Password</label>
+            <font color="red">
+                <b>*</b>
+            </font>
+            <type>text</type>
+        </input>
+        <input field="BEYOND_CORP_API">
+            <label>(Optional) ZeroTrust Tenant API Token URL</label><font color="red"><b>*</b></font>
+            <type>text</type>
+        </input>
+        <input field="BEYOND_CORP_KEY">
+            <label>(Optional) ZeroTrust Tenant Key</label><font color="red"><b>*</b></font>
+            <type>text</type>
+        </input>
+          <input field="BEYOND_CORP_SECRET">
+            <label>(Optional) ZeroTrust Tenant Secret</label><font color="red"><b>*</b></font>
+            <type>text</type>
+          </input>
+        <input field="EXCLUSION_LIST">
+            <label>(Optional) "Send to all servers" exclusion list</label>
+            <font color="red">
+                <b>*</b>
+            </font>
+            <type>text</type>
+        </input>
+    </block>
 
 </setup>

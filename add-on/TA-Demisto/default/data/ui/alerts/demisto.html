@@ -31,7 +31,7 @@
 
         <splunk-search-dropdown
             name="action.demisto.param.demisto_server"
-            search="| rest /servicesNS/nobody/TA-Demisto/server_list"
+            search="| rest splunk_server=local /servicesNS/nobody/TA-Demisto/server_list"
             label-field="server_url" value-field="title">
         </splunk-search-dropdown>
       <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">Send incidents to the Server above.</span>
@@ -95,7 +95,7 @@
 
         <div class="controls">
             
-            <textarea name="action.demisto.param.details" rows="10" id="details" value="Incident created from Splunk to Demisto">"Incident created from data available in Splunk"</textarea>
+            <textarea name="action.demisto.param.details" rows="10" id="details" value="Incident created from Splunk to Demisto"></textarea>
             <span class="help-block">
                 Include tokens to insert text based on search results.
                 <a href="{{SPLUNKWEB_URL_PREFIX}}/help?location=learnmore.alert.action.tokens" target="_blank"

@@ -58,3 +58,28 @@ param.send_all_servers = <bool>
     * Send alert to all the Demisto servers
     * Defaults to false
 
+[demisto_indicator]
+param._cam = <json>
+	* Json specification for classifying response actions.
+    * Used in AR.
+    * For more information refer Appendix A of Splunk_SA_CIM.
+    * Defaults to None.
+
+param.indicator = <string>
+	* Field defines value of the indicator in Demisto
+
+param.indicator_type = <string>
+	* type of indicator
+
+param.reputation = <int>
+	* reputation of indicator
+
+param.comment = <string>
+	* Any comments of notes related to the indicator
+
+param.send_all_servers = <bool>
+    * Send alert to all the Demisto servers
+    * Defaults to false
+
+param.demisto_server = <string>
+    * Demisto server

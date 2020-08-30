@@ -1,0 +1,74 @@
+<form class="form-horizontal form-complex">
+    <script type="text/javascript">
+        
+    </script>
+    <h3>Incicator Settings</h3>
+    <br/>
+
+    <div class="control-group">
+        <label class="control-label" for="indicator">Indicator</label>
+        <font color="red"><b>*</b></font>
+        <div class="controls">
+            <input type="text" name="action.demisto_indicator.param.indicator" id="indicator" value="" required/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="indicator_type">Type</label>
+        <font color="red"><b>*</b></font>
+        <div class="controls">
+            <select id="indicator_type" name="action.demisto_indicator.param.indicator_type">
+                <option value="CVE CVSS Score">CVE CVSS Score</option>
+                <option value="Domain">Domain</option>
+                <option value="Email">Email</option>
+                <option value="File enhancement scripts">File enhancement scripts</option>
+                <option value="File MD5">File MD5</option>
+                <option value="File SHA-1">File SHA-1</option>
+                <option value="File SHA-256">File SHA-256</option>
+                <option value="hostname">hostname</option>
+                <option value="IP">IP</option>
+                <option value="Registry Path Reputation">Registry Path Reputation</option>
+                <option value="ssdeep">ssdeep</option>
+                <option value="URL">URL</option>
+                <option value="username">username</option>
+            </select>
+            <span class="help-block">Select the type of indicator</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="reputation">Reputation</label>
+        <font color="red"><b>*</b></font>
+        <div class="controls">
+            <select id="reputation" name="action.demisto_indicator.param.reputation">
+                <option value="0">None</option>
+                <option value="1">Good</option>
+                <option value="2">Suspicious</option>
+                <option value="3">Bad</option>
+            </select>
+            <span class="help-block">Select the reputation of the indicator</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="comment">Comment</label>
+        <font color="red"><b>*</b></font>
+        <div class="controls">
+            <textarea name="action.demisto_indicator.param.comment" rows="10" id="comment" value="Indicator created from Splunk to Demisto"></textarea>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" style="text-align: left !important;" for="send_all_servers">Send Indicator to all the Servers</label>
+
+        <div class="controls">
+            <input type="checkbox" name="action.demisto_indicator.param.send_all_servers" id="send_all_servers" checked="false" value="true"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" style="text-align: left !important;" for="server_url">Demisto Server</label>
+
+        <splunk-search-dropdown
+            name="action.demisto_indicator.param.demisto_server"
+            search="| rest splunk_server=local /servicesNS/nobody/TA-Demisto/server_list"
+            label-field="server_url" value-field="title">
+        </splunk-search-dropdown>
+      <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">Send indicator to the Server above.</span>
+    </div>
+</form>

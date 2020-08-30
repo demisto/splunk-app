@@ -10,6 +10,9 @@ import re
 
 import splunk.rest as rest
 import splunk.version as ver
+import six
+from io import open
+from six.moves import range
 
 
 version = float(re.search("(\d+.\d+)", ver.__version__).group(1))
@@ -133,7 +136,7 @@ class ModularAction(object):
         ## use | sendalert param.action_name=$action_name$
         self.action_name = self.configuration.get('action_name') or action_name
         ## use sid to determine action_mode
-        if isinstance(self.sid, basestring) and 'scheduler' in self.sid:
+        if isinstance(self.sid, six.string_types) and 'scheduler' in self.sid:
             self.action_mode = 'saved'
         else:
             self.action_mode = 'adhoc'
@@ -157,7 +160,7 @@ class ModularAction(object):
         if self.info_file:
             try:
                 with open(self.info_file, 'rU') as fh:
-                    self.info = csv.DictReader(fh).next()
+                    self.info = next(csv.DictReader(fh))
             except Exception as e:
                 self.message('Could not retrieve info.csv', level = logging.WARN)
 
@@ -283,7 +286,7 @@ class ModularAction(object):
         self.orig_sid = result.get('orig_sid', '')
         ## This is for events/results that were created as the result of a previous action
         self.orig_rid = result.get('orig_rid', '')
-        if 'rid' in result and isinstance(result['rid'], (basestring, int)):
+        if 'rid' in result and isinstance(result['rid'], (six.string_types, int)):
             self.rid = str(result['rid'])
             if self.sid_snapshot:
                 self.rid = '%s.%s' % (self.rid, self.sid_snapshot)
@@ -348,7 +351,7 @@ class ModularAction(object):
             vals = []
             ## if we have a proper mv field
             if (key.startswith('__mv_')
-                and val and isinstance(val, basestring)
+                and val and isinstance(val, six.string_types)
                 and val.startswith('$') and val.endswith('$')):
                 real_key = key[5:]
                 vals = val[1:-1].split('$;$')
@@ -369,7 +372,7 @@ class ModularAction(object):
                     if key.startswith('__mv'):
                         val = val.replace('$$', '$')
                     ## escape quotes
-                    if isinstance(val, basestring):
+                    if isinstance(val, six.string_types):
                         val = val.replace('"', r'\"')
                     ## check map
                     if mapexp(real_key):
@@ -462,7 +465,7 @@ class ModularAction(object):
                 get_string(source, ''))
             ## process event chunks
             for chunk in (self.events[x:x + ModularAction.DEFAULT_CHUNK]
-                          for x in xrange(0, len(self.events), ModularAction.DEFAULT_CHUNK)):
+                          for x in range(0, len(self.events), ModularAction.DEFAULT_CHUNK)):
                 ## initialize output string
                 default_breaker = '\n' + ModularAction.DEFAULT_BREAKER
                 fout = header_line + default_breaker + (default_breaker).join(chunk)
