@@ -34,7 +34,7 @@ jobs:
           echo ::set-env name=SPL_PATH::$SPL_PATH
 
           cd add-on
-          tar -cvzf $SPL_PATH TA-Demisto
+          COPYFILE_DISABLE=1 tar -cvzf $SPL_PATH --exclude='*.pyc' TA-Demisto
       - name: Upload tar file to artifacts
         uses: actions/upload-artifact@v2
         with:

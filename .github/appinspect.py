@@ -53,7 +53,7 @@ class AppInspector:
             if response.status_code == 404 or status in ['PENDING', 'PREPARING', 'PROCESSING']:
                 time.sleep(5)  # report is not ready - do nothing
             elif response.status_code == 200:
-                print(f'Report is ready! Status: {status}')
+                print(f'Report is ready!')
                 break
             else:
                 response.raise_for_status()
