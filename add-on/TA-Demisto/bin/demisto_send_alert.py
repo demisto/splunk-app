@@ -108,7 +108,7 @@ class DemistoAction(ModularAction):
     def get_password_for_server(self, save_name):
         try:
             r = splunk.rest.simpleRequest(SPLUNK_PASSWORD_ENDPOINT, self.session_key, method='GET', getargs={
-                'output_mode': 'json', 'search': save_name})
+                'output_mode': 'json', 'search': 'Demisto'})
 
             password = ""
 
@@ -116,8 +116,7 @@ class DemistoAction(ModularAction):
                 dict_data = json.loads(r[1])
                 if len(dict_data["entry"]) > 0:
                     for ele in dict_data["entry"]:
-                        if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:{}:".format(
-                                save_name):
+                        if ele["content"]["realm"] == "TA-Demisto" and ele["name"] == "TA-Demisto:Demisto:":
                             password = ele["content"].get('clear_password')
                             break
 
@@ -203,12 +202,12 @@ if __name__ == '__main__':
         if modaction.configuration.get('send_all_servers', '') == '1':
             for url in demisto_servers:
                 # getting Demisto's API key from Splunk
-                save_name = hashlib.sha1(url).hexdigest()
+                save_name = hashlib.sha1(url.encode('utf-8')).hexdigest()
                 password = modaction.get_password_for_server(save_name)
                 '''
                         Process the result set by opening results_file with gzip
                         '''
-                with gzip.open(modaction.results_file, 'rb') as fh:
+                with gzip.open(modaction.results_file, 'rt', encoding='utf-8') as fh:
                     '''
                     ## Iterate the result set using a dictionary reader
                     ## We also use enumerate which provides "num" which
@@ -224,13 +223,13 @@ if __name__ == '__main__':
                                                           search_name=search_name, proxies=proxies)
         else:
             url = modaction.configuration.get('demisto_server', '')
-            save_name = hashlib.sha1(url).hexdigest()
+            save_name = hashlib.sha1(url.encode('utf-8')).hexdigest()
             password = modaction.get_password_for_server(save_name)
 
             '''
             Process the result set by opening results_file with gzip
             '''
-            with gzip.open(modaction.results_file, 'rb') as fh:
+            with gzip.open(modaction.results_file, 'rt', encoding='utf-8') as fh:
                 '''
                 ## Iterate the result set using a dictionary reader
                 ## We also use enumerate which provides "num" which

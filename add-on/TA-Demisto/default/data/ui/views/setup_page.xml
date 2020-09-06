@@ -1,0 +1,9 @@
+<dashboard isDashboard="false" script="javascript/setup_page.js" stylesheet="styles/setup_page.css">
+    <row>
+        <panel>
+            <html>
+                <div id="main_container"></div>
+            </html>
+        </panel>
+    </row>
+</dashboard>
