@@ -1,8 +1,0 @@
-{
-  "incident_name": "test_incident",
-  "type": "Unclassified",
-  "ignore_labels": "",
-  "severity": "2",
-  "labels": "key1:value1,key2:value2",
-  "occured": "1597936126"
-}

@@ -1,141 +1,105 @@
-import json
-
-from lib.demisto_utils import get_demisto_config_from_response
-from lib.demisto_incident import DemistoIncident
+ta_demisto.modalert_create_xsoar_incident_helper import get_incident_labels, get_incident_custom_fields, \
+    get_incident_occurred_field
 
 
-class MockLogger:
+class MockHelper:
     def __init__(self):
         self.info_data = []
         self.debug_data = []
 
-    def info(self, msg):
+    def log_info(self, msg):
         self.info_data.append(msg)
 
-    def debug(self, msg):
+    def log_debug(self, msg):
         self.debug_data.append(msg)
 
 
-def test_create_incident_dictionary_with_labels():
+def test_get_incident_labels__empty_labels_string():
     """
         Given:
-            A valid incident settings configuration that contains comma-separated labels
+            - A valid event dictionary
+            - An empty labels string attribute of an alert action
+            - An valid ignore_labels string attribute of an alert action
         When:
-            Calling create_incident_dictionary function
+            Calling get_incident_labels function
         Then:
-            Verify the function output is a valid demisto incident dictionary, by checking:
-            - The labels were inserted correctly into the incident labels attribute.
-            - The SplunkURL, search_name and SplunkSearch labels are empty/None.
+            - Verify the event labels are returned into a valid incident labels dictionary.
+            - Verify the labels mentioned in ignore_labels string aren't included in the output.
     """
-    with open('add-on/tests/test_data/incident_config_with_labels.json', 'r') as f:
-        data = json.loads(f.read())
-        demisto_incident = DemistoIncident(logger=MockLogger())
-        incident = demisto_incident.create_incident_dictionary(data=data)
-        assert len(incident['labels']) == 4
-        assert get_label_value_by_type(incident['labels'], 'SplunkSearch') == ''
-        assert get_label_value_by_type(incident['labels'], 'search_name') is None
-        assert get_label_value_by_type(incident['labels'], 'SplunkURL') == ''
-        assert get_label_value_by_type(incident['labels'], 'key1') == 'value1'
-        assert get_label_value_by_type(incident['labels'], 'key2') == 'value2'
+    event = {
+        'test_key1': 'test_val1',
+        'test_key2': 'test_val2',
+        'test_key3': 'test_val3',
+        'test_key4': 'test_val4'
+    }
+    labels_str = ''
+    ignore_labels = 'test_key2,test_key3'
+
+    labels = get_incident_labels(MockHelper(), event, labels_str, ignore_labels)
+    assert 'test_key1' in labels
+    assert 'test_key2' not in labels
+    assert 'test_key3' not in labels
+    assert 'test_key4' in labels
 
 
-def test_create_incident_dictionary_no_labels():
+def test_get_incident_labels__with_labels_string_and_search_data():
     """
         Given:
-            - A valid incident settings configuration that contains:
-                - three customFields (comma-separated string)
-                - an `occurred` timestamp
-                - A severity attribute with the value "2"
-            - A splunk search query
-            - A splunk search URL
-            - A splunk search name
+            - A valid event dictionary
+            - A valid labels string attribute of an alert action
+            - Search data (search_name, search_url, search_query)
         When:
-            Calling create_incident_dictionary function
+            Calling get_incident_labels function
         Then:
-            Verify the function output is a valid demisto incident dictionary, by checking:
-            - The customFields were parsed correctly
-            - The `occurred` attribute was parsed to a valid date string
-            - The `severity` attribute was parsed to a valid float
-            - The splunk search query, search URL and search name were inserted to the incident labels.
+            - Verify the labels in the string are inserted to the labels dictionary.
+            - Verify non of the fields in the event dictionary is not in the labels dictionary.
+            - Verify the search data is inserted to the labels dictionary.
     """
-    with open('add-on/tests/test_data/incident_config_no_labels.json', 'r') as f:
-        data = json.loads(f.read())
+    event = {
+        'test_key1': 'test_val1',
+        'test_key2': 'test_val2'
+    }
+    labels_str = 'label1:value1,label2:value2:value2.1'
+    ignore_labels = ''
+    search_query, search_name, search_url = 'search_query', 'search_name', 'search_url'
 
-        demisto_incident = DemistoIncident(logger=MockLogger())
-        incident = demisto_incident.create_incident_dictionary(data=data,
-                                                               search_query='mock_search_query',
-                                                               search_url='https://test.com',
-                                                               search_name='mock_search_name')
-        assert len(incident['customFields'].items()) == 3
-        assert '2020-08-20' in incident['occurred']
-        assert incident['severity'] == 2.0
-        assert get_label_value_by_type(incident['labels'], 'SplunkSearch') == 'mock_search_query'
-        assert get_label_value_by_type(incident['labels'], 'SplunkURL') == 'https://test.com'
-        assert get_label_value_by_type(incident['labels'], 'search_name') == 'mock_search_name'
+    labels = get_incident_labels(MockHelper(), event, labels_str, ignore_labels, search_query, search_name, search_url)
+    assert 'test_key1' not in labels
+    assert 'test_key2' not in labels
+    assert 'label1' in labels
+    assert labels['label1'] == 'value1'
+    assert 'label2' in labels
+    assert labels['label2'] == 'value2:value2.1'
 
 
-def test_create_incident_dictionary_with_result_argument():
+def test_get_incident_custom_fields():
     """
         Given:
-            - A valid incident settings configuration that contains an `ignore_labels` attribute (:=`key1,key2`)
+            A valid custom_fields string attribute of an alert action
         When:
-            Calling create_incident_dictionary function with a `result` argument
+            Calling get_incident_custom_fields function
         Then:
-            Verify the function output is a valid demisto incident dictionary, by checking:
-            - The labels (key1, key2) in ignore_labels attributes weren't inserted to the incident labels.
-            - The incident rawJSON is populated by the result data.
+            Verify the output is parsed to a valid dictionary of incident custom fields.
     """
-    with open('add-on/tests/test_data/incident_config_no_labels.json', 'r') as f:
-        data = json.loads(f.read())
+    custom_fields_str = 'killchain:1.1.1.1,User:john'
 
-        result = {
-            'key1': 'value1',
-            'key2': 'value2',
-            'key3': 'value3'
-        }
-
-        demisto_incident = DemistoIncident(logger=MockLogger())
-        incident = demisto_incident.create_incident_dictionary(data=data, result=result)
-        assert get_label_value_by_type(incident['labels'], 'key1') is None
-        assert get_label_value_by_type(incident['labels'], 'key2') is None
-        assert get_label_value_by_type(incident['labels'], 'key3') == 'value3'
+    incident_custom_fields = get_incident_custom_fields(custom_fields_str)
+    assert len(incident_custom_fields) == 2
+    assert 'killchain' in incident_custom_fields
+    assert incident_custom_fields['killchain'] == '1.1.1.1'
+    assert 'User' in incident_custom_fields
+    assert incident_custom_fields['User'] == 'john'
 
 
-def get_label_value_by_type(labels, label_type):
-    for label in labels:
-        if label.get('type') == label_type:
-            return label.get('value')
-    return None
-
-
-def test_get_demisto_config_from_response_good():
+def test_get_incident_occurred_field():
     """
         Given:
-            A successful response of demisto config response splunk get request
-            that contains config attributes such as 'DEMISTOURL', 'config' and ''
+            A valid occurred string attribute of an alert action in epoch format
         When:
-            Calling get_demisto_config_from_response function
+            Calling get_incident_occurred_field function
         Then:
-            Verify the configuration is retrieved correctly by checking the value of 'DEMISTOURL' field
-            and verifying that '' and 'config' attributes are not in the function output
+            Verify the output is parsed to a valid incident occurred field in the format '%Y-%m-%dT%H:%M:%S'.
     """
-    with open('add-on/tests/test_data/demisto_conf_resp.json', 'r') as f:
-        resp = f.read()
-        config = get_demisto_config_from_response(success=True, content=resp)
-        assert config.get('DEMISTOURL') == 'https://test.com'
-        assert '' not in config
-        assert 'config' not in config
-
-
-def test_get_config_from_response_bad():
-    """
-        Given:
-            An unsuccessful response of demisto config response splunk get request
-        When:
-            Calling get_demisto_config_from_response function
-        Then:
-            Verify the function output is an empty dict
-    """
-    resp = json.dumps({'msg': 'bad_resp'})
-    config = get_demisto_config_from_response(success=False, content=resp)
-    assert len(config.items()) == 0
+    occurred_str = '1599591202'
+    occurred = get_incident_occurred_field(occurred_str)
+    assert occurred == '2020-09-08T21:53:22'
