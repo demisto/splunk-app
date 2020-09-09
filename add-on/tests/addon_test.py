@@ -23,7 +23,8 @@ def test_get_incident_labels__empty_labels_string():
         When:
             Calling get_incident_labels function
         Then:
-            - Verify the event labels are returned into a valid incident labels dictionary.
+            - Verify the event labels are returned into a valid incident labels list of dictionaries of the form:
+              {'type': <label_type>, 'value': <label_value>}
             - Verify the labels mentioned in ignore_labels string aren't included in the output.
     """
     event = {
@@ -36,10 +37,12 @@ def test_get_incident_labels__empty_labels_string():
     ignore_labels = 'test_key2,test_key3'
 
     labels = get_incident_labels(MockHelper(), event, labels_str, ignore_labels)
-    assert 'test_key1' in labels
-    assert 'test_key2' not in labels
-    assert 'test_key3' not in labels
-    assert 'test_key4' in labels
+    labels_types = [label.get('type') for label in labels]
+
+    assert 'test_key1' in labels_types
+    assert 'test_key2' not in labels_types
+    assert 'test_key3' not in labels_types
+    assert 'test_key4' in labels_types
 
 
 def test_get_incident_labels__with_labels_string_and_search_data():
@@ -52,8 +55,8 @@ def test_get_incident_labels__with_labels_string_and_search_data():
             Calling get_incident_labels function
         Then:
             - Verify the labels in the string are inserted to the labels dictionary.
-            - Verify non of the fields in the event dictionary is not in the labels dictionary.
-            - Verify the search data is inserted to the labels dictionary.
+            - Verify none of the fields in the event dictionary is in the labels dictionary.
+            - Verify the search data is inserted to the labels dictionary correctly.
     """
     event = {
         'test_key1': 'test_val1',
@@ -64,12 +67,25 @@ def test_get_incident_labels__with_labels_string_and_search_data():
     search_query, search_name, search_url = 'search_query', 'search_name', 'search_url'
 
     labels = get_incident_labels(MockHelper(), event, labels_str, ignore_labels, search_query, search_name, search_url)
-    assert 'test_key1' not in labels
-    assert 'test_key2' not in labels
-    assert 'label1' in labels
-    assert labels['label1'] == 'value1'
-    assert 'label2' in labels
-    assert labels['label2'] == 'value2:value2.1'
+    labels_types = [label.get('type') for label in labels]
+    labels_values = [label.get('value') for label in labels]
+
+    assert 'test_key1' not in labels_types
+    assert 'test_key2' not in labels_types
+
+    assert 'label1' in labels_types
+    assert 'label2' in labels_types
+
+    assert 'value1' in labels_values
+    assert 'value2:value2.1' in labels_values
+
+    assert 'SplunkSearch' in labels_types
+    assert 'SplunkURL' in labels_types
+    assert 'search_name' in labels_types
+
+    assert 'search_query' in labels_values
+    assert 'search_url' in labels_values
+    assert 'search_name' in labels_values
 
 
 def test_get_incident_custom_fields():
@@ -102,4 +118,4 @@ def test_get_incident_occurred_field():
     """
     occurred_str = '1599591202'
     occurred = get_incident_occurred_field(occurred_str)
-    assert occurred == '2020-09-08T21:53:22'
+    assert occurred == '2020-09-08T18:53:22+00:00'
