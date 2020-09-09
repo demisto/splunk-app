@@ -1,5 +1,5 @@
-from ta_demisto.modalert_create_xsoar_incident_helper import get_incident_labels, get_incident_custom_fields, \
-    get_incident_occurred_field
+from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
+    get_incident_custom_fields
 
 
 class MockHelper:

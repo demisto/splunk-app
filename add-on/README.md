@@ -1,7 +1,7 @@
 
 # ABOUT THIS APP
 
-Supporting Add-on for Demisto. This application allows a user to create incident into Demisto from Splunk using custom alert action.
+Supporting Add-on for XSOAR. This application allows a user to create incident into XSOAR from Splunk using custom alert action.
 
 
 # REQUIREMENTS
