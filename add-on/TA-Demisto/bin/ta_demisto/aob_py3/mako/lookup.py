@@ -15,7 +15,7 @@ from mako.template import Template
 
 try:
     import threading
-except BaseException:
+except:
     import dummy_threading as threading
 
 
@@ -300,8 +300,8 @@ class TemplateLookup(TemplateCollection):
 
         filename = posixpath.normpath(filename)
         for dir_ in self.directories:
-            if filename[0: len(dir_)] == dir_:
-                return filename[len(dir_):]
+            if filename[0 : len(dir_)] == dir_:
+                return filename[len(dir_) :]
         else:
             return None
 
@@ -327,7 +327,7 @@ class TemplateLookup(TemplateCollection):
                     **self.template_args
                 )
                 return template
-            except BaseException:
+            except:
                 # if compilation fails etc, ensure
                 # template is removed from collection,
                 # re-raise

@@ -1,12 +1,13 @@
+from future import standard_library
+standard_library.install_aliases()
+import configparser
+import os.path as op
+
+from .data_collection import ta_mod_input as ta_input
+from .ta_cloud_connect_client import TACloudConnectClient as CollectorCls
 from ..common.lib_util import (
     get_main_file, get_app_root_dir, get_mod_input_script_name
 )
-from .ta_cloud_connect_client import TACloudConnectClient as CollectorCls
-from .data_collection import ta_mod_input as ta_input
-import os.path as op
-import configparser
-from future import standard_library
-standard_library.install_aliases()
 
 
 def _load_options_from_inputs_spec(app_root, stanza_name):

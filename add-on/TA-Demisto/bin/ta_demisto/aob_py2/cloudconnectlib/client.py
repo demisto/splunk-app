@@ -35,7 +35,7 @@ class CloudConnectClient(object):
         """
         try:
             conf = load_json_file(self._config_file)
-        except BaseException:
+        except:
             raise ConfigException(
                 'Unable to load configuration file %s: %s'
                 % (self._config_file, traceback.format_exc())

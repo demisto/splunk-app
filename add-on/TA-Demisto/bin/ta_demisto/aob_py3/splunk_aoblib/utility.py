@@ -3,7 +3,6 @@
 import logging
 import sys
 
-
 def get_stderr_stream_logger(logger_name=None, log_level=logging.INFO):
     if logger_name is None:
         logger_name = 'aob_default_logger'

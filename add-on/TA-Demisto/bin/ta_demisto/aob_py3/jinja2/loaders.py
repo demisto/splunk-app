@@ -192,8 +192,9 @@ class FileSystemLoader(BaseLoader):
             walk_dir = os.walk(searchpath, followlinks=self.followlinks)
             for dirpath, dirnames, filenames in walk_dir:
                 for filename in filenames:
-                    template = os.path.join(dirpath, filename)[len(searchpath):].strip(os.path.sep) \
-                        .replace(os.path.sep, '/')
+                    template = os.path.join(dirpath, filename) \
+                        [len(searchpath):].strip(os.path.sep) \
+                                          .replace(os.path.sep, '/')
                     if template[:2] == './':
                         template = template[2:]
                     if template not in found:
@@ -219,7 +220,7 @@ class PackageLoader(BaseLoader):
     def __init__(self, package_name, package_path='templates',
                  encoding='utf-8'):
         from pkg_resources import DefaultProvider, ResourceManager, \
-            get_provider
+                                  get_provider
         provider = get_provider(package_name)
         self.encoding = encoding
         self.manager = ResourceManager()
@@ -237,7 +238,6 @@ class PackageLoader(BaseLoader):
         if self.filesystem_bound:
             filename = self.provider.get_resource_filename(self.manager, p)
             mtime = path.getmtime(filename)
-
             def uptodate():
                 try:
                     return path.getmtime(filename) == mtime
@@ -255,7 +255,6 @@ class PackageLoader(BaseLoader):
             path = ''
         offset = len(path)
         results = []
-
         def _walk(path):
             for filename in self.provider.resource_listdir(path):
                 fullname = path + '/' + filename
@@ -447,7 +446,7 @@ class ModuleLoader(BaseLoader):
         mod.__path__ = path
 
         sys.modules[package_name] = weakref.proxy(mod,
-                                                  lambda x: sys.modules.pop(package_name, None))
+            lambda x: sys.modules.pop(package_name, None))
 
         # the only strong reference, the sys.modules entry is weak
         # so that the garbage collector can remove it once the

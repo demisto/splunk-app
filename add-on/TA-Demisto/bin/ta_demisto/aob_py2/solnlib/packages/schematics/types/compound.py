@@ -24,7 +24,7 @@ from ..util import get_all_subclasses, import_string
 from .base import BaseType, get_value_in
 
 __all__ = ['CompoundType', 'MultiType', 'ModelType', 'ListType', 'DictType',
-           'PolyModelType']
+    'PolyModelType']
 
 
 class CompoundType(BaseType):
@@ -78,7 +78,6 @@ class CompoundType(BaseType):
             else:
                 field = field(**options)
         return field
-
 
 MultiType = CompoundType
 
@@ -139,7 +138,7 @@ class ModelType(CompoundType):
 
     def pre_setattr(self, value):
         if value is not None \
-                and not isinstance(value, Model):
+          and not isinstance(value, Model):
             if not isinstance(value, dict):
                 raise ConversionError(_('Model conversion requires a model or dict'))
             value = self.model_class(value)
@@ -208,7 +207,7 @@ class ListType(CompoundType):
     def _coerce(self, value):
         if isinstance(value, list):
             return value
-        elif isinstance(value, (string_type, Mapping)):  # unacceptable iterables
+        elif isinstance(value, (string_type, Mapping)): # unacceptable iterables
             pass
         elif isinstance(value, Sequence):
             return value

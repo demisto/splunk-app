@@ -24,7 +24,7 @@ else:
     from itertools import izip as zip  # noqa
     from StringIO import StringIO
     from urlparse import (
-        urljoin, urlunsplit, SplitResult, urlsplit as _urlsplit  # noqa
+        urljoin, urlunsplit, SplitResult, urlsplit as _urlsplit # noqa
     )
     from urllib import unquote  # noqa
     from urllib2 import urlopen  # noqa

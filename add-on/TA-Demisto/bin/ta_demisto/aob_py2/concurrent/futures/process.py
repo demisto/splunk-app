@@ -70,7 +70,6 @@ __author__ = 'Brian Quinlan (brian@sweetapp.com)'
 _threads_queues = weakref.WeakKeyDictionary()
 _shutdown = False
 
-
 def _python_exit():
     global _shutdown
     _shutdown = True
@@ -78,15 +77,13 @@ def _python_exit():
     for t, q in items:
         q.put(None)
     for t, q in items:
-        t.join(sys.maxsize)
-
+        t.join(sys.maxint)
 
 # Controls how many more calls than processes will be queued in the call queue.
 # A smaller number will mean that processes spend more time idle waiting for
 # work while a larger number will make Future.cancel() succeed less frequently
 # (Futures in the call queue cannot be cancelled).
 EXTRA_QUEUED_CALLS = 1
-
 
 class _WorkItem(object):
     def __init__(self, future, fn, args, kwargs):
@@ -95,13 +92,11 @@ class _WorkItem(object):
         self.args = args
         self.kwargs = kwargs
 
-
 class _ResultItem(object):
     def __init__(self, work_id, exception=None, result=None):
         self.work_id = work_id
         self.exception = exception
         self.result = result
-
 
 class _CallItem(object):
     def __init__(self, work_id, fn, args, kwargs):
@@ -109,7 +104,6 @@ class _CallItem(object):
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-
 
 def _process_worker(call_queue, result_queue):
     """Evaluates calls from call_queue and places the results in result_queue.
@@ -132,14 +126,13 @@ def _process_worker(call_queue, result_queue):
             return
         try:
             r = call_item.fn(*call_item.args, **call_item.kwargs)
-        except BaseException:
+        except:
             e = sys.exc_info()[1]
             result_queue.put(_ResultItem(call_item.work_id,
                                          exception=e))
         else:
             result_queue.put(_ResultItem(call_item.work_id,
                                          result=r))
-
 
 def _add_call_item_to_queue(pending_work_items,
                             work_ids,
@@ -178,7 +171,6 @@ def _add_call_item_to_queue(pending_work_items,
                 del pending_work_items[work_id]
                 continue
 
-
 def _queue_management_worker(executor_reference,
                              processes,
                              pending_work_items,
@@ -204,7 +196,6 @@ def _queue_management_worker(executor_reference,
             process workers.
     """
     nb_shutdown_processes = [0]
-
     def shutdown_one_process():
         """Tell a worker to terminate, which will in turn wake us again"""
         call_queue.put(None)
@@ -246,11 +237,8 @@ def _queue_management_worker(executor_reference,
                 return
         del executor
 
-
 _system_limits_checked = False
 _system_limited = None
-
-
 def _check_system_limits():
     global _system_limits_checked, _system_limited
     if _system_limits_checked:
@@ -317,13 +305,13 @@ class ProcessPoolExecutor(_base.Executor):
             q.put(None)
         if self._queue_management_thread is None:
             self._queue_management_thread = threading.Thread(
-                target=_queue_management_worker,
-                args=(weakref.ref(self, weakref_cb),
-                      self._processes,
-                      self._pending_work_items,
-                      self._work_ids,
-                      self._call_queue,
-                      self._result_queue))
+                    target=_queue_management_worker,
+                    args=(weakref.ref(self, weakref_cb),
+                          self._processes,
+                          self._pending_work_items,
+                          self._work_ids,
+                          self._call_queue,
+                          self._result_queue))
             self._queue_management_thread.daemon = True
             self._queue_management_thread.start()
             _threads_queues[self._queue_management_thread] = self._result_queue
@@ -331,9 +319,9 @@ class ProcessPoolExecutor(_base.Executor):
     def _adjust_process_count(self):
         for _ in range(len(self._processes), self._max_workers):
             p = multiprocessing.Process(
-                target=_process_worker,
-                args=(self._call_queue,
-                      self._result_queue))
+                    target=_process_worker,
+                    args=(self._call_queue,
+                          self._result_queue))
             p.start()
             self._processes.add(p)
 
@@ -363,7 +351,7 @@ class ProcessPoolExecutor(_base.Executor):
             # Wake up queue management thread
             self._result_queue.put(None)
             if wait:
-                self._queue_management_thread.join(sys.maxsize)
+                self._queue_management_thread.join(sys.maxint)
         # To reduce the risk of openning too many files, remove references to
         # objects that use file descriptors.
         self._queue_management_thread = None
@@ -371,6 +359,5 @@ class ProcessPoolExecutor(_base.Executor):
         self._result_queue = None
         self._processes = None
     shutdown.__doc__ = _base.Executor.shutdown.__doc__
-
 
 atexit.register(_python_exit)

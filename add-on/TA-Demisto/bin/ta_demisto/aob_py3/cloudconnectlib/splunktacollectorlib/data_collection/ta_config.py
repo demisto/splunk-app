@@ -51,8 +51,8 @@ class TaConfig(object):
     def get_all_conf_contents(self):
         if self._all_conf_contents:
             return self._all_conf_contents.get(c.inputs), \
-                self._all_conf_contents.get(c.all_configs), \
-                self._all_conf_contents.get(c.global_settings)
+                   self._all_conf_contents.get(c.all_configs), \
+                   self._all_conf_contents.get(c.global_settings)
 
         inputs, configs, global_settings = th.get_all_conf_contents(
             self._meta_config[c.server_uri],

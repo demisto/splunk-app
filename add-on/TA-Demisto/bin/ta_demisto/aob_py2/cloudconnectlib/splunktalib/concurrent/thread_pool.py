@@ -2,17 +2,18 @@
 A simple thread pool implementation
 """
 from __future__ import division
-from ..common import log
-from time import time
-import traceback
-import multiprocessing
-import queue
-import threading
-from builtins import object
-from builtins import range
 
 from future import standard_library
 standard_library.install_aliases()
+from builtins import range
+from builtins import object
+import threading
+import queue
+import multiprocessing
+import traceback
+from time import time
+
+from ..common import log
 
 
 class ThreadPool(object):
@@ -201,7 +202,7 @@ class ThreadPool(object):
         work_size = self._work_queue.qsize()
 
         log.logger.debug("current_thr_size=%s, free_thrs=%s, work_size=%s",
-                         thr_size, free_thrs, work_size)
+                        thr_size, free_thrs, work_size)
         if work_size and work_size > free_thrs:
             if thr_size < self._max_size:
                 thr_size = min(thr_size * 2, self._max_size)
@@ -218,7 +219,7 @@ class ThreadPool(object):
     def _do_admin(self):
         admin_q = self._admin_queue
         resize_win = self._resize_window
-        while True:
+        while 1:
             try:
                 wakup = admin_q.get(timeout=resize_win + 1)
             except queue.Empty:
@@ -239,7 +240,7 @@ class ThreadPool(object):
 
         work_queue = self._work_queue
         count_lock = self._count_lock
-        while True:
+        while 1:
             log.logger.debug("Going to get job")
             func = work_queue.get()
             if func is None:

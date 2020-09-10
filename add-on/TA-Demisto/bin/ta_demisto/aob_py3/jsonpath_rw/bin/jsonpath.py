@@ -17,10 +17,8 @@ import argparse
 # JsonPath-RW imports
 from jsonpath_rw import parse
 
-
 def find_matches_for_file(expr, f):
     return expr.find(json.load(f))
-
 
 def print_matches(matches):
     print('\n'.join(['{0}'.format(match.value) for match in matches]))
@@ -49,6 +47,8 @@ def main(*argv):
             [*]             - any array index
     """)
 
+
+
     parser.add_argument('expression', help='A JSONPath expression.')
     parser.add_argument('files', metavar='file', nargs='*', help='Files to search (if none, searches stdin)')
 
@@ -66,7 +66,6 @@ def main(*argv):
             for filename in glob.glob(pattern):
                 with open(filename) as f:
                     print_matches(find_matches_for_file(expr, f))
-
 
 def entry_point():
     main(*sys.argv)

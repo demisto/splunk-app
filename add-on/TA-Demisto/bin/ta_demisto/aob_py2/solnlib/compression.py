@@ -114,7 +114,7 @@ class ZipHandler(object):
 
         try:
             text = decompressor.read(files[0].filename)
-        except BaseException:
+        except:
             raise ValueError('Unknown exception when extracting zip file.')
 
         if len(text) != files[0].file_size:

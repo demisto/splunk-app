@@ -18,7 +18,6 @@ from ..pgen2 import token
 from .. import fixer_base
 from ..fixer_util import Name, Call, ListComp, in_special_context
 
-
 class FixFilter(fixer_base.ConditionalFix):
     BM_compatible = True
 

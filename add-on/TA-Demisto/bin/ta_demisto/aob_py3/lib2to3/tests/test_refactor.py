@@ -26,7 +26,6 @@ finally:
 
 _2TO3_FIXERS = refactor.get_fixers_from_package("lib2to3.fixes")
 
-
 class TestRefactoringTool(unittest.TestCase):
 
     def setUp(self):
@@ -44,7 +43,7 @@ class TestRefactoringTool(unittest.TestCase):
         return refactor.RefactoringTool(fixers, options, explicit)
 
     def test_print_function_option(self):
-        rt = self.rt({"print_function": True})
+        rt = self.rt({"print_function" : True})
         self.assertIs(rt.grammar, pygram.python_grammar_no_print_statement)
         self.assertIs(rt.driver.grammar,
                       pygram.python_grammar_no_print_statement)
@@ -52,7 +51,7 @@ class TestRefactoringTool(unittest.TestCase):
     def test_write_unchanged_files_option(self):
         rt = self.rt()
         self.assertFalse(rt.write_unchanged_files)
-        rt = self.rt({"write_unchanged_files": True})
+        rt = self.rt({"write_unchanged_files" : True})
         self.assertTrue(rt.write_unchanged_files)
 
     def test_fixer_loading_helpers(self):
@@ -78,7 +77,7 @@ class TestRefactoringTool(unittest.TestCase):
                          fs(("generators", "feature")))
         inp = "from __future__ import generators, print_function"
         self.assertEqual(run(inp), fs(("generators", "print_function")))
-        inp = "from __future__ import print_function, generators"
+        inp ="from __future__ import print_function, generators"
         self.assertEqual(run(inp), fs(("print_function", "generators")))
         inp = "from __future__ import (print_function,)"
         self.assertEqual(run(inp), fs(("print_function",)))
@@ -224,7 +223,6 @@ from __future__ import print_function"""
     def test_refactor_file_write_unchanged_file(self):
         test_file = os.path.join(FIXER_DIR, "parrot_example.py")
         debug_messages = []
-
         def recording_log_debug(msg, *args):
             debug_messages.append(msg % args)
         self.check_file_refactoring(test_file, fixers=(),
@@ -234,7 +232,7 @@ from __future__ import print_function"""
         # Testing that it logged this message when write=False was passed is
         # sufficient to see that it did not bail early after "No changes".
         message_regex = r"Not writing changes to .*%s" % \
-            re.escape(os.sep + os.path.basename(test_file))
+                re.escape(os.sep + os.path.basename(test_file))
         for message in debug_messages:
             if "Not writing changes" in message:
                 self.assertRegex(message, message_regex)

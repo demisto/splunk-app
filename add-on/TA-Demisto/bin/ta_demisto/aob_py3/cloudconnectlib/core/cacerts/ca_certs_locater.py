@@ -104,7 +104,7 @@ def _do_safe_remove(file_path):
     if os.path.exists(file_path):
         try:
             os.remove(file_path)
-        except BaseException:
+        except:
             pass
 
 
@@ -116,7 +116,7 @@ def _get_temp_cert_file_dir():
     if not op.isdir(temp_dir):
         try:
             os.mkdir(temp_dir)
-        except BaseException:
+        except:
             pass
     for candidate in ['temp_certs', 'local', 'default']:
         dir_path = op.join(app_root, candidate)

@@ -9,9 +9,9 @@ from datetime import datetime
 
 import sys
 if sys.version_info[0] >= 3:
-    from functools import lru_cache
+   from functools import lru_cache
 else:
-    from functools32 import lru_cache
+   from functools32 import lru_cache
 
 from splunktaucclib.global_config import GlobalConfig, GlobalConfigSchema
 from . import ta_consts as c
@@ -20,7 +20,7 @@ from ...splunktalib.common import util
 
 
 def utc2timestamp(human_time):
-    regex1 = r"\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}"
+    regex1 = "\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}"
     match = re.search(regex1, human_time)
     if match:
         formated = match.group()
@@ -30,7 +30,7 @@ def utc2timestamp(human_time):
     strped_time = datetime.strptime(formated, c.time_fmt)
     timestamp = timegm(strped_time.utctimetuple())
 
-    regex2 = r"\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}(\.\d+)"
+    regex2 = "\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}(\.\d+)"
     match = re.search(regex2, human_time)
     if match:
         timestamp += float(match.group(1))
@@ -82,7 +82,7 @@ class ConfigSchemaHandler(object):
         self._config = sc.Config(splunkd_uri=meta_configs[c.server_uri],
                                  session_key=meta_configs[c.session_key],
                                  schema=json.dumps(client_schema[
-                                     c.config]),
+                                                       c.config]),
                                  user="nobody",
                                  app=ConfigSchemaHandler._app_name)
         self._client_schema = client_schema
@@ -119,9 +119,9 @@ class ConfigSchemaHandler(object):
         for division_key, division_value in division_contents.items():
             try:
                 assert self.TYPE in division_value and \
-                    division_value[self.TYPE] in \
-                    [self.TYPE_SINGLE, self.TYPE_MULTI] and \
-                    self.SEPARATOR in division_value if \
+                       division_value[self.TYPE] in \
+                       [self.TYPE_SINGLE, self.TYPE_MULTI] and \
+                       self.SEPARATOR in division_value if \
                     division_value[self.TYPE] == self.TYPE_MULTI else True
             except Exception:
                 raise Exception("Invalid division schema")

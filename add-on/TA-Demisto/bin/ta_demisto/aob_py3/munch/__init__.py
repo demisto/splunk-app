@@ -21,12 +21,16 @@
     converted via Munch.to/fromDict().
 """
 
-from .python3_compat import *   # pylint: disable=wildcard-import
-from collections import defaultdict
 __version__ = '2.3.2'
 VERSION = tuple(map(int, __version__.split('.')))
 
 __all__ = ('Munch', 'munchify', 'DefaultMunch', 'DefaultFactoryMunch', 'unmunchify')
+
+
+from collections import defaultdict
+
+
+from .python3_compat import *   # pylint: disable=wildcard-import
 
 
 class Munch(dict):
@@ -124,7 +128,7 @@ class Munch(dict):
         except AttributeError:
             try:
                 self[k] = v
-            except BaseException:
+            except:
                 raise AttributeError(k)
         else:
             object.__setattr__(self, k, v)

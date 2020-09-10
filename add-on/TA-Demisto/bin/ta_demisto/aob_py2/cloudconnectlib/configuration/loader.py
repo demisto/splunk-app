@@ -50,7 +50,7 @@ class CloudConnectConfigLoader(object):
         """
         try:
             return load_json_file(schema_file)
-        except BaseException:
+        except:
             raise ConfigException(
                 'Cannot load schema from file {}: {}'.format(
                     schema_file, traceback.format_exc())

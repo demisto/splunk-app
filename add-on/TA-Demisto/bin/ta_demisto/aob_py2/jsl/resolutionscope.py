@@ -15,7 +15,6 @@ class ResolutionScope(object):
         A URI, an output part (expressed by parent schema id properties) scope of
         the current schema.
     """
-
     def __init__(self, base='', current='', output=''):
         self._base, _ = urldefrag(base)
         self._current, _ = urldefrag(current)

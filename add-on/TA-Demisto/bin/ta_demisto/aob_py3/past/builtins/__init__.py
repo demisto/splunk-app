@@ -65,7 +65,7 @@ if utils.PY3:
                'basestring', 'dict', 'str', 'long', 'unicode',
                'apply', 'chr', 'cmp', 'execfile', 'intern', 'raw_input',
                'reload', 'unichr', 'xrange'
-               ]
+              ]
 
 else:
     # No namespace pollution on Py2

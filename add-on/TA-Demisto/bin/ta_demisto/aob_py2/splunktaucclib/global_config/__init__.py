@@ -3,7 +3,13 @@ Global Config Module
 """
 
 from __future__ import absolute_import
-from .schema import GlobalConfigSchema
+
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from urllib.parse import urlparse
+from solnlib.splunk_rest_client import SplunkRestClient
+
 from .configuration import (
     Inputs,
     Configs,
@@ -11,12 +17,7 @@ from .configuration import (
     GlobalConfigError,
     Configuration
 )
-from solnlib.splunk_rest_client import SplunkRestClient
-from urllib.parse import urlparse
-from builtins import object
-
-from future import standard_library
-standard_library.install_aliases()
+from .schema import GlobalConfigSchema
 
 
 __all__ = [

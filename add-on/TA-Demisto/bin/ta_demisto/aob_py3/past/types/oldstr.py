@@ -23,7 +23,7 @@ def unescape(s):
     Example:
     >>> s = unescape(r'abc\\def')   # i.e. 'abc\\\\def'
     >>> print(s)
-    r'abc\def'
+    'abc\def'
     >>> s2 = unescape('abc\\ndef')
     >>> len(s2)
     8
@@ -114,7 +114,7 @@ class oldstr(with_metaclass(BaseOldStr, _builtin_bytes)):
 
     def __getitem__(self, y):
         if isinstance(y, Integral):
-            return super(oldstr, self).__getitem__(slice(y, y + 1))
+            return super(oldstr, self).__getitem__(slice(y, y+1))
         else:
             return super(oldstr, self).__getitem__(y)
 

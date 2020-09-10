@@ -122,7 +122,7 @@ class BaseModInput(smi.Script):
             return
         try:
             self.set_log_level(self.log_level)
-        except BaseException:
+        except:
             self.log_debug('set log level fails.')
         try:
             self.collect_events(ew)
@@ -161,8 +161,8 @@ class BaseModInput(smi.Script):
         :param inputs:
         """
         dirname = os.path.dirname
-        config_path = os.path.join(dirname(dirname(dirname(dirname(dirname(__file__))))),
-                                   'appserver', 'static', 'js', 'build', 'globalConfig.json')
+        config_path = os.path.join(dirname(dirname(dirname(dirname(dirname(__file__))))), 'appserver', 'static', 'js', 'build',
+                                   'globalConfig.json')
         with open(config_path) as f:
             schema_json = ''.join([l for l in f])
         global_schema = GlobalConfigSchema(json.loads(schema_json))
@@ -505,7 +505,7 @@ class BaseModInput(smi.Script):
                 if 'session_key' not in self.context_meta:
                     raise ValueError('session_key not found in input meta.')
                 dscheme, dhost, dport = sutils.extract_http_scheme_host_port(self.context_meta[
-                    'server_uri'])
+                                                                                 'server_uri'])
                 self.ckpt = checkpointer.KVStoreCheckpointer(self.app + "_checkpointer",
                                                              self.context_meta['session_key'], self.app,
                                                              scheme=dscheme, host=dhost, port=dport)

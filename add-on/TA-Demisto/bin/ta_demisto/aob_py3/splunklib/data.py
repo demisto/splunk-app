@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""The **splunklib.data** module reads the responses from splunkd in Atom Feed
+"""The **splunklib.data** module reads the responses from splunkd in Atom Feed 
 format, which is the format used by most of the REST API.
 """
 
@@ -39,37 +39,30 @@ XNAME_LIST = XNAMEF_REST % LNAME_LIST
 # Some responses don't use namespaces (eg: search/parse) so we look for
 # both the extended and local versions of the following names.
 
-
 def isdict(name):
     return name == XNAME_DICT or name == LNAME_DICT
-
 
 def isitem(name):
     return name == XNAME_ITEM or name == LNAME_ITEM
 
-
 def iskey(name):
     return name == XNAME_KEY or name == LNAME_KEY
-
 
 def islist(name):
     return name == XNAME_LIST or name == LNAME_LIST
 
-
 def hasattrs(element):
     return len(element.attrib) > 0
 
-
 def localname(xname):
     rcurly = xname.find('}')
-    return xname if rcurly == -1 else xname[rcurly + 1:]
-
+    return xname if rcurly == -1 else xname[rcurly+1:]
 
 def load(text, match=None):
-    """This function reads a string that contains the XML of an Atom Feed, then
-    returns the
-    data in a native Python structure (a ``dict`` or ``list``). If you also
-    provide a tag name or path to match, only the matching sub-elements are
+    """This function reads a string that contains the XML of an Atom Feed, then 
+    returns the 
+    data in a native Python structure (a ``dict`` or ``list``). If you also 
+    provide a tag name or path to match, only the matching sub-elements are 
     loaded.
 
     :param text: The XML text to load.
@@ -77,11 +70,9 @@ def load(text, match=None):
     :param match: A tag name or path to match (optional).
     :type match: ``string``
     """
-    if text is None:
-        return None
+    if text is None: return None
     text = text.strip()
-    if len(text) == 0:
-        return None
+    if len(text) == 0: return None
     nametable = {
         'namespaces': [],
         'names': {}
@@ -94,28 +85,23 @@ def load(text, match=None):
     root = XML(text)
     items = [root] if match is None else root.findall(match)
     count = len(items)
-    if count == 0:
+    if count == 0: 
         return None
-    elif count == 1:
+    elif count == 1: 
         return load_root(items[0], nametable)
     else:
         return [load_root(item, nametable) for item in items]
 
 # Load the attributes of the given element.
-
-
 def load_attrs(element):
-    if not hasattrs(element):
-        return None
+    if not hasattrs(element): return None
     attrs = record()
-    for key, value in six.iteritems(element.attrib):
+    for key, value in six.iteritems(element.attrib): 
         attrs[key] = value
     return attrs
 
 # Parse a <dict> element and return a Python dict
-
-
-def load_dict(element, nametable=None):
+def load_dict(element, nametable = None):
     value = record()
     children = list(element)
     for child in children:
@@ -125,16 +111,12 @@ def load_dict(element, nametable=None):
     return value
 
 # Loads the given elements attrs & value into single merged dict.
-
-
 def load_elem(element, nametable=None):
     name = localname(element.tag)
     attrs = load_attrs(element)
     value = load_value(element, nametable)
-    if attrs is None:
-        return name, value
-    if value is None:
-        return name, attrs
+    if attrs is None: return name, value
+    if value is None: return name, attrs
     # If value is simple, merge into attrs dict using special key
     if isinstance(value, six.string_types):
         attrs["$text"] = value
@@ -152,8 +134,6 @@ def load_elem(element, nametable=None):
     return name, value
 
 # Parse a <list> element and return a Python list
-
-
 def load_list(element, nametable=None):
     assert islist(element.tag)
     value = []
@@ -164,20 +144,14 @@ def load_list(element, nametable=None):
     return value
 
 # Load the given root element.
-
-
 def load_root(element, nametable=None):
     tag = element.tag
-    if isdict(tag):
-        return load_dict(element, nametable)
-    if islist(tag):
-        return load_list(element, nametable)
+    if isdict(tag): return load_dict(element, nametable)
+    if islist(tag): return load_list(element, nametable)
     k, v = load_elem(element, nametable)
     return Record.fromkv(k, v)
 
 # Load the children of the given element.
-
-
 def load_value(element, nametable=None):
     children = list(element)
     count = len(children)
@@ -185,10 +159,10 @@ def load_value(element, nametable=None):
     # No children, assume a simple text value
     if count == 0:
         text = element.text
-        if text is None:
+        if text is None: 
             return None
         text = text.strip()
-        if len(text) == 0:
+        if len(text) == 0: 
             return None
         return text
 
@@ -196,10 +170,8 @@ def load_value(element, nametable=None):
     if count == 1:
         child = children[0]
         tag = child.tag
-        if isdict(tag):
-            return load_dict(child, nametable)
-        if islist(tag):
-            return load_list(child, nametable)
+        if isdict(tag): return load_dict(child, nametable)
+        if islist(tag): return load_list(child, nametable)
 
     value = record()
     for child in children:
@@ -207,7 +179,7 @@ def load_value(element, nametable=None):
         # If we have seen this name before, promote the value to a list
         if name in value:
             current = value[name]
-            if not isinstance(current, list):
+            if not isinstance(current, list): 
                 value[name] = [current]
             value[name].append(item)
         else:
@@ -216,37 +188,34 @@ def load_value(element, nametable=None):
     return value
 
 # A generic utility that enables "dot" access to dicts
-
-
 class Record(dict):
-    """This generic utility class enables dot access to members of a Python
+    """This generic utility class enables dot access to members of a Python 
     dictionary.
 
-    Any key that is also a valid Python identifier can be retrieved as a field.
-    So, for an instance of ``Record`` called ``r``, ``r.key`` is equivalent to
-    ``r['key']``. A key such as ``invalid-key`` or ``invalid.key`` cannot be
-    retrieved as a field, because ``-`` and ``.`` are not allowed in
+    Any key that is also a valid Python identifier can be retrieved as a field. 
+    So, for an instance of ``Record`` called ``r``, ``r.key`` is equivalent to 
+    ``r['key']``. A key such as ``invalid-key`` or ``invalid.key`` cannot be 
+    retrieved as a field, because ``-`` and ``.`` are not allowed in 
     identifiers.
 
-    Keys of the form ``a.b.c`` are very natural to write in Python as fields. If
-    a group of keys shares a prefix ending in ``.``, you can retrieve keys as a
+    Keys of the form ``a.b.c`` are very natural to write in Python as fields. If 
+    a group of keys shares a prefix ending in ``.``, you can retrieve keys as a 
     nested dictionary by calling only the prefix. For example, if ``r`` contains
     keys ``'foo'``, ``'bar.baz'``, and ``'bar.qux'``, ``r.bar`` returns a record
-    with the keys ``baz`` and ``qux``. If a key contains multiple ``.``, each
-    one is placed into a nested dictionary, so you can write ``r.bar.qux`` or
+    with the keys ``baz`` and ``qux``. If a key contains multiple ``.``, each 
+    one is placed into a nested dictionary, so you can write ``r.bar.qux`` or 
     ``r['bar.qux']`` interchangeably.
     """
     sep = '.'
 
     def __call__(self, *args):
-        if len(args) == 0:
-            return self
+        if len(args) == 0: return self
         return Record((key, self[key]) for key in args)
 
     def __getattr__(self, name):
         try:
             return self[name]
-        except KeyError:
+        except KeyError: 
             raise AttributeError(name)
 
     def __delattr__(self, name):
@@ -266,7 +235,7 @@ class Record(dict):
             return dict.__getitem__(self, key)
         key += self.sep
         result = record()
-        for k, v in six.iteritems(self):
+        for k,v in six.iteritems(self):
             if not k.startswith(key):
                 continue
             suffix = k[len(key):]
@@ -283,15 +252,15 @@ class Record(dict):
         if len(result) == 0:
             raise KeyError("No key or prefix: %s" % key)
         return result
+    
 
-
-def record(value=None):
-    """This function returns a :class:`Record` instance constructed with an
+def record(value=None): 
+    """This function returns a :class:`Record` instance constructed with an 
     initial value that you provide.
-
+    
     :param `value`: An initial record value.
     :type `value`: ``dict``
     """
-    if value is None:
-        value = {}
+    if value is None: value = {}
     return Record(value)
+

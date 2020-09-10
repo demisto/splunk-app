@@ -15,12 +15,12 @@ from types import MethodType
 
 from jinja2.nodes import EvalContext, _context_function_types
 from jinja2.utils import Markup, soft_unicode, escape, missing, concat, \
-    internalcode, object_type_repr, evalcontextfunction, Namespace
+     internalcode, object_type_repr, evalcontextfunction, Namespace
 from jinja2.exceptions import UndefinedError, TemplateRuntimeError, \
-    TemplateNotFound
+     TemplateNotFound
 from jinja2._compat import imap, text_type, iteritems, \
-    implements_iterator, implements_to_string, string_types, PY2, \
-    with_metaclass
+     implements_iterator, implements_to_string, string_types, PY2, \
+     with_metaclass
 
 
 # these variables are exported to the template runtime
@@ -34,10 +34,7 @@ __all__ = ['LoopContext', 'TemplateReference', 'Macro', 'Markup',
 to_string = text_type
 
 #: the identity function.  Useful for certain things in the environment
-
-
-def identity(x): return x
-
+identity = lambda x: x
 
 _first_iteration = object()
 _last_iteration = object()
@@ -119,7 +116,7 @@ class ContextMeta(type):
            resolve_or_missing is default_resolve_or_missing:
             rv._legacy_resolve_mode = True
         elif resolve is default_resolve and \
-                resolve_or_missing is default_resolve_or_missing:
+             resolve_or_missing is default_resolve_or_missing:
             rv._fast_resolve_mode = True
 
         return rv
@@ -280,7 +277,7 @@ class Context(with_metaclass(ContextMeta)):
         return context
 
     def _all(meth):
-        def proxy(self): return getattr(self.get_all(), meth)()
+        proxy = lambda self: getattr(self.get_all(), meth)()
         proxy.__doc__ = getattr(dict, meth).__doc__
         proxy.__name__ = meth
         return proxy
@@ -651,7 +648,7 @@ class Undefined(object):
         __rsub__ = _fail_with_undefined_error
 
     def __eq__(self, other):
-        return isinstance(self, type(other))
+        return type(self) is type(other)
 
     def __ne__(self, other):
         return not self.__eq__(other)

@@ -40,17 +40,17 @@ def order_future_lines(code):
     lines = code.split('\n')
 
     uufuture_line_numbers = [i for i, line in enumerate(lines)
-                             if line.startswith('from __future__ import ')]
+                               if line.startswith('from __future__ import ')]
 
     future_line_numbers = [i for i, line in enumerate(lines)
-                           if line.startswith('from future')
-                           or line.startswith('from past')]
+                             if line.startswith('from future')
+                             or line.startswith('from past')]
 
     builtins_line_numbers = [i for i, line in enumerate(lines)
                              if line.startswith('from builtins')]
 
     assert code.lstrip() == code, ('internal usage error: '
-                                   'dedent the code before calling order_future_lines()')
+            'dedent the code before calling order_future_lines()')
 
     def mymax(numbers):
         return max(numbers) if len(numbers) > 0 else 0
@@ -59,7 +59,7 @@ def order_future_lines(code):
         return min(numbers) if len(numbers) > 0 else float('inf')
 
     assert mymax(uufuture_line_numbers) <= mymin(future_line_numbers), \
-        'the __future__ and future imports are out of order'
+            'the __future__ and future imports are out of order'
 
     # assert mymax(future_line_numbers) <= mymin(builtins_line_numbers), \
     #         'the future and builtins imports are out of order'
@@ -93,7 +93,6 @@ class VerboseCalledProcessError(CalledProcessError):
     Like CalledProcessError, but it displays more information (message and
     script output) for diagnosing test failures etc.
     """
-
     def __init__(self, msg, returncode, cmd, output=None):
         self.msg = msg
         self.returncode = returncode
@@ -104,10 +103,8 @@ class VerboseCalledProcessError(CalledProcessError):
         return ("Command '%s' failed with exit status %d\nMessage: %s\nOutput: %s"
                 % (self.cmd, self.returncode, self.msg, self.output))
 
-
 class FuturizeError(VerboseCalledProcessError):
     pass
-
 
 class PasteurizeError(VerboseCalledProcessError):
     pass
@@ -118,7 +115,6 @@ class CodeHandler(unittest.TestCase):
     Handy mixin for test classes for writing / reading / futurizing /
     running .py files in the test suite.
     """
-
     def setUp(self):
         """
         The outputs from the various futurize stages should have the
@@ -340,7 +336,7 @@ class CodeHandler(unittest.TestCase):
                         'env=%s' % self.env,
                         fn,
                         '----\n%s\n----' % f.read(),
-                )
+                    )
             ErrorClass = (FuturizeError if 'futurize' in script else PasteurizeError)
             raise ErrorClass(msg, e.returncode, e.cmd, output=e.output)
         return output
@@ -364,7 +360,7 @@ class CodeHandler(unittest.TestCase):
                         'env=%s' % self.env,
                         fn,
                         '----\n%s\n----' % f.read(),
-                )
+                    )
             if not hasattr(e, 'output'):
                 # The attribute CalledProcessError.output doesn't exist on Py2.6
                 e.output = None
@@ -380,7 +376,6 @@ def expectedFailurePY3(func):
     if not PY3:
         return func
     return unittest.expectedFailure(func)
-
 
 def expectedFailurePY26(func):
     if not PY26:
@@ -405,8 +400,6 @@ if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
     unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
 
 # From Py3.3:
-
-
 def assertRegex(self, text, expected_regex, msg=None):
     """Fail the test unless the text matches the regular expression."""
     if isinstance(expected_regex, (str, unicode)):
@@ -417,10 +410,8 @@ def assertRegex(self, text, expected_regex, msg=None):
         msg = '%s: %r not found in %r' % (msg, expected_regex.pattern, text)
         raise self.failureException(msg)
 
-
 if not hasattr(unittest.TestCase, 'assertRegex'):
     bind_method(unittest.TestCase, 'assertRegex', assertRegex)
-
 
 class _AssertRaisesBaseContext(object):
 
@@ -456,7 +447,6 @@ class _AssertRaisesBaseContext(object):
         with self:
             callable_obj(*args, **kwargs)
 
-
 class _AssertWarnsContext(_AssertRaisesBaseContext):
     """A context manager used to implement TestCase.assertWarns* methods."""
 
@@ -488,7 +478,7 @@ class _AssertWarnsContext(_AssertRaisesBaseContext):
             if first_matching is None:
                 first_matching = w
             if (self.expected_regex is not None and
-                    not self.expected_regex.search(str(w))):
+                not self.expected_regex.search(str(w))):
                 continue
             # store warning for later retrieval
             self.warning = w
@@ -498,7 +488,7 @@ class _AssertWarnsContext(_AssertRaisesBaseContext):
         # Now we simply try to choose a helpful failure message
         if first_matching is not None:
             self._raiseFailure('"{}" does not match "{}"'.format(
-                self.expected_regex.pattern, str(first_matching)))
+                     self.expected_regex.pattern, str(first_matching)))
         if self.obj_name:
             self._raiseFailure("{} not triggered by {}".format(exc_name,
                                                                self.obj_name))
@@ -536,7 +526,6 @@ def assertWarns(self, expected_warning, callable_obj=None, *args, **kwargs):
     """
     context = _AssertWarnsContext(expected_warning, self, callable_obj)
     return context.handle('assertWarns', callable_obj, args, kwargs)
-
 
 if not hasattr(unittest.TestCase, 'assertWarns'):
     bind_method(unittest.TestCase, 'assertWarns', assertWarns)

@@ -168,7 +168,7 @@ class CredentialManager(object):
             except Exception:
                 raise
 
-            ent_regx = r"%s:(%s%s\d+):" % (self._realm, name, self._sep)
+            ent_regx = "%s:(%s%s\d+):" % (self._realm, name, self._sep)
             ent_pattern = re.compile(ent_regx)
             for stanza in stanzas:
                 stanza_name = stanza.get("name")

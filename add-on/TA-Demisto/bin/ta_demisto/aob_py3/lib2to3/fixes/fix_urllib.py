@@ -9,36 +9,36 @@ from lib2to3.fixes.fix_imports import alternates, FixImports
 from lib2to3.fixer_util import (Name, Comma, FromImport, Newline,
                                 find_indentation, Node, syms)
 
-MAPPING = {"urllib": [
-    ("urllib.request",
-     ["URLopener", "FancyURLopener", "urlretrieve",
-      "_urlopener", "urlopen", "urlcleanup",
-      "pathname2url", "url2pathname"]),
-    ("urllib.parse",
-     ["quote", "quote_plus", "unquote", "unquote_plus",
-      "urlencode", "splitattr", "splithost", "splitnport",
-      "splitpasswd", "splitport", "splitquery", "splittag",
+MAPPING = {"urllib":  [
+                ("urllib.request",
+                    ["URLopener", "FancyURLopener", "urlretrieve",
+                     "_urlopener", "urlopen", "urlcleanup",
+                     "pathname2url", "url2pathname"]),
+                ("urllib.parse",
+                    ["quote", "quote_plus", "unquote", "unquote_plus",
+                     "urlencode", "splitattr", "splithost", "splitnport",
+                     "splitpasswd", "splitport", "splitquery", "splittag",
                      "splittype", "splituser", "splitvalue", ]),
-    ("urllib.error",
-     ["ContentTooShortError"])],
-    "urllib2": [
-    ("urllib.request",
-     ["urlopen", "install_opener", "build_opener",
-      "Request", "OpenerDirector", "BaseHandler",
-      "HTTPDefaultErrorHandler", "HTTPRedirectHandler",
-      "HTTPCookieProcessor", "ProxyHandler",
-      "HTTPPasswordMgr",
-      "HTTPPasswordMgrWithDefaultRealm",
-      "AbstractBasicAuthHandler",
-      "HTTPBasicAuthHandler", "ProxyBasicAuthHandler",
-      "AbstractDigestAuthHandler",
-      "HTTPDigestAuthHandler", "ProxyDigestAuthHandler",
-      "HTTPHandler", "HTTPSHandler", "FileHandler",
+                ("urllib.error",
+                    ["ContentTooShortError"])],
+           "urllib2" : [
+                ("urllib.request",
+                    ["urlopen", "install_opener", "build_opener",
+                     "Request", "OpenerDirector", "BaseHandler",
+                     "HTTPDefaultErrorHandler", "HTTPRedirectHandler",
+                     "HTTPCookieProcessor", "ProxyHandler",
+                     "HTTPPasswordMgr",
+                     "HTTPPasswordMgrWithDefaultRealm",
+                     "AbstractBasicAuthHandler",
+                     "HTTPBasicAuthHandler", "ProxyBasicAuthHandler",
+                     "AbstractDigestAuthHandler",
+                     "HTTPDigestAuthHandler", "ProxyDigestAuthHandler",
+                     "HTTPHandler", "HTTPSHandler", "FileHandler",
                      "FTPHandler", "CacheFTPHandler",
                      "UnknownHandler"]),
-    ("urllib.error",
-     ["URLError", "HTTPError"]),
-]
+                ("urllib.error",
+                    ["URLError", "HTTPError"]),
+           ]
 }
 
 # Duplicate the url parsing functions for urllib2.
@@ -137,7 +137,6 @@ class FixUrllib(FixImports):
             new_nodes = []
             indentation = find_indentation(node)
             first = True
-
             def handle_name(name, prefix):
                 if name.type == syms.import_as_name:
                     kids = [Name(name.children[0].value, prefix=prefix),

@@ -1,23 +1,23 @@
-from splunktaucclib.rest_handler import util
+from future import standard_library
+standard_library.install_aliases()
+import json
+import traceback
+from urlparse import urlparse
+from solnlib.splunkenv import get_splunkd_uri
+from solnlib.splunk_rest_client import SplunkRestClient
+from solnlib.conf_manager import ConfManager
+from splunktaucclib.rest_handler.error import RestError
 from splunktaucclib.rest_handler.admin_external import (
     AdminExternalHandler,
 )
-from splunktaucclib.rest_handler.error import RestError
-from solnlib.conf_manager import ConfManager
-from solnlib.splunk_rest_client import SplunkRestClient
-from solnlib.splunkenv import get_splunkd_uri
-from urlparse import urlparse
-import traceback
-import json
-from future import standard_library
-standard_library.install_aliases()
+from splunktaucclib.rest_handler import util
 
 
 def _migrate_error_handle(func):
     def handle(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except BaseException:
+        except:
             raise RestError(
                 500,
                 'Migrating failed. %s' % traceback.format_exc()

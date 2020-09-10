@@ -9,8 +9,6 @@ from .. import fixer_base
 from ..fixer_util import LParen, RParen
 
 # XXX This doesn't support nested for loops like [x for x in 1, 2 for x in 1, 2]
-
-
 class FixParen(fixer_base.BaseFix):
     BM_compatible = True
 
@@ -41,6 +39,6 @@ class FixParen(fixer_base.BaseFix):
 
         lparen = LParen()
         lparen.prefix = target.prefix
-        target.prefix = u""  # Make it hug the parentheses
+        target.prefix = u"" # Make it hug the parentheses
         target.insert_child(0, lparen)
         target.append_child(RParen())

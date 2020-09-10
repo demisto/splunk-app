@@ -88,7 +88,7 @@ class newstr(with_metaclass(BaseNewStr, unicode)):
         # Special case: If someone requests str(str(u'abc')), return the same
         # object (same id) for consistency with Py3.3. This is not true for
         # other objects like list or dict.
-        elif isinstance(args[0], newstr) and cls == newstr:
+        elif type(args[0]) == newstr and cls == newstr:
             return args[0]
         elif isinstance(args[0], unicode):
             value = args[0]
@@ -121,7 +121,7 @@ class newstr(with_metaclass(BaseNewStr, unicode)):
         errmsg = "'in <string>' requires string as left operand, not {0}"
         # Don't use isinstance() here because we only want to catch
         # newstr, not Python 2 unicode:
-        if isinstance(key, newstr):
+        if type(key) == newstr:
             newkey = key
         elif isinstance(key, unicode) or isinstance(key, bytes) and not isnewbytes(key):
             newkey = newstr(key)
@@ -138,7 +138,7 @@ class newstr(with_metaclass(BaseNewStr, unicode)):
         " left + self "
         try:
             return newstr(left) + self
-        except BaseException:
+        except:
             return NotImplemented
 
     def __mul__(self, other):
@@ -156,7 +156,7 @@ class newstr(with_metaclass(BaseNewStr, unicode)):
             if isnewbytes(item):
                 raise TypeError(errmsg.format(i))
         # Support use as a staticmethod: str.join('-', ['a', 'b'])
-        if isinstance(self, newstr):
+        if type(self) == newstr:
             return newstr(super(newstr, self).join(iterable))
         else:
             return newstr(super(newstr, newstr(self)).join(iterable))
@@ -287,14 +287,14 @@ class newstr(with_metaclass(BaseNewStr, unicode)):
 
     def __eq__(self, other):
         if (isinstance(other, unicode) or
-                isinstance(other, bytes) and not isnewbytes(other)):
+            isinstance(other, bytes) and not isnewbytes(other)):
             return super(newstr, self).__eq__(other)
         else:
             return False
 
     def __ne__(self, other):
         if (isinstance(other, unicode) or
-                isinstance(other, bytes) and not isnewbytes(other)):
+            isinstance(other, bytes) and not isnewbytes(other)):
             return super(newstr, self).__ne__(other)
         else:
             return True
@@ -303,25 +303,25 @@ class newstr(with_metaclass(BaseNewStr, unicode)):
 
     def __lt__(self, other):
         if (isinstance(other, unicode) or
-                isinstance(other, bytes) and not isnewbytes(other)):
+            isinstance(other, bytes) and not isnewbytes(other)):
             return super(newstr, self).__lt__(other)
         raise TypeError(self.unorderable_err.format(type(other)))
 
     def __le__(self, other):
         if (isinstance(other, unicode) or
-                isinstance(other, bytes) and not isnewbytes(other)):
+            isinstance(other, bytes) and not isnewbytes(other)):
             return super(newstr, self).__le__(other)
         raise TypeError(self.unorderable_err.format(type(other)))
 
     def __gt__(self, other):
         if (isinstance(other, unicode) or
-                isinstance(other, bytes) and not isnewbytes(other)):
+            isinstance(other, bytes) and not isnewbytes(other)):
             return super(newstr, self).__gt__(other)
         raise TypeError(self.unorderable_err.format(type(other)))
 
     def __ge__(self, other):
         if (isinstance(other, unicode) or
-                isinstance(other, bytes) and not isnewbytes(other)):
+            isinstance(other, bytes) and not isnewbytes(other)):
             return super(newstr, self).__ge__(other)
         raise TypeError(self.unorderable_err.format(type(other)))
 

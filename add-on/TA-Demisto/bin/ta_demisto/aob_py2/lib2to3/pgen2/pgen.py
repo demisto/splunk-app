@@ -4,10 +4,8 @@
 # Pgen imports
 from . import grammar, token, tokenize
 
-
 class PgenGrammar(grammar.Grammar):
     pass
-
 
 class ParserGenerator(object):
 
@@ -19,16 +17,17 @@ class ParserGenerator(object):
         self.filename = filename
         self.stream = stream
         self.generator = tokenize.generate_tokens(stream.readline)
-        self.gettoken()  # Initialize lookahead
+        self.gettoken() # Initialize lookahead
         self.dfas, self.startsymbol = self.parse()
         if close_stream is not None:
             close_stream()
-        self.first = {}  # map from symbol name to set of tokens
+        self.first = {} # map from symbol name to set of tokens
         self.addfirstsets()
 
     def make_grammar(self):
         c = PgenGrammar()
-        names = sorted(self.dfas.keys())
+        names = self.dfas.keys()
+        names.sort()
         names.remove(self.startsymbol)
         names.insert(0, self.startsymbol)
         for name in names:
@@ -55,7 +54,7 @@ class ParserGenerator(object):
         first = {}
         for label in sorted(rawfirst):
             ilabel = self.make_label(c, label)
-            # assert ilabel not in first # XXX failed on <> ... !=
+            ##assert ilabel not in first # XXX failed on <> ... !=
             first[ilabel] = 1
         return first
 
@@ -97,7 +96,7 @@ class ParserGenerator(object):
                     return ilabel
             else:
                 # An operator (any non-numeric token)
-                itoken = grammar.opmap[value]  # Fails if unknown token
+                itoken = grammar.opmap[value] # Fails if unknown token
                 if itoken in c.tokens:
                     return c.tokens[itoken]
                 else:
@@ -106,15 +105,16 @@ class ParserGenerator(object):
                     return ilabel
 
     def addfirstsets(self):
-        names = sorted(self.dfas.keys())
+        names = self.dfas.keys()
+        names.sort()
         for name in names:
             if name not in self.first:
                 self.calcfirst(name)
-            # print name, self.first[name].keys()
+            #print name, self.first[name].keys()
 
     def calcfirst(self, name):
         dfa = self.dfas[name]
-        self.first[name] = None  # dummy to detect left recursion
+        self.first[name] = None # dummy to detect left recursion
         state = dfa[0]
         totalset = {}
         overlapcheck = {}
@@ -161,7 +161,7 @@ class ParserGenerator(object):
             self.simplify_dfa(dfa)
             newlen = len(dfa)
             dfas[name] = dfa
-            # print name, oldlen, newlen
+            #print name, oldlen, newlen
             if startsymbol is None:
                 startsymbol = name
         return dfas, startsymbol
@@ -173,12 +173,10 @@ class ParserGenerator(object):
         # values.
         assert isinstance(start, NFAState)
         assert isinstance(finish, NFAState)
-
         def closure(state):
             base = {}
             addclosure(state, base)
             return base
-
         def addclosure(state, base):
             assert isinstance(state, NFAState)
             if state in base:
@@ -188,7 +186,7 @@ class ParserGenerator(object):
                 if label is None:
                     addclosure(next, base)
         states = [DFAState(closure(start), finish)]
-        for state in states:  # NB states grows while we're iterating
+        for state in states: # NB states grows while we're iterating
             arcs = {}
             for nfastate in state.nfaset:
                 for label, next in nfastate.arcs:
@@ -202,7 +200,7 @@ class ParserGenerator(object):
                     st = DFAState(nfaset, finish)
                     states.append(st)
                 state.addarc(st, label)
-        return states  # List of DFAState instances; first one is start
+        return states # List of DFAState instances; first one is start
 
     def dump_nfa(self, name, start, finish):
         print "Dump of NFA for", name
@@ -238,10 +236,10 @@ class ParserGenerator(object):
         while changes:
             changes = False
             for i, state_i in enumerate(dfa):
-                for j in range(i + 1, len(dfa)):
+                for j in range(i+1, len(dfa)):
                     state_j = dfa[j]
                     if state_i == state_j:
-                        # print "  unify", i, j
+                        #print "  unify", i, j
                         del dfa[j]
                         for state in dfa:
                             state.unifystate(state_j, state_i)
@@ -325,28 +323,26 @@ class ParserGenerator(object):
         while tup[0] in (tokenize.COMMENT, tokenize.NL):
             tup = self.generator.next()
         self.type, self.value, self.begin, self.end, self.line = tup
-        # print token.tok_name[self.type], repr(self.value)
+        #print token.tok_name[self.type], repr(self.value)
 
     def raise_error(self, msg, *args):
         if args:
             try:
                 msg = msg % args
-            except BaseException:
+            except:
                 msg = " ".join([msg] + map(str, args))
         raise SyntaxError(msg, (self.filename, self.end[0],
                                 self.end[1], self.line))
 
-
 class NFAState(object):
 
     def __init__(self):
-        self.arcs = []  # list of (label, NFAState) pairs
+        self.arcs = [] # list of (label, NFAState) pairs
 
     def addarc(self, next, label=None):
         assert label is None or isinstance(label, str)
         assert isinstance(next, NFAState)
         self.arcs.append((label, next))
-
 
 class DFAState(object):
 
@@ -356,7 +352,7 @@ class DFAState(object):
         assert isinstance(final, NFAState)
         self.nfaset = nfaset
         self.isfinal = final in nfaset
-        self.arcs = {}  # map from label to DFAState
+        self.arcs = {} # map from label to DFAState
 
     def addarc(self, next, label):
         assert isinstance(label, str)
@@ -383,8 +379,7 @@ class DFAState(object):
                 return False
         return True
 
-    __hash__ = None  # For Py3 compatibility.
-
+    __hash__ = None # For Py3 compatibility.
 
 def generate_grammar(filename="Grammar.txt"):
     p = ParserGenerator(filename)

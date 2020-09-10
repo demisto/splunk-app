@@ -5,7 +5,6 @@
 from .. import fixer_base
 from ..fixer_util import Name
 
-
 class FixRawInput(fixer_base.BaseFix):
 
     BM_compatible = True

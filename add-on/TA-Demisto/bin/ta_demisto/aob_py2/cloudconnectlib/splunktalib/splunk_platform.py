@@ -1,16 +1,15 @@
-import sys
-from .common import util as scu
-from io import StringIO
-from configparser import ConfigParser
-import subprocess
-import os.path as op
-import os
 from future import standard_library
 standard_library.install_aliases()
+import os
+import os.path as op
+import subprocess
+from configparser import ConfigParser
+from io import StringIO
 
+from .common import util as scu
 
+import sys
 PY_VERSION = (sys.version_info[0], sys.version_info[1])
-
 
 def make_splunkhome_path(parts):
     """

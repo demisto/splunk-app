@@ -21,7 +21,6 @@ from pgen2 import driver
 
 logging.basicConfig()
 
-
 def main():
     gr = driver.load_grammar("Grammar.txt")
     dr = driver.Driver(gr, convert=pytree.convert)
@@ -31,7 +30,7 @@ def main():
     if not diff(fn, tree):
         print "No diffs."
     if not sys.argv[1:]:
-        return  # Pass a dummy argument to run the complete test suite below
+        return # Pass a dummy argument to run the complete test suite below
 
     problems = []
 
@@ -64,7 +63,7 @@ def main():
             fn = os.path.join(dir, name)
             try:
                 tree = dr.parse_file(fn, debug=True)
-            except pgen2.parse.ParseError as err:
+            except pgen2.parse.ParseError, err:
                 print "ParseError:", err
             else:
                 if diff(fn, tree):
@@ -78,7 +77,6 @@ def main():
         for fn in problems:
             print "***", fn
 
-
 def diff(fn, tree):
     f = open("@", "w")
     try:
@@ -89,7 +87,6 @@ def diff(fn, tree):
         return os.system("diff -u %s @" % fn)
     finally:
         os.remove("@")
-
 
 if __name__ == "__main__":
     main()

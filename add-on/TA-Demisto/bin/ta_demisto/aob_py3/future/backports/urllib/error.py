@@ -38,7 +38,6 @@ class URLError(IOError):
     def __str__(self):
         return '<urlopen error %s>' % self.reason
 
-
 class HTTPError(URLError, urllib_response.addinfourl):
     """Raised when HTTP error occurs, but also acts like non-error return"""
     __super_init = urllib_response.addinfourl.__init__

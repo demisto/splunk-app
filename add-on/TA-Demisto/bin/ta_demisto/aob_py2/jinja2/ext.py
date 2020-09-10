@@ -14,10 +14,10 @@ import re
 
 from jinja2 import nodes
 from jinja2.defaults import BLOCK_START_STRING, \
-    BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, \
-    COMMENT_START_STRING, COMMENT_END_STRING, LINE_STATEMENT_PREFIX, \
-    LINE_COMMENT_PREFIX, TRIM_BLOCKS, NEWLINE_SEQUENCE, \
-    KEEP_TRAILING_NEWLINE, LSTRIP_BLOCKS
+     BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, \
+     COMMENT_START_STRING, COMMENT_END_STRING, LINE_STATEMENT_PREFIX, \
+     LINE_COMMENT_PREFIX, TRIM_BLOCKS, NEWLINE_SEQUENCE, \
+     KEEP_TRAILING_NEWLINE, LSTRIP_BLOCKS
 from jinja2.environment import Environment
 from jinja2.runtime import concat
 from jinja2.exceptions import TemplateAssertionError, TemplateSyntaxError
@@ -326,7 +326,7 @@ class InternationalizationExtension(Extension):
         """Parse until the next block tag with a given name."""
         referenced = []
         buf = []
-        while True:
+        while 1:
             if parser.stream.current.type == 'data':
                 buf.append(parser.stream.current.value.replace('%', '%%'))
                 next(parser.stream)

@@ -38,7 +38,8 @@ __all__ = [
     'parser',
     'quoprimime',
     'utils',
-]
+    ]
+
 
 
 # Some convenience routines.  Don't import Parser and Message as side-effects
@@ -52,7 +53,6 @@ def message_from_string(s, *args, **kws):
     from future.backports.email.parser import Parser
     return Parser(*args, **kws).parsestr(s)
 
-
 def message_from_bytes(s, *args, **kws):
     """Parse a bytes string into a Message object model.
 
@@ -61,7 +61,6 @@ def message_from_bytes(s, *args, **kws):
     from future.backports.email.parser import BytesParser
     return BytesParser(*args, **kws).parsebytes(s)
 
-
 def message_from_file(fp, *args, **kws):
     """Read a file and parse its contents into a Message object model.
 
@@ -69,7 +68,6 @@ def message_from_file(fp, *args, **kws):
     """
     from future.backports.email.parser import Parser
     return Parser(*args, **kws).parse(fp)
-
 
 def message_from_binary_file(fp, *args, **kws):
     """Read a binary file and parse its contents into a Message object model.

@@ -26,7 +26,7 @@ try:
     CONF_PARSER_KWARGS = {}
 except ImportError:
     from configparser import ConfigParser
-    CONF_PARSER_KWARGS = {'strict': False}
+    CONF_PARSER_KWARGS = { 'strict': False }
 
 from io import StringIO
 

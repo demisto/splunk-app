@@ -149,7 +149,6 @@ class newrange(Sequence):
 class range_iterator(Iterator):
     """An iterator for a :class:`range`.
     """
-
     def __init__(self, range_):
         self._stepper = islice(count(range_.start, range_.step), len(range_))
 

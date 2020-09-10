@@ -39,11 +39,8 @@ class Parser(object):
         backward compatibility.
 
         """
-        if 'policy' in _3to2kwargs:
-            policy = _3to2kwargs['policy']
-            del _3to2kwargs['policy']
-        else:
-            policy = compat32
+        if 'policy' in _3to2kwargs: policy = _3to2kwargs['policy']; del _3to2kwargs['policy']
+        else: policy = compat32
         self._class = _class
         self.policy = policy
 
@@ -74,6 +71,7 @@ class Parser(object):
         the file.
         """
         return self.parse(StringIO(text), headersonly=headersonly)
+
 
 
 class HeaderParser(Parser):
@@ -115,6 +113,7 @@ class BytesParser(object):
         fp = TextIOWrapper(fp, encoding='ascii', errors='surrogateescape')
         with fp:
             return self.parser.parse(fp, headersonly)
+
 
     def parsebytes(self, text, headersonly=False):
         """Create a message structure from a byte string.

@@ -12,7 +12,7 @@ __all__ = [
     'Header',
     'decode_header',
     'make_header',
-]
+    ]
 
 import re
 import binascii
@@ -76,7 +76,7 @@ def decode_header(header):
     # If it is a Header object, we can just return the encoded chunks.
     if hasattr(header, '_chunks'):
         return [(_charset._encode(string, str(charset)), str(charset))
-                for string, charset in header._chunks]
+                    for string, charset in header._chunks]
     # If no encoding, just return the header with no charset.
     if not ecre.search(header):
         return [(header, None)]
@@ -104,8 +104,8 @@ def decode_header(header):
     import sys
     droplist = []
     for n, w in enumerate(words):
-        if n > 1 and w[1] and words[n - 2][1] and words[n - 1][0].isspace():
-            droplist.append(n - 1)
+        if n>1 and w[1] and words[n-2][1] and words[n-1][0].isspace():
+            droplist.append(n-1)
     for d in reversed(droplist):
         del words[d]
 
@@ -303,7 +303,7 @@ class Header(object):
             try:
                 s.encode(output_charset, errors)
             except UnicodeEncodeError:
-                if output_charset != 'us-ascii':
+                if output_charset!='us-ascii':
                     raise
                 charset = UTF8
         self._chunks.append((s, charset))
@@ -382,7 +382,7 @@ class Header(object):
                                    charset)
                 else:
                     sline = line.lstrip()
-                    fws = line[:len(line) - len(sline)]
+                    fws = line[:len(line)-len(sline)]
                     formatter.feed(fws, sline, charset)
             if len(lines) > 1:
                 formatter.newline()
@@ -391,7 +391,7 @@ class Header(object):
         value = formatter._str(linesep)
         if _embeded_header.search(value):
             raise HeaderParseError("header value appears to contain "
-                                   "an embedded header: {!r}".format(value))
+                "an embedded header: {!r}".format(value))
         return value
 
     def _normalize(self):
@@ -500,12 +500,12 @@ class _ValueFormatter(object):
         # where we would sometimes *introduce* FWS after a splitchar, or the
         # algorithm before that, where we would turn all white space runs into
         # single spaces or tabs.)
-        parts = re.split("([" + FWS + "]+)", fws + string)
+        parts = re.split("(["+FWS+"]+)", fws+string)
         if parts[0]:
             parts[:0] = ['']
         else:
             parts.pop(0)
-        for fws, part in zip(*[iter(parts)] * 2):
+        for fws, part in zip(*[iter(parts)]*2):
             self._append_chunk(fws, part)
 
     def _append_chunk(self, fws, string):
@@ -514,13 +514,13 @@ class _ValueFormatter(object):
             # Find the best split point, working backward from the end.
             # There might be none, on a long first line.
             for ch in self._splitchars:
-                for i in range(self._current_line.part_count() - 1, 0, -1):
+                for i in range(self._current_line.part_count()-1, 0, -1):
                     if ch.isspace():
                         fws = self._current_line[i][0]
-                        if fws and fws[0] == ch:
+                        if fws and fws[0]==ch:
                             break
-                    prevpart = self._current_line[i - 1][1]
-                    if prevpart and prevpart[-1] == ch:
+                    prevpart = self._current_line[i-1][1]
+                    if prevpart and prevpart[-1]==ch:
                         break
                 else:
                     continue
@@ -556,17 +556,17 @@ class _Accumulator(list):
         return popped
 
     def pop(self):
-        if self.part_count() == 0:
+        if self.part_count()==0:
             return ('', '')
         return super().pop()
 
     def __len__(self):
-        return sum((len(fws) + len(part) for fws, part in self),
+        return sum((len(fws)+len(part) for fws, part in self),
                    self._initial_size)
 
     def __str__(self):
         return EMPTYSTRING.join((EMPTYSTRING.join((fws, part))
-                                 for fws, part in self))
+                                for fws, part in self))
 
     def reset(self, startval=None):
         if startval is None:
@@ -575,7 +575,7 @@ class _Accumulator(list):
         self._initial_size = 0
 
     def is_onlyws(self):
-        return self._initial_size == 0 and (not self or str(self).isspace())
+        return self._initial_size==0 and (not self or str(self).isspace())
 
     def part_count(self):
         return super().__len__()

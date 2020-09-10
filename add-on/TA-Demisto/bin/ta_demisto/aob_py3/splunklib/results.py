@@ -39,7 +39,7 @@ from io import BytesIO
 from splunklib import six
 try:
     import xml.etree.cElementTree as et
-except BaseException:
+except:
     import xml.etree.ElementTree as et
 
 try:
@@ -49,14 +49,13 @@ except ImportError:
 
 try:
     from splunklib.six.moves import cStringIO as StringIO
-except BaseException:
+except:
     from splunklib.six import StringIO
 
 __all__ = [
     "ResultsReader",
     "Message"
 ]
-
 
 class Message(object):
     """This class represents informational messages that Splunk interleaves in the results stream.
@@ -68,7 +67,6 @@ class Message(object):
 
         m = Message("DEBUG", "There's something in that variable...")
     """
-
     def __init__(self, type_, message):
         self.type = type_
         self.message = message
@@ -82,7 +80,6 @@ class Message(object):
     def __hash__(self):
         return hash((self.type, self.message))
 
-
 class _ConcatenatedStream(object):
     """Lazily concatenate zero or more streams into a stream.
 
@@ -95,7 +92,6 @@ class _ConcatenatedStream(object):
         s = _ConcatenatedStream(StringIO("abc"), StringIO("def"))
         assert s.read() == "abcdef"
     """
-
     def __init__(self, *streams):
         self.streams = list(streams)
 
@@ -114,7 +110,6 @@ class _ConcatenatedStream(object):
                 del self.streams[0]
         return response
 
-
 class _XMLDTDFilter(object):
     """Lazily remove all XML DTDs from a stream.
 
@@ -128,7 +123,6 @@ class _XMLDTDFilter(object):
         s = _XMLDTDFilter("<?xml abcd><element><?xml ...></element>")
         assert s.read() == "<element></element>"
     """
-
     def __init__(self, stream):
         self.stream = stream
 
@@ -158,7 +152,6 @@ class _XMLDTDFilter(object):
                 if n is not None:
                     n -= 1
         return response
-
 
 class ResultsReader(object):
     """This class returns dictionaries and Splunk messages from an XML results
@@ -195,7 +188,6 @@ class ResultsReader(object):
     # except that you cannot get the current generator inside the
     # function creating that generator. Thus it's all wrapped up for
     # the sake of one field.
-
     def __init__(self, stream):
         # The search/jobs/exports endpoint, when run with
         # earliest_time=rt and latest_time=rt streams a sequence of
@@ -268,16 +260,16 @@ class ResultsReader(object):
                         # So we'll define it here
 
                         def __itertext(self):
-                            tag = self.tag
-                            if not isinstance(tag, six.string_types) and tag is not None:
-                                return
-                            if self.text:
-                                yield self.text
-                            for e in self:
-                                for s in __itertext(e):
-                                    yield s
-                                if e.tail:
-                                    yield e.tail
+                          tag = self.tag
+                          if not isinstance(tag, six.string_types) and tag is not None:
+                              return
+                          if self.text:
+                              yield self.text
+                          for e in self:
+                              for s in __itertext(e):
+                                  yield s
+                              if e.tail:
+                                  yield e.tail
 
                         text = "".join(__itertext(elem))
                     values.append(text)
@@ -297,3 +289,7 @@ class ResultsReader(object):
                 return
             else:
                 raise
+
+
+
+

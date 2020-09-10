@@ -19,20 +19,20 @@ from jinja2.optimizer import Optimizer
 from jinja2.exceptions import TemplateAssertionError
 from jinja2.utils import Markup, concat, escape
 from jinja2._compat import range_type, text_type, string_types, \
-    iteritems, NativeStringIO, imap, izip
+     iteritems, NativeStringIO, imap, izip
 from jinja2.idtracking import Symbols, VAR_LOAD_PARAMETER, \
-    VAR_LOAD_RESOLVE, VAR_LOAD_ALIAS, VAR_LOAD_UNDEFINED
+     VAR_LOAD_RESOLVE, VAR_LOAD_ALIAS, VAR_LOAD_UNDEFINED
 
 
 operators = {
-    'eq': '==',
-    'ne': '!=',
-    'gt': '>',
-    'gteq': '>=',
-    'lt': '<',
-    'lteq': '<=',
-    'in': 'in',
-    'notin': 'not in'
+    'eq':       '==',
+    'ne':       '!=',
+    'gt':       '>',
+    'gteq':     '>=',
+    'lt':       '<',
+    'lteq':     '<=',
+    'in':       'in',
+    'notin':    'not in'
 }
 
 # what method to iterate over items do we want to use for dict iteration
@@ -95,7 +95,7 @@ def has_safe_repr(value):
             if not has_safe_repr(item):
                 return False
         return True
-    elif isinstance(value, dict):
+    elif type(value) is dict:
         for key, value in iteritems(value):
             if not has_safe_repr(key):
                 return False
@@ -537,10 +537,10 @@ class CodeGenerator(NodeVisitor):
             else:
                 args.append(frame.symbols.declare_parameter('caller'))
             macro_ref.accesses_caller = True
-        if 'kwargs' in undeclared and 'kwargs' not in skip_special_params:
+        if 'kwargs' in undeclared and not 'kwargs' in skip_special_params:
             args.append(frame.symbols.declare_parameter('kwargs'))
             macro_ref.accesses_kwargs = True
-        if 'varargs' in undeclared and 'varargs' not in skip_special_params:
+        if 'varargs' in undeclared and not 'varargs' in skip_special_params:
             args.append(frame.symbols.declare_parameter('varargs'))
             macro_ref.accesses_varargs = True
 
@@ -1030,8 +1030,8 @@ class CodeGenerator(NodeVisitor):
         # is necessary if the loop is in recursive mode if the special loop
         # variable is accessed in the body.
         extended_loop = node.recursive or 'loop' in \
-            find_undeclared(node.iter_child_nodes(
-                only=('body',)), ('loop',))
+                        find_undeclared(node.iter_child_nodes(
+                            only=('body',)), ('loop',))
 
         loop_ref = None
         if extended_loop:
@@ -1231,10 +1231,10 @@ class CodeGenerator(NodeVisitor):
                getattr(func, 'evalcontextfunction', False):
                 allow_constant_finalize = False
             elif getattr(func, 'environmentfunction', False):
-                def finalize(x): return text_type(
+                finalize = lambda x: text_type(
                     self.environment.finalize(self.environment, x))
             else:
-                def finalize(x): return text_type(self.environment.finalize(x))
+                finalize = lambda x: text_type(self.environment.finalize(x))
         else:
             finalize = text_type
 
@@ -1349,10 +1349,10 @@ class CodeGenerator(NodeVisitor):
                                'contextfunction', False):
                         self.write('context, ')
                     elif getattr(self.environment.finalize,
-                                 'evalcontextfunction', False):
+                               'evalcontextfunction', False):
                         self.write('context.eval_ctx, ')
                     elif getattr(self.environment.finalize,
-                                 'environmentfunction', False):
+                               'environmentfunction', False):
                         self.write('environment, ')
                     close += 1
                 self.visit(argument, frame)
@@ -1407,7 +1407,7 @@ class CodeGenerator(NodeVisitor):
         # instruction indicates a parameter which are always defined.
         if node.ctx == 'load':
             load = frame.symbols.find_load(ref)
-            if not (load is not None and load[0] == VAR_LOAD_PARAMETER and
+            if not (load is not None and load[0] == VAR_LOAD_PARAMETER and \
                     not self.parameter_is_undeclared(ref)):
                 self.write('(undefined(name=%r) if %s is missing else %s)' %
                            (node.name, ref, ref))
@@ -1615,8 +1615,8 @@ class CodeGenerator(NodeVisitor):
             if node.expr2 is not None:
                 return self.visit(node.expr2, frame)
             self.write('undefined(%r)' % ('the inline if-'
-                                          'expression on %s evaluated to false and '
-                                          'no else section was defined.' % self.position(node)))
+                       'expression on %s evaluated to false and '
+                       'no else section was defined.' % self.position(node)))
 
         self.write('(')
         self.visit(node.expr1, frame)

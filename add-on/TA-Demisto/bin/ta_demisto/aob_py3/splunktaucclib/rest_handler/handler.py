@@ -3,19 +3,21 @@ REST Handler.
 """
 
 from __future__ import absolute_import
-from .credentials import RestCredentials
-from .entity import RestEntity
-from .error import RestError
-from solnlib.splunk_rest_client import SplunkRestClient
-from solnlib.packages.splunklib import binding
-from functools import wraps
-from urllib.parse import urlparse
-import traceback
-import json
-from builtins import object
 
 from future import standard_library
 standard_library.install_aliases()
+from builtins import object
+import json
+import traceback
+from urllib.parse import urlparse
+
+from functools import wraps
+from solnlib.packages.splunklib import binding
+from solnlib.splunk_rest_client import SplunkRestClient
+
+from .error import RestError
+from .entity import RestEntity
+from .credentials import RestCredentials
 
 
 __all__ = ['RestHandler']
@@ -37,7 +39,7 @@ def _check_name_for_create(name):
 def _pre_request(existing):
     """
     Encode payload before request.
-    :param existing:
+    :param existing: 
         if True: means must exist
         if False: means must NOT exist
     :return:
@@ -49,7 +51,6 @@ def _pre_request(existing):
         :param meth: RestHandler instance method
         :return:
         """
-
         def check_existing(self, name):
             if not existing:
                 # for create, check name
@@ -99,7 +100,6 @@ def _decode_response(meth):
     :param meth: RestHandler instance method
     :return:
     """
-
     def decode(self, name, data, acl):
         self._endpoint.decode(name, data)
         return RestEntity(
@@ -437,3 +437,4 @@ class RestHandler(object):
             for field_name in encrypted_field_names:
                 if field_name in model['content'] and model['content'][field_name] != '':
                     model['content'][field_name] = self.PASSWORD
+

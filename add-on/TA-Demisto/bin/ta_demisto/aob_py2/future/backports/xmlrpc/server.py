@@ -125,7 +125,6 @@ try:
 except ImportError:
     fcntl = None
 
-
 def resolve_dotted_attribute(obj, attr, allow_dotted_names=True):
     """resolve_dotted_attribute(a, 'b.c.d') => a.b.c.d
 
@@ -145,20 +144,18 @@ def resolve_dotted_attribute(obj, attr, allow_dotted_names=True):
         if i.startswith('_'):
             raise AttributeError(
                 'attempt to access private attribute "%s"' % i
-            )
+                )
         else:
-            obj = getattr(obj, i)
+            obj = getattr(obj,i)
     return obj
-
 
 def list_public_methods(obj):
     """Returns a list of attribute strings, found in the specified
     object, which represent callable attributes"""
 
     return [member for member in dir(obj)
-            if not member.startswith('_') and
-            callable(getattr(obj, member))]
-
+                if not member.startswith('_') and
+                    callable(getattr(obj, member))]
 
 class SimpleXMLRPCDispatcher(object):
     """Mix-in class that dispatches XML-RPC requests.
@@ -231,9 +228,9 @@ class SimpleXMLRPCDispatcher(object):
         see http://xmlrpc.usefulinc.com/doc/reserved.html
         """
 
-        self.funcs.update({'system.listMethods': self.system_listMethods,
-                           'system.methodSignature': self.system_methodSignature,
-                           'system.methodHelp': self.system_methodHelp})
+        self.funcs.update({'system.listMethods' : self.system_listMethods,
+                      'system.methodSignature' : self.system_methodSignature,
+                      'system.methodHelp' : self.system_methodHelp})
 
     def register_multicall_functions(self):
         """Registers the XML-RPC multicall method in the system
@@ -241,9 +238,9 @@ class SimpleXMLRPCDispatcher(object):
 
         see http://www.xmlrpc.com/discuss/msgReader$1208"""
 
-        self.funcs.update({'system.multicall': self.system_multicall})
+        self.funcs.update({'system.multicall' : self.system_multicall})
 
-    def _marshaled_dispatch(self, data, dispatch_method=None, path=None):
+    def _marshaled_dispatch(self, data, dispatch_method = None, path = None):
         """Dispatches an XML-RPC method from marshalled (XML) data.
 
         XML-RPC methods are dispatched from the marshalled (XML) data
@@ -270,13 +267,13 @@ class SimpleXMLRPCDispatcher(object):
         except Fault as fault:
             response = dumps(fault, allow_none=self.allow_none,
                              encoding=self.encoding)
-        except BaseException:
+        except:
             # report exception back to server
             exc_type, exc_value, exc_tb = sys.exc_info()
             response = dumps(
                 Fault(1, "%s:%s" % (exc_type, exc_value)),
                 encoding=self.encoding, allow_none=self.allow_none,
-            )
+                )
 
         return response.encode(self.encoding)
 
@@ -328,10 +325,10 @@ class SimpleXMLRPCDispatcher(object):
             elif not hasattr(self.instance, '_dispatch'):
                 try:
                     method = resolve_dotted_attribute(
-                        self.instance,
-                        method_name,
-                        self.allow_dotted_names
-                    )
+                                self.instance,
+                                method_name,
+                                self.allow_dotted_names
+                                )
                 except AttributeError:
                     pass
 
@@ -363,15 +360,15 @@ class SimpleXMLRPCDispatcher(object):
                 results.append([self._dispatch(method_name, params)])
             except Fault as fault:
                 results.append(
-                    {'faultCode': fault.faultCode,
-                     'faultString': fault.faultString}
-                )
-            except BaseException:
+                    {'faultCode' : fault.faultCode,
+                     'faultString' : fault.faultString}
+                    )
+            except:
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 results.append(
-                    {'faultCode': 1,
-                     'faultString': "%s:%s" % (exc_type, exc_value)}
-                )
+                    {'faultCode' : 1,
+                     'faultString' : "%s:%s" % (exc_type, exc_value)}
+                    )
         return results
 
     def _dispatch(self, method, params):
@@ -411,7 +408,7 @@ class SimpleXMLRPCDispatcher(object):
                             self.instance,
                             method,
                             self.allow_dotted_names
-                        )
+                            )
                     except AttributeError:
                         pass
 
@@ -419,7 +416,6 @@ class SimpleXMLRPCDispatcher(object):
             return func(*params)
         else:
             raise Exception('method "%s" is not supported' % method)
-
 
 class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
     """Simple XML-RPC request handler class.
@@ -432,11 +428,11 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
     # paths not on this list will result in a 404 error.
     rpc_paths = ('/', '/RPC2')
 
-    # if not None, encode responses larger than this, if possible
-    encode_threshold = 1400  # a common MTU
+    #if not None, encode responses larger than this, if possible
+    encode_threshold = 1400 #a common MTU
 
-    # Override form StreamRequestHandler: full buffering of output
-    # and no Nagle.
+    #Override form StreamRequestHandler: full buffering of output
+    #and no Nagle.
     wbufsize = -1
     disable_nagle_algorithm = True
 
@@ -481,7 +477,7 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
             # We read this in chunks to avoid straining
             # socket.read(); around the 10 or 15Mb mark, some platforms
             # begin to have problems (bug #792570).
-            max_chunk_size = 10 * 1024 * 1024
+            max_chunk_size = 10*1024*1024
             size_remaining = int(self.headers["content-length"])
             L = []
             while size_remaining:
@@ -495,7 +491,7 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
 
             data = self.decode_request_content(data)
             if data is None:
-                return  # response has been sent
+                return #response has been sent
 
             # In previous versions of SimpleXMLRPCServer, _dispatch
             # could be overridden in this class, instead of in
@@ -503,9 +499,9 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
             # check to see if a subclass implements _dispatch and dispatch
             # using that method if present.
             response = self.server._marshaled_dispatch(
-                data, getattr(self, '_dispatch', None), self.path
-            )
-        except Exception as e:  # This should only happen if the module is buggy
+                    data, getattr(self, '_dispatch', None), self.path
+                )
+        except Exception as e: # This should only happen if the module is buggy
             # internal error, report as HTTP server error
             self.send_response(500)
 
@@ -536,7 +532,7 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(response)
 
     def decode_request_content(self, data):
-        # support gzip encoding of request
+        #support gzip encoding of request
         encoding = self.headers.get("content-encoding", "identity").lower()
         if encoding == "identity":
             return data
@@ -552,8 +548,8 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-length", "0")
         self.end_headers()
 
-    def report_404(self):
-        # Report a 404 error
+    def report_404 (self):
+            # Report a 404 error
         self.send_response(404)
         response = b'No such page'
         self.send_header("Content-type", "text/plain")
@@ -566,7 +562,6 @@ class SimpleXMLRPCRequestHandler(BaseHTTPRequestHandler):
 
         if self.server.logRequests:
             BaseHTTPRequestHandler.log_request(self, code, size)
-
 
 class SimpleXMLRPCServer(socketserver.TCPServer,
                          SimpleXMLRPCDispatcher):
@@ -603,7 +598,6 @@ class SimpleXMLRPCServer(socketserver.TCPServer,
             flags |= fcntl.FD_CLOEXEC
             fcntl.fcntl(self.fileno(), fcntl.F_SETFD, flags)
 
-
 class MultiPathXMLRPCServer(SimpleXMLRPCServer):
     """Multipath XML-RPC Server
     This specialization of SimpleXMLRPCServer allows the user to create
@@ -612,7 +606,6 @@ class MultiPathXMLRPCServer(SimpleXMLRPCServer):
     'virtual XML-RPC servers' at the same port.
     Make sure that the requestHandler accepts the paths in question.
     """
-
     def __init__(self, addr, requestHandler=SimpleXMLRPCRequestHandler,
                  logRequests=True, allow_none=False, encoding=None,
                  bind_and_activate=True, use_builtin_types=False):
@@ -630,11 +623,11 @@ class MultiPathXMLRPCServer(SimpleXMLRPCServer):
     def get_dispatcher(self, path):
         return self.dispatchers[path]
 
-    def _marshaled_dispatch(self, data, dispatch_method=None, path=None):
+    def _marshaled_dispatch(self, data, dispatch_method = None, path = None):
         try:
             response = self.dispatchers[path]._marshaled_dispatch(
-                data, dispatch_method, path)
-        except BaseException:
+               data, dispatch_method, path)
+        except:
             # report low level exception back to server
             # (each dispatcher should have handled their own
             # exceptions)
@@ -644,7 +637,6 @@ class MultiPathXMLRPCServer(SimpleXMLRPCServer):
                 encoding=self.encoding, allow_none=self.allow_none)
             response = response.encode(self.encoding)
         return response
-
 
 class CGIXMLRPCRequestHandler(SimpleXMLRPCDispatcher):
     """Simple handler for XML-RPC data passed through CGI."""
@@ -676,9 +668,9 @@ class CGIXMLRPCRequestHandler(SimpleXMLRPCDispatcher):
 
         response = http_server.DEFAULT_ERROR_MESSAGE % \
             {
-                'code': code,
-                'message': message,
-                'explain': explain
+             'code' : code,
+             'message' : message,
+             'explain' : explain
             }
         response = response.encode('utf-8')
         print('Status: %d %s' % (code, message))
@@ -698,7 +690,7 @@ class CGIXMLRPCRequestHandler(SimpleXMLRPCDispatcher):
         """
 
         if request_text is None and \
-                os.environ.get('REQUEST_METHOD', None) == 'GET':
+            os.environ.get('REQUEST_METHOD', None) == 'GET':
             self.handle_get()
         else:
             # POST data is normally available through stdin
@@ -730,13 +722,12 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
         # names. Only methods with names consisting of word characters
         # and '.'s are hyperlinked.
         pattern = re.compile(r'\b((http|ftp)://\S+[\w/]|'
-                             r'RFC[- ]?(\d+)|'
-                             r'PEP[- ]?(\d+)|'
-                             r'(self\.)?((?:\w|\.)+))\b')
-        while True:
+                                r'RFC[- ]?(\d+)|'
+                                r'PEP[- ]?(\d+)|'
+                                r'(self\.)?((?:\w|\.)+))\b')
+        while 1:
             match = pattern.search(text, here)
-            if not match:
-                break
+            if not match: break
             start, end = match.span()
             results.append(escape(text[here:start]))
 
@@ -750,7 +741,7 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
             elif pep:
                 url = 'http://www.python.org/dev/peps/pep-%04d/' % int(pep)
                 results.append('<a href="%s">%s</a>' % (url, escape(all)))
-            elif text[end:end + 1] == '(':
+            elif text[end:end+1] == '(':
                 results.append(self.namelink(name, methods, funcs, classes))
             elif selfdot:
                 results.append('self.<strong>%s</strong>' % name)
@@ -774,14 +765,14 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
             args = inspect.getfullargspec(object)
             # exclude the argument bound to the instance, it will be
             # confusing to the non-Python user
-            argspec = inspect.formatargspec(
-                args.args[1:],
-                args.varargs,
-                args.varkw,
-                args.defaults,
-                annotations=args.annotations,
-                formatvalue=self.formatvalue
-            )
+            argspec = inspect.formatargspec (
+                    args.args[1:],
+                    args.varargs,
+                    args.varkw,
+                    args.defaults,
+                    annotations=args.annotations,
+                    formatvalue=self.formatvalue
+                )
         elif inspect.isfunction(object):
             args = inspect.getfullargspec(object)
             argspec = inspect.formatargspec(
@@ -798,7 +789,7 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
             docstring = pydoc.getdoc(object)
 
         decl = title + argspec + (note and self.grey(
-            '<font face="helvetica, arial">%s</font>' % note))
+               '<font face="helvetica, arial">%s</font>' % note))
 
         doc = self.markup(
             docstring, self.preformat, funcs, classes, methods)
@@ -829,7 +820,6 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
             'Methods', '#ffffff', '#eeaa77', ''.join(contents))
 
         return result
-
 
 class XMLRPCDocGenerator(object):
     """Generates documentation for an XML-RPC server.
@@ -878,7 +868,7 @@ class XMLRPCDocGenerator(object):
             if method_name in self.funcs:
                 method = self.funcs[method_name]
             elif self.instance is not None:
-                method_info = [None, None]  # argspec, documentation
+                method_info = [None, None] # argspec, documentation
                 if hasattr(self.instance, '_get_method_argstring'):
                     method_info[0] = self.instance._get_method_argstring(method_name)
                 if hasattr(self.instance, '_methodHelp'):
@@ -890,9 +880,9 @@ class XMLRPCDocGenerator(object):
                 elif not hasattr(self.instance, '_dispatch'):
                     try:
                         method = resolve_dotted_attribute(
-                            self.instance,
-                            method_name
-                        )
+                                    self.instance,
+                                    method_name
+                                    )
                     except AttributeError:
                         method = method_info
                 else:
@@ -905,13 +895,12 @@ class XMLRPCDocGenerator(object):
 
         documenter = ServerHTMLDoc()
         documentation = documenter.docserver(
-            self.server_name,
-            self.server_documentation,
-            methods
-        )
+                                self.server_name,
+                                self.server_documentation,
+                                methods
+                            )
 
         return documenter.page(self.server_title, documentation)
-
 
 class DocXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
     """XML-RPC and documentation request handler class.
@@ -941,9 +930,8 @@ class DocXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
         self.end_headers()
         self.wfile.write(response)
 
-
-class DocXMLRPCServer(SimpleXMLRPCServer,
-                      XMLRPCDocGenerator):
+class DocXMLRPCServer(  SimpleXMLRPCServer,
+                        XMLRPCDocGenerator):
     """XML-RPC and HTML documentation server.
 
     Adds the ability to serve server documentation to the capabilities
@@ -958,9 +946,8 @@ class DocXMLRPCServer(SimpleXMLRPCServer,
                                     use_builtin_types)
         XMLRPCDocGenerator.__init__(self)
 
-
-class DocCGIXMLRPCRequestHandler(CGIXMLRPCRequestHandler,
-                                 XMLRPCDocGenerator):
+class DocCGIXMLRPCRequestHandler(   CGIXMLRPCRequestHandler,
+                                    XMLRPCDocGenerator):
     """Handler for XML-RPC data and documentation requests passed through
     CGI"""
 
@@ -999,7 +986,7 @@ if __name__ == '__main__':
 
     server = SimpleXMLRPCServer(("localhost", 8000))
     server.register_function(pow)
-    server.register_function(lambda x, y: x + y, 'add')
+    server.register_function(lambda x,y: x+y, 'add')
     server.register_instance(ExampleService(), allow_dotted_names=True)
     server.register_multicall_functions()
     print('Serving XML-RPC on localhost port 8000')

@@ -11,7 +11,6 @@ sys.exc_traceback -> sys.exc_info()[2]
 from .. import fixer_base
 from ..fixer_util import Attr, Call, Name, Number, Subscript, Node, syms
 
-
 class FixSysExc(fixer_base.BaseFix):
     # This order matches the ordering of sys.exc_info().
     exc_info = [u"exc_type", u"exc_value", u"exc_traceback"]

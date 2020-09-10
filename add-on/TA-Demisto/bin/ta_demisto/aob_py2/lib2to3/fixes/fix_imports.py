@@ -5,10 +5,10 @@
 from .. import fixer_base
 from ..fixer_util import Name, attr_chain
 
-MAPPING = {'StringIO': 'io',
+MAPPING = {'StringIO':  'io',
            'cStringIO': 'io',
            'cPickle': 'pickle',
-           '__builtin__': 'builtins',
+           '__builtin__' : 'builtins',
            'copy_reg': 'copyreg',
            'Queue': 'queue',
            'SocketServer': 'socketserver',
@@ -42,20 +42,20 @@ MAPPING = {'StringIO': 'io',
            'DocXMLRPCServer': 'xmlrpc.server',
            'SimpleXMLRPCServer': 'xmlrpc.server',
            'httplib': 'http.client',
-           'htmlentitydefs': 'html.entities',
-           'HTMLParser': 'html.parser',
+           'htmlentitydefs' : 'html.entities',
+           'HTMLParser' : 'html.parser',
            'Cookie': 'http.cookies',
            'cookielib': 'http.cookiejar',
            'BaseHTTPServer': 'http.server',
            'SimpleHTTPServer': 'http.server',
            'CGIHTTPServer': 'http.server',
-           # 'test.test_support': 'test.support',
+           #'test.test_support': 'test.support',
            'commands': 'subprocess',
-           'UserString': 'collections',
-           'UserList': 'collections',
-           'urlparse': 'urllib.parse',
-           'robotparser': 'urllib.robotparser',
-           }
+           'UserString' : 'collections',
+           'UserList' : 'collections',
+           'urlparse' : 'urllib.parse',
+           'robotparser' : 'urllib.robotparser',
+}
 
 
 def alternates(members):

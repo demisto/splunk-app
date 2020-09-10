@@ -51,7 +51,7 @@ class CCEJob(object):
                      "proxy_port='%s', proxy_rdns='%s', proxy_type='%s', "
                      "proxy_username='%s'",
                      proxy_setting.get("proxy_enabled"),
-                     proxy_setting.get("proxy_url"),
+                     proxy_setting.get("proxy_url"), 
                      proxy_setting.get("proxy_port"),
                      proxy_setting.get("proxy_rdns"),
                      proxy_setting.get("proxy_type"),

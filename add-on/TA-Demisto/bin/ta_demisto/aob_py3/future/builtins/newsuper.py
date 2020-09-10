@@ -42,7 +42,6 @@ _builtin_super = super
 
 _SENTINEL = object()
 
-
 def newsuper(typ=_SENTINEL, type_or_obj=_SENTINEL, framedepth=1):
     '''Like builtin super(), but capable of magic.
 
@@ -79,7 +78,7 @@ def newsuper(typ=_SENTINEL, type_or_obj=_SENTINEL, framedepth=1):
                 # Drill down through any wrappers to the underlying func.
                 # This handles e.g. classmethod() and staticmethod().
                 try:
-                    while not isinstance(meth, FunctionType):
+                    while not isinstance(meth,FunctionType):
                         if isinstance(meth, property):
                             # Calling __get__ on the property will invoke
                             # user code which might throw exceptions or have
@@ -95,8 +94,8 @@ def newsuper(typ=_SENTINEL, type_or_obj=_SENTINEL, framedepth=1):
                 if meth.func_code is f.f_code:
                     break   # Aha!  Found you.
             else:
-                continue  # Not found! Move onto the next class in MRO.
-            break  # Found! Break out of the search loop.
+                continue    #  Not found! Move onto the next class in MRO.
+            break    #  Found! Break out of the search loop.
         else:
             raise RuntimeError('super() called outside a method')
 
@@ -109,7 +108,7 @@ def newsuper(typ=_SENTINEL, type_or_obj=_SENTINEL, framedepth=1):
 def superm(*args, **kwds):
     f = sys._getframe(1)
     nm = f.f_code.co_name
-    return getattr(newsuper(framedepth=2), nm)(*args, **kwds)
+    return getattr(newsuper(framedepth=2),nm)(*args, **kwds)
 
 
 __all__ = ['newsuper']

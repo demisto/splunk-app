@@ -68,7 +68,7 @@ class ConfFile(object):
     reserved_keys = ('userName', 'appName')
 
     def __init__(self, name, conf, session_key, app, owner='nobody',
-                 scheme=None, host=None, port=None, realm=None, **context):
+                 scheme=None, host=None, port=None, realm=None,**context):
         self._name = name
         self._conf = conf
         self._session_key = session_key
@@ -79,7 +79,7 @@ class ConfFile(object):
         self._port = port
         self._context = context
         self._cred_manager = None
-        # 'realm' is set to provided 'realm' argument otherwise as default behaviour it is set to 'APP_NAME'.
+        ### 'realm' is set to provided 'realm' argument otherwise as default behaviour it is set to 'APP_NAME'.
         if realm is None:
             self._realm = self._app
         else:
@@ -107,7 +107,7 @@ class ConfFile(object):
         if not encrypt_keys:
             return stanza
 
-        encrypt_stanza_keys = [k for k in encrypt_keys if k in stanza]
+        encrypt_stanza_keys = [ k for k in encrypt_keys if k in stanza ]
         encrypt_fields = {key: stanza[key] for key in encrypt_stanza_keys}
         if not encrypt_fields:
             return stanza

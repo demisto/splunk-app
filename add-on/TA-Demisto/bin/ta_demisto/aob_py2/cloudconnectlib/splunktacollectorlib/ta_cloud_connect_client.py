@@ -27,7 +27,7 @@ class TACloudConnectClient(TaDataClient):
         pairs = ['{}="{}"'.format(c.stanza_name, self._task_config[
             c.stanza_name])]
         set_cc_logger(stulog.logger,
-                      logger_prefix="[{}]".format(" ".join(pairs)))
+                          logger_prefix="[{}]".format(" ".join(pairs)))
 
     def is_stopped(self):
         return self._stop

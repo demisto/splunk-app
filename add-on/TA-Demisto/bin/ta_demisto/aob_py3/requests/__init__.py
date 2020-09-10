@@ -40,23 +40,6 @@ is at <http://python-requests.org>.
 :license: Apache 2.0, see LICENSE for more details.
 """
 
-from logging import NullHandler
-import logging
-from .exceptions import (
-    RequestException, Timeout, URLRequired,
-    TooManyRedirects, HTTPError, ConnectionError,
-    FileModeWarning, ConnectTimeout, ReadTimeout
-)
-from .status_codes import codes
-from .sessions import session, Session
-from .api import request, get, head, post, patch, put, delete, options
-from .models import Request, Response, PreparedRequest
-from . import packages
-from . import utils
-from .__version__ import __copyright__, __cake__
-from .__version__ import __build__, __author__, __author_email__, __license__
-from .__version__ import __title__, __description__, __url__, __version__
-from urllib3.exceptions import DependencyWarning
 import urllib3
 import chardet
 import warnings
@@ -99,7 +82,6 @@ def _check_cryptography(cryptography_version):
         warning = 'Old version of cryptography ({}) may cause slowdown.'.format(cryptography_version)
         warnings.warn(warning, RequestsDependencyWarning)
 
-
 # Check imported dependencies for compatibility.
 try:
     check_compatibility(urllib3.__version__, chardet.__version__)
@@ -120,10 +102,28 @@ except ImportError:
     pass
 
 # urllib3's DependencyWarnings should be silenced.
+from urllib3.exceptions import DependencyWarning
 warnings.simplefilter('ignore', DependencyWarning)
 
+from .__version__ import __title__, __description__, __url__, __version__
+from .__version__ import __build__, __author__, __author_email__, __license__
+from .__version__ import __copyright__, __cake__
+
+from . import utils
+from . import packages
+from .models import Request, Response, PreparedRequest
+from .api import request, get, head, post, patch, put, delete, options
+from .sessions import session, Session
+from .status_codes import codes
+from .exceptions import (
+    RequestException, Timeout, URLRequired,
+    TooManyRedirects, HTTPError, ConnectionError,
+    FileModeWarning, ConnectTimeout, ReadTimeout
+)
 
 # Set default logging handler to avoid "No handler found" warnings.
+import logging
+from logging import NullHandler
 
 logging.getLogger(__name__).addHandler(NullHandler())
 

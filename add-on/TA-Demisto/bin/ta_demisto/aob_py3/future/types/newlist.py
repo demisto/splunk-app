@@ -35,7 +35,6 @@ class newlist(with_metaclass(BaseNewList, _builtin_list)):
     """
     A backport of the Python 3 list object to Py2
     """
-
     def copy(self):
         """
         L.copy() -> list -- a shallow copy of L
@@ -55,7 +54,7 @@ class newlist(with_metaclass(BaseNewList, _builtin_list)):
 
         if len(args) == 0:
             return super(newlist, cls).__new__(cls)
-        elif isinstance(args[0], newlist):
+        elif type(args[0]) == newlist:
             value = args[0]
         else:
             value = args[0]
@@ -68,7 +67,7 @@ class newlist(with_metaclass(BaseNewList, _builtin_list)):
         " left + self "
         try:
             return newlist(left) + self
-        except BaseException:
+        except:
             return NotImplemented
 
     def __getitem__(self, y):

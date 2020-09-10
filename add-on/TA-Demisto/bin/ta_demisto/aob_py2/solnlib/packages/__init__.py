@@ -59,3 +59,4 @@ else:
         import yaml
 
         sys.modules['%s.yaml' % __name__] = yaml
+

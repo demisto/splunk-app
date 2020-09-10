@@ -10,7 +10,6 @@
 import os.path
 import shutil
 
-
 def get_source_range(lines, tag):
     srclines = enumerate(lines)
     start_tag = '#--! %s-start' % tag
@@ -26,7 +25,6 @@ def get_source_range(lines, tag):
 
     return (start_index + 1, end_index)
 
-
 def filter_section(lines, tag):
     filtered_lines = []
     include = True
@@ -37,7 +35,6 @@ def filter_section(lines, tag):
         elif include:
             filtered_lines.append(line)
     return filtered_lines
-
 
 def main():
     dirname = os.path.dirname(__file__)
@@ -62,12 +59,11 @@ def main():
     lines[parseopt_notrack_start:parseopt_notrack_end] = parseopt_notrack_lines
     lines[parseopt_start:parseopt_end] = parseopt_lines
 
-    lines = [line.rstrip() + '\n' for line in lines]
+    lines = [line.rstrip()+'\n' for line in lines]
     with open(os.path.join(dirname, 'yacc.py'), 'w') as f:
         f.writelines(lines)
 
     print('Updated yacc.py')
-
 
 if __name__ == '__main__':
     main()

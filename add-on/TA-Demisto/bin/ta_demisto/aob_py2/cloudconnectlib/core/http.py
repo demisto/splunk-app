@@ -14,9 +14,9 @@ from httplib2 import Http, socks, ProxyInfo
 from solnlib.packages.requests import PreparedRequest, utils
 from solnlib.utils import is_true
 
-try:  # Python2 environment support
+try: # Python2 environment support
     from httplib2 import SSLHandshakeError
-except BaseException:  # Python3 environment support
+except: # Python3 environment support
     from ssl import SSLError as SSLHandshakeError
 
 _logger = get_cc_logger()
@@ -149,16 +149,13 @@ def get_proxy_info(proxy_config):
     )
     return proxy_info
 
-
 def standardize_proxy_config(proxy_config):
     """
         This function is used to standardize the proxy information structure to get it evaluated through `get_proxy_info` function
     """
 
     if not isinstance(proxy_config, dict):
-        raise ValueError(
-            "Received unexpected format of proxy configuration. Expected format: object, Actual format: {}".format(
-                type(proxy_config)))
+        raise ValueError("Received unexpected format of proxy configuration. Expected format: object, Actual format: {}".format(type(proxy_config)))
 
     standard_proxy_config = {
         "proxy_enabled": proxy_config.get("enabled", proxy_config.get("proxy_enabled")),
@@ -178,13 +175,12 @@ class HttpClient(object):
         """Constructs a `HTTPRequest` with a optional proxy setting.
         """
         self._connection = None
-
+    
         if proxy_info:
             if isinstance(proxy_info, munch.Munch):
                 proxy_info = dict(proxy_info)
 
-            # Updating the proxy_info object to make it compatible for getting
-            # evaluated through `get_proxy_info` function
+            # Updating the proxy_info object to make it compatible for getting evaluated through `get_proxy_info` function
             proxy_info = standardize_proxy_config(proxy_info)
             self._proxy_info = get_proxy_info(proxy_info)
         else:
@@ -292,4 +288,4 @@ class HttpClient(object):
     @staticmethod
     def _is_need_retry(status, retried, maximum_retries):
         return retried < maximum_retries \
-            and status in defaults.retry_statuses
+               and status in defaults.retry_statuses

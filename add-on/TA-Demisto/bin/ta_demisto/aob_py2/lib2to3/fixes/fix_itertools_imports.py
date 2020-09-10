@@ -9,7 +9,7 @@ class FixItertoolsImports(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = """
               import_from< 'from' 'itertools' 'import' imports=any >
-              """ % (locals())
+              """ %(locals())
 
     def transform(self, node, results):
         imports = results['imports']
@@ -50,7 +50,7 @@ class FixItertoolsImports(fixer_base.BaseFix):
 
         # If there are no imports left, just get rid of the entire statement
         if (not (imports.children or getattr(imports, 'value', None)) or
-                imports.parent is None):
+            imports.parent is None):
             p = node.prefix
             node = BlankLine()
             node.prefix = p

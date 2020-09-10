@@ -33,7 +33,7 @@ class Schema(object):
 class SchemaOptions(object):
 
     def __init__(self, namespace=None, roles=None, export_level=DEFAULT,
-                 serialize_when_none=None, export_order=False, extras=None):
+            serialize_when_none=None, export_order=False, extras=None):
         self.namespace = namespace
         self.roles = roles or {}
         self.export_level = export_level

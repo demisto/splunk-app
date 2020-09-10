@@ -13,7 +13,7 @@ __all__ = [
     'encode_base64',
     'encode_noop',
     'encode_quopri',
-]
+    ]
 
 
 try:

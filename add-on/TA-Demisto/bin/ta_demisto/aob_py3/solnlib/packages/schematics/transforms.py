@@ -67,8 +67,8 @@ def import_loop(schema, mutable, raw_data=None, field_converter=None, trusted_da
     context = Context._make(context)
     try:
         context.initialized
-    except BaseException:
-        if isinstance(field_converter, types.FunctionType):
+    except:
+        if type(field_converter) is types.FunctionType:
             field_converter = BasicConverter(field_converter)
         context._setdefaults({
             'initialized': True,
@@ -103,8 +103,8 @@ def import_loop(schema, mutable, raw_data=None, field_converter=None, trusted_da
         all_fields = schema._valid_input_keys
         if context.mapping:
             mapped_keys = (set(itertools.chain(*(
-                listify(input_keys) for target_key, input_keys in context.mapping.items()
-                if target_key != 'model_mapping'))))
+                          listify(input_keys) for target_key, input_keys in context.mapping.items()
+                          if target_key != 'model_mapping'))))
             all_fields = all_fields | mapped_keys
         if context.strict:
             # Check for rogues if strict is set
@@ -232,8 +232,8 @@ def export_loop(schema, instance_or_dict, field_converter=None, role=None, raise
     context = Context._make(context)
     try:
         context.initialized
-    except BaseException:
-        if isinstance(field_converter, types.FunctionType):
+    except:
+        if type(field_converter) is types.FunctionType:
             field_converter = BasicConverter(field_converter)
         context._setdefaults({
             'initialized': True,
@@ -252,7 +252,7 @@ def export_loop(schema, instance_or_dict, field_converter=None, role=None, raise
         data = {}
 
     filter_func = (context.role if callable(context.role) else
-                   schema._options.roles.get(context.role))
+        schema._options.roles.get(context.role))
     if filter_func is None:
         if context.role and context.raise_error_on_role:
             error_msg = '%s Model has no role "%s"'

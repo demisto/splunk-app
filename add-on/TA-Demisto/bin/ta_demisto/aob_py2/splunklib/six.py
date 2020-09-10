@@ -223,7 +223,6 @@ class _SixMetaPathImporter(object):
         return None
     get_source = get_code  # same as get_code
 
-
 _importer = _SixMetaPathImporter(__name__)
 
 
@@ -479,7 +478,6 @@ class Module_six_moves_urllib(types.ModuleType):
 
     def __dir__(self):
         return ['parse', 'error', 'request', 'response', 'robotparser']
-
 
 _importer._add_module(Module_six_moves_urllib(__name__ + ".moves.urllib"),
                       "moves.urllib")

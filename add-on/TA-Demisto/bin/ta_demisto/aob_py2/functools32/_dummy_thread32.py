@@ -27,13 +27,11 @@ TIMEOUT_MAX = 2**31
 # imports are done when needed on a function-by-function basis.  Since threads
 # are disabled, the import lock should not be an issue anyway (??).
 
-
 class error(Exception):
     """Dummy implementation of _thread.error."""
 
     def __init__(self, *args):
         self.args = args
-
 
 def start_new_thread(function, args, kwargs={}):
     """Dummy implementation of _thread.start_new_thread().
@@ -48,9 +46,9 @@ def start_new_thread(function, args, kwargs={}):
     raised when the function returns.
 
     """
-    if not isinstance(args, type(tuple())):
+    if type(args) != type(tuple()):
         raise TypeError("2nd arg must be a tuple")
-    if not isinstance(kwargs, type(dict())):
+    if type(kwargs) != type(dict()):
         raise TypeError("3rd arg must be a dict")
     global _main
     _main = False
@@ -58,7 +56,7 @@ def start_new_thread(function, args, kwargs={}):
         function(*args, **kwargs)
     except SystemExit:
         pass
-    except BaseException:
+    except:
         import traceback
         traceback.print_exc()
     _main = True
@@ -67,11 +65,9 @@ def start_new_thread(function, args, kwargs={}):
         _interrupt = False
         raise KeyboardInterrupt
 
-
 def exit():
     """Dummy implementation of _thread.exit()."""
     raise SystemExit
-
 
 def get_ident():
     """Dummy implementation of _thread.get_ident().
@@ -82,18 +78,15 @@ def get_ident():
     """
     return -1
 
-
 def allocate_lock():
     """Dummy implementation of _thread.allocate_lock()."""
     return LockType()
-
 
 def stack_size(size=None):
     """Dummy implementation of _thread.stack_size()."""
     if size is not None:
         raise error("setting thread stack size not supported")
     return 0
-
 
 class LockType(object):
     """Class implementing dummy implementation of _thread.LockType.
@@ -150,12 +143,10 @@ class LockType(object):
     def locked(self):
         return self.locked_status
 
-
 # Used to signal that interrupt_main was called in a "thread"
 _interrupt = False
 # True when not executing in a "thread"
 _main = True
-
 
 def interrupt_main():
     """Set _interrupt flag to True to have start_new_thread raise

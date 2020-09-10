@@ -12,7 +12,6 @@ change the imports to Py3 style.
 from lib2to3 import fixer_base
 from libfuturize.fixer_util import touch_import_top
 
-
 class FixAddFutureStandardLibraryImport(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = "file_input"

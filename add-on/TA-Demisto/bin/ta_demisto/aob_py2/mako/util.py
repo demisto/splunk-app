@@ -60,7 +60,7 @@ def verify_directory(dir_):
         try:
             tries += 1
             os.makedirs(dir_, compat.octal("0775"))
-        except BaseException:
+        except:
             if tries > 5:
                 raise
 
@@ -221,7 +221,7 @@ class LRUCache(dict):
                 key=operator.attrgetter("timestamp"),
                 reverse=True,
             )
-            for item in bytime[self.capacity:]:
+            for item in bytime[self.capacity :]:
                 try:
                     del self[item.key]
                 except KeyError:
@@ -252,7 +252,7 @@ def parse_encoding(fp):
         line1 = fp.readline()
         has_bom = line1.startswith(codecs.BOM_UTF8)
         if has_bom:
-            line1 = line1[len(codecs.BOM_UTF8):]
+            line1 = line1[len(codecs.BOM_UTF8) :]
 
         m = _PYTHON_MAGIC_COMMENT_re.match(line1.decode("ascii", "ignore"))
         if not m:
@@ -293,7 +293,8 @@ def sorted_dict_repr(d):
     Used by the lexer unit test to compare parse trees based on strings.
 
     """
-    keys = sorted(d.keys())
+    keys = list(d.keys())
+    keys.sort()
     return "{" + ", ".join(["%r: %r" % (k, d[k]) for k in keys]) + "}"
 
 

@@ -207,7 +207,7 @@ class Parser(object):
     def parse_if(self):
         """Parse an if construct."""
         node = result = nodes.If(lineno=self.stream.expect('name:if').lineno)
-        while True:
+        while 1:
             node.test = self.parse_tuple(with_condexpr=False)
             node.body = self.parse_statements(('name:elif', 'name:else',
                                                'name:endif'))
@@ -249,7 +249,7 @@ class Parser(object):
             nodes.Keyword('autoescape', self.parse_expression())
         ]
         node.body = self.parse_statements(('name:endautoescape',),
-                                          drop_needle=True)
+                                            drop_needle=True)
         return nodes.Scope([node])
 
     def parse_block(self):
@@ -315,7 +315,7 @@ class Parser(object):
                 return True
             return False
 
-        while True:
+        while 1:
             if node.names:
                 self.stream.expect('comma')
             if self.stream.current.type == 'name':
@@ -473,7 +473,7 @@ class Parser(object):
         lineno = self.stream.current.lineno
         expr = self.parse_math1()
         ops = []
-        while True:
+        while 1:
             token_type = self.stream.current.type
             if token_type in _compare_operators:
                 next(self.stream)
@@ -609,10 +609,10 @@ class Parser(object):
         elif with_condexpr:
             parse = self.parse_expression
         else:
-            def parse(): return self.parse_expression(with_condexpr=False)
+            parse = lambda: self.parse_expression(with_condexpr=False)
         args = []
         is_tuple = False
-        while True:
+        while 1:
             if args:
                 self.stream.expect('comma')
             if self.is_tuple_end(extra_end_rules):
@@ -666,7 +666,7 @@ class Parser(object):
         return nodes.Dict(items, lineno=token.lineno)
 
     def parse_postfix(self, node):
-        while True:
+        while 1:
             token_type = self.stream.current.type
             if token_type == 'dot' or token_type == 'lbracket':
                 node = self.parse_subscript(node)
@@ -679,7 +679,7 @@ class Parser(object):
         return node
 
     def parse_filter_expr(self, node):
-        while True:
+        while 1:
             token_type = self.stream.current.type
             if token_type == 'pipe':
                 node = self.parse_filter(node)

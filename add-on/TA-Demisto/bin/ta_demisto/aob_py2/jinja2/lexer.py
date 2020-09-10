@@ -108,38 +108,38 @@ TOKEN_EOF = intern('eof')
 
 # bind operators to token types
 operators = {
-    '+': TOKEN_ADD,
-    '-': TOKEN_SUB,
-    '/': TOKEN_DIV,
-    '//': TOKEN_FLOORDIV,
-    '*': TOKEN_MUL,
-    '%': TOKEN_MOD,
-    '**': TOKEN_POW,
-    '~': TOKEN_TILDE,
-    '[': TOKEN_LBRACKET,
-    ']': TOKEN_RBRACKET,
-    '(': TOKEN_LPAREN,
-    ')': TOKEN_RPAREN,
-    '{': TOKEN_LBRACE,
-    '}': TOKEN_RBRACE,
-    '==': TOKEN_EQ,
-    '!=': TOKEN_NE,
-    '>': TOKEN_GT,
-    '>=': TOKEN_GTEQ,
-    '<': TOKEN_LT,
-    '<=': TOKEN_LTEQ,
-    '=': TOKEN_ASSIGN,
-    '.': TOKEN_DOT,
-    ':': TOKEN_COLON,
-    '|': TOKEN_PIPE,
-    ',': TOKEN_COMMA,
-    ';': TOKEN_SEMICOLON
+    '+':            TOKEN_ADD,
+    '-':            TOKEN_SUB,
+    '/':            TOKEN_DIV,
+    '//':           TOKEN_FLOORDIV,
+    '*':            TOKEN_MUL,
+    '%':            TOKEN_MOD,
+    '**':           TOKEN_POW,
+    '~':            TOKEN_TILDE,
+    '[':            TOKEN_LBRACKET,
+    ']':            TOKEN_RBRACKET,
+    '(':            TOKEN_LPAREN,
+    ')':            TOKEN_RPAREN,
+    '{':            TOKEN_LBRACE,
+    '}':            TOKEN_RBRACE,
+    '==':           TOKEN_EQ,
+    '!=':           TOKEN_NE,
+    '>':            TOKEN_GT,
+    '>=':           TOKEN_GTEQ,
+    '<':            TOKEN_LT,
+    '<=':           TOKEN_LTEQ,
+    '=':            TOKEN_ASSIGN,
+    '.':            TOKEN_DOT,
+    ':':            TOKEN_COLON,
+    '|':            TOKEN_PIPE,
+    ',':            TOKEN_COMMA,
+    ';':            TOKEN_SEMICOLON
 }
 
 reverse_operators = dict([(v, k) for k, v in iteritems(operators)])
 assert len(operators) == len(reverse_operators), 'operators dropped'
 operator_re = re.compile('(%s)' % '|'.join(re.escape(x) for x in
-                                           sorted(operators, key=lambda x: -len(x))))
+                         sorted(operators, key=lambda x: -len(x))))
 
 ignored_tokens = frozenset([TOKEN_COMMENT_BEGIN, TOKEN_COMMENT,
                             TOKEN_COMMENT_END, TOKEN_WHITESPACE,
@@ -153,18 +153,18 @@ def _describe_token_type(token_type):
     if token_type in reverse_operators:
         return reverse_operators[token_type]
     return {
-        TOKEN_COMMENT_BEGIN: 'begin of comment',
-        TOKEN_COMMENT_END: 'end of comment',
-        TOKEN_COMMENT: 'comment',
-        TOKEN_LINECOMMENT: 'comment',
-        TOKEN_BLOCK_BEGIN: 'begin of statement block',
-        TOKEN_BLOCK_END: 'end of statement block',
-        TOKEN_VARIABLE_BEGIN: 'begin of print statement',
-        TOKEN_VARIABLE_END: 'end of print statement',
-        TOKEN_LINESTATEMENT_BEGIN: 'begin of line statement',
-        TOKEN_LINESTATEMENT_END: 'end of line statement',
-        TOKEN_DATA: 'template data / text',
-        TOKEN_EOF: 'end of template'
+        TOKEN_COMMENT_BEGIN:        'begin of comment',
+        TOKEN_COMMENT_END:          'end of comment',
+        TOKEN_COMMENT:              'comment',
+        TOKEN_LINECOMMENT:          'comment',
+        TOKEN_BLOCK_BEGIN:          'begin of statement block',
+        TOKEN_BLOCK_END:            'end of statement block',
+        TOKEN_VARIABLE_BEGIN:       'begin of print statement',
+        TOKEN_VARIABLE_END:         'end of print statement',
+        TOKEN_LINESTATEMENT_BEGIN:  'begin of line statement',
+        TOKEN_LINESTATEMENT_END:    'end of line statement',
+        TOKEN_DATA:                 'template data / text',
+        TOKEN_EOF:                  'end of template'
     }.get(token_type, token_type)
 
 
@@ -419,7 +419,7 @@ class Lexer(object):
 
     def __init__(self, environment):
         # shortcuts
-        def c(x): return re.compile(x, re.M | re.S)
+        c = lambda x: re.compile(x, re.M | re.S)
         e = re.escape
 
         # lexing rules for tags
@@ -463,17 +463,17 @@ class Lexer(object):
 
             lstrip_re = r'^[ \t]*'
             block_prefix_re = r'%s%s(?!%s)|%s\+?' % (
-                lstrip_re,
-                e(environment.block_start_string),
-                no_lstrip_re,
-                e(environment.block_start_string),
-            )
+                    lstrip_re,
+                    e(environment.block_start_string),
+                    no_lstrip_re,
+                    e(environment.block_start_string),
+                    )
             comment_prefix_re = r'%s%s%s|%s\+?' % (
-                lstrip_re,
-                e(environment.comment_start_string),
-                no_variable_re,
-                e(environment.comment_start_string),
-            )
+                    lstrip_re,
+                    e(environment.comment_start_string),
+                    no_variable_re,
+                    e(environment.comment_start_string),
+                    )
             prefix_re['block'] = block_prefix_re
             prefix_re['comment'] = comment_prefix_re
         else:
@@ -493,7 +493,7 @@ class Lexer(object):
                         e(environment.block_end_string),
                         e(environment.block_end_string)
                     )] + [
-                        r'(?P<%s_begin>\s*%s\-|%s)' % (n, r, prefix_re.get(n, r))
+                        r'(?P<%s_begin>\s*%s\-|%s)' % (n, r, prefix_re.get(n,r))
                         for n, r in root_tag_rules
                     ])), (TOKEN_DATA, '#bygroup'), '#bygroup'),
                 # data
@@ -541,7 +541,7 @@ class Lexer(object):
             # line comments
             TOKEN_LINECOMMENT_BEGIN: [
                 (c(r'(.*?)()(?=\n|$)'), (TOKEN_LINECOMMENT,
-                                         TOKEN_LINECOMMENT_END), '#pop')
+                 TOKEN_LINECOMMENT_END), '#pop')
             ]
         }
 
@@ -621,7 +621,7 @@ class Lexer(object):
 
         balancing_stack = []
 
-        while True:
+        while 1:
             # tokenizer loop
             for regex, tokens, new_state in statetokens:
                 m = regex.match(source, pos)

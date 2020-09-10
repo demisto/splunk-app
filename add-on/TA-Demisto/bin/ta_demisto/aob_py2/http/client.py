@@ -1,4 +1,13 @@
 from __future__ import absolute_import
+import sys
+
+assert sys.version_info[0] < 3
+
+from httplib import *
+from httplib import HTTPMessage
+
+# These constants aren't included in __all__ in httplib.py:
+
 from httplib import (HTTP_PORT,
                      HTTPS_PORT,
 
@@ -61,16 +70,7 @@ from httplib import (HTTP_PORT,
                      NOT_EXTENDED,
 
                      MAXAMOUNT,
-                     )
-from httplib import HTTPMessage
-from httplib import *
-import sys
-
-assert sys.version_info[0] < 3
-
-
-# These constants aren't included in __all__ in httplib.py:
-
+                    )
 
 # These are not available on Python 2.6.x:
 try:
@@ -81,11 +81,11 @@ except ImportError:
 # These may not be available on all versions of Python 2.6.x or 2.7.x
 try:
     from httplib import (
-        _MAXLINE,
-        _MAXHEADERS,
-        _is_legal_header_name,
-        _is_illegal_header_value,
-        _METHODS_EXPECTING_BODY
-    )
+                         _MAXLINE,
+                         _MAXHEADERS,
+                         _is_legal_header_name,
+                         _is_illegal_header_value,
+                         _METHODS_EXPECTING_BODY
+                        )
 except ImportError:
     pass

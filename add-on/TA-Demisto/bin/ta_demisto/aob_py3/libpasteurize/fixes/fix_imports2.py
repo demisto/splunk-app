@@ -7,7 +7,7 @@ from lib2to3.fixer_util import Name, String, FromImport, Newline, Comma
 from libfuturize.fixer_util import touch_import_top
 
 
-TK_BASE_NAMES = (u'ACTIVE', u'ALL', u'ANCHOR', u'ARC', u'BASELINE', u'BEVEL', u'BOTH',
+TK_BASE_NAMES = (u'ACTIVE', u'ALL', u'ANCHOR', u'ARC',u'BASELINE', u'BEVEL', u'BOTH',
                  u'BOTTOM', u'BROWSE', u'BUTT', u'CASCADE', u'CENTER', u'CHAR',
                  u'CHECKBUTTON', u'CHORD', u'COMMAND', u'CURRENT', u'DISABLED',
                  u'DOTBOX', u'E', u'END', u'EW', u'EXCEPTION', u'EXTENDED', u'FALSE',
@@ -23,82 +23,82 @@ TK_BASE_NAMES = (u'ACTIVE', u'ALL', u'ANCHOR', u'ARC', u'BASELINE', u'BEVEL', u'
                  u'wantobjects')
 
 PY2MODULES = {
-    u'urllib2': (
-        u'AbstractBasicAuthHandler', u'AbstractDigestAuthHandler',
-        u'AbstractHTTPHandler', u'BaseHandler', u'CacheFTPHandler',
-        u'FTPHandler', u'FileHandler', u'HTTPBasicAuthHandler',
-        u'HTTPCookieProcessor', u'HTTPDefaultErrorHandler',
-        u'HTTPDigestAuthHandler', u'HTTPError', u'HTTPErrorProcessor',
-        u'HTTPHandler', u'HTTPPasswordMgr',
-        u'HTTPPasswordMgrWithDefaultRealm', u'HTTPRedirectHandler',
-        u'HTTPSHandler', u'OpenerDirector', u'ProxyBasicAuthHandler',
-        u'ProxyDigestAuthHandler', u'ProxyHandler', u'Request',
-        u'StringIO', u'URLError', u'UnknownHandler', u'addinfourl',
-        u'build_opener', u'install_opener', u'parse_http_list',
-        u'parse_keqv_list', u'randombytes', u'request_host', u'urlopen'),
-    u'urllib': (
-        u'ContentTooShortError', u'FancyURLopener', u'URLopener',
-        u'basejoin', u'ftperrors', u'getproxies',
-        u'getproxies_environment', u'localhost', u'pathname2url',
-        u'quote', u'quote_plus', u'splitattr', u'splithost',
+              u'urllib2' : (
+                  u'AbstractBasicAuthHandler', u'AbstractDigestAuthHandler',
+                  u'AbstractHTTPHandler', u'BaseHandler', u'CacheFTPHandler',
+                  u'FTPHandler', u'FileHandler', u'HTTPBasicAuthHandler',
+                  u'HTTPCookieProcessor', u'HTTPDefaultErrorHandler',
+                  u'HTTPDigestAuthHandler', u'HTTPError', u'HTTPErrorProcessor',
+                  u'HTTPHandler', u'HTTPPasswordMgr',
+                  u'HTTPPasswordMgrWithDefaultRealm', u'HTTPRedirectHandler',
+                  u'HTTPSHandler', u'OpenerDirector', u'ProxyBasicAuthHandler',
+                  u'ProxyDigestAuthHandler', u'ProxyHandler', u'Request',
+                  u'StringIO', u'URLError', u'UnknownHandler', u'addinfourl',
+                  u'build_opener', u'install_opener', u'parse_http_list',
+                  u'parse_keqv_list', u'randombytes', u'request_host', u'urlopen'),
+              u'urllib' : (
+                  u'ContentTooShortError', u'FancyURLopener',u'URLopener',
+                  u'basejoin', u'ftperrors', u'getproxies',
+                  u'getproxies_environment', u'localhost', u'pathname2url',
+                  u'quote', u'quote_plus', u'splitattr', u'splithost',
                   u'splitnport', u'splitpasswd', u'splitport', u'splitquery',
                   u'splittag', u'splittype', u'splituser', u'splitvalue',
                   u'thishost', u'unquote', u'unquote_plus', u'unwrap',
                   u'url2pathname', u'urlcleanup', u'urlencode', u'urlopen',
                   u'urlretrieve',),
-    u'urlparse': (
-        u'parse_qs', u'parse_qsl', u'urldefrag', u'urljoin',
-        u'urlparse', u'urlsplit', u'urlunparse', u'urlunsplit'),
-    u'dbm': (
-        u'ndbm', u'gnu', u'dumb'),
-    u'anydbm': (
-        u'error', u'open'),
-    u'whichdb': (
-        u'whichdb',),
-    u'BaseHTTPServer': (
-        u'BaseHTTPRequestHandler', u'HTTPServer'),
-    u'CGIHTTPServer': (
-        u'CGIHTTPRequestHandler',),
-    u'SimpleHTTPServer': (
-        u'SimpleHTTPRequestHandler',),
-    u'FileDialog': TK_BASE_NAMES + (
-        u'FileDialog', u'LoadFileDialog', u'SaveFileDialog',
-        u'dialogstates', u'test'),
-    u'tkFileDialog': (
-        u'Directory', u'Open', u'SaveAs', u'_Dialog', u'askdirectory',
-        u'askopenfile', u'askopenfilename', u'askopenfilenames',
-        u'askopenfiles', u'asksaveasfile', u'asksaveasfilename'),
-    u'SimpleDialog': TK_BASE_NAMES + (
-        u'SimpleDialog',),
-    u'tkSimpleDialog': TK_BASE_NAMES + (
-        u'askfloat', u'askinteger', u'askstring', u'Dialog'),
-    u'SimpleXMLRPCServer': (
-        u'CGIXMLRPCRequestHandler', u'SimpleXMLRPCDispatcher',
-        u'SimpleXMLRPCRequestHandler', u'SimpleXMLRPCServer',
-        u'list_public_methods', u'remove_duplicates',
-        u'resolve_dotted_attribute'),
-    u'DocXMLRPCServer': (
-        u'DocCGIXMLRPCRequestHandler', u'DocXMLRPCRequestHandler',
-        u'DocXMLRPCServer', u'ServerHTMLDoc', u'XMLRPCDocGenerator'),
-}
+              u'urlparse' : (
+                  u'parse_qs', u'parse_qsl', u'urldefrag', u'urljoin',
+                  u'urlparse', u'urlsplit', u'urlunparse', u'urlunsplit'),
+              u'dbm' : (
+                  u'ndbm', u'gnu', u'dumb'),
+              u'anydbm' : (
+                  u'error', u'open'),
+              u'whichdb' : (
+                  u'whichdb',),
+              u'BaseHTTPServer' : (
+                  u'BaseHTTPRequestHandler', u'HTTPServer'),
+              u'CGIHTTPServer' : (
+                  u'CGIHTTPRequestHandler',),
+              u'SimpleHTTPServer' : (
+                  u'SimpleHTTPRequestHandler',),
+              u'FileDialog' : TK_BASE_NAMES + (
+                  u'FileDialog', u'LoadFileDialog', u'SaveFileDialog',
+                  u'dialogstates', u'test'),
+              u'tkFileDialog' : (
+                  u'Directory', u'Open', u'SaveAs', u'_Dialog', u'askdirectory',
+                  u'askopenfile', u'askopenfilename', u'askopenfilenames',
+                  u'askopenfiles', u'asksaveasfile', u'asksaveasfilename'),
+              u'SimpleDialog' : TK_BASE_NAMES + (
+                  u'SimpleDialog',),
+              u'tkSimpleDialog' : TK_BASE_NAMES + (
+                  u'askfloat', u'askinteger', u'askstring', u'Dialog'),
+              u'SimpleXMLRPCServer' : (
+                  u'CGIXMLRPCRequestHandler', u'SimpleXMLRPCDispatcher',
+                  u'SimpleXMLRPCRequestHandler', u'SimpleXMLRPCServer',
+                  u'list_public_methods', u'remove_duplicates',
+                  u'resolve_dotted_attribute'),
+              u'DocXMLRPCServer' : (
+                  u'DocCGIXMLRPCRequestHandler', u'DocXMLRPCRequestHandler',
+                  u'DocXMLRPCServer', u'ServerHTMLDoc',u'XMLRPCDocGenerator'),
+                }
 
-MAPPING = {u'urllib.request':
-           (u'urllib2', u'urllib'),
-           u'urllib.error':
-           (u'urllib2', u'urllib'),
-           u'urllib.parse':
-           (u'urllib2', u'urllib', u'urlparse'),
-           u'dbm.__init__':
-           (u'anydbm', u'whichdb'),
-           u'http.server':
-           (u'CGIHTTPServer', u'SimpleHTTPServer', u'BaseHTTPServer'),
-           u'tkinter.filedialog':
-           (u'tkFileDialog', u'FileDialog'),
-           u'tkinter.simpledialog':
-           (u'tkSimpleDialog', u'SimpleDialog'),
-           u'xmlrpc.server':
-           (u'DocXMLRPCServer', u'SimpleXMLRPCServer'),
-           }
+MAPPING = { u'urllib.request' :
+                (u'urllib2', u'urllib'),
+            u'urllib.error' :
+                (u'urllib2', u'urllib'),
+            u'urllib.parse' :
+                (u'urllib2', u'urllib', u'urlparse'),
+            u'dbm.__init__' :
+                (u'anydbm', u'whichdb'),
+            u'http.server' :
+                (u'CGIHTTPServer', u'SimpleHTTPServer', u'BaseHTTPServer'),
+            u'tkinter.filedialog' :
+                (u'tkFileDialog', u'FileDialog'),
+            u'tkinter.simpledialog' :
+                (u'tkSimpleDialog', u'SimpleDialog'),
+            u'xmlrpc.server' :
+                (u'DocXMLRPCServer', u'SimpleXMLRPCServer'),
+            }
 
 # helps match 'http', as in 'from http.server import ...'
 simple_name = u"name='%s'"
@@ -136,7 +136,7 @@ def all_modules_subpattern():
     """
     names_dot_attrs = [mod.split(u".") for mod in MAPPING]
     ret = u"( " + u" | ".join([dotted_name % (simple_name % (mod[0]),
-                                              simple_attr % (mod[1])) for mod in names_dot_attrs])
+                                            simple_attr % (mod[1])) for mod in names_dot_attrs])
     ret += u" | "
     ret += u" | ".join([simple_name % (mod[0]) for mod in names_dot_attrs if mod[1] == u"__init__"]) + u" )"
     return ret

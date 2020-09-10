@@ -19,7 +19,7 @@ else:
         from _dummy_thread import get_ident
 
 __all__ = ['get_ident', 'setdefault', 'Constant', 'listify',
-           'get_all_subclasses', 'ImportStringError', 'import_string']
+    'get_all_subclasses', 'ImportStringError', 'import_string']
 
 
 def setdefault(obj, attr, value, search_mro=False, overwrite_none=False):

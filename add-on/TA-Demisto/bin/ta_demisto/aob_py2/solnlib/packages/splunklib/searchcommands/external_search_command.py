@@ -35,7 +35,6 @@ from . import splunklib_logger as logger
 class ExternalSearchCommand(object):
     """
     """
-
     def __init__(self, path, argv=None, environ=None):
 
         if not isinstance(path, (bytes, six.text_type)):
@@ -89,7 +88,7 @@ class ExternalSearchCommand(object):
             if self._argv is None:
                 self._argv = os.path.splitext(os.path.basename(self._path))[0]
             self._execute(self._path, self._argv, self._environ)
-        except BaseException:
+        except:
             error_type, error, tb = sys.exc_info()
             message = 'Command execution failed: ' + six.text_type(error)
             self._logger.error(message + '\nTraceback:\n' + ''.join(traceback.format_tb(tb)))

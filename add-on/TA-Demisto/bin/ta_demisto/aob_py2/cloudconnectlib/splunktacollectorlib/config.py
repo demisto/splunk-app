@@ -4,23 +4,24 @@ The load/save action is based on specified schema.
 """
 
 from __future__ import absolute_import
-from urllib.parse import quote
-from .common import UCCException
-from .common import log as stulog
-from ..splunktalib.common import util as sc_util
-from ..splunktalib.rest import splunkd_request, code_to_msg
-import six
-import time
-import traceback
-import logging
-import json
-from builtins import object
-from builtins import range
-from builtins import str
 
 from future import standard_library
 standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+import json
+import logging
+import traceback
+import time
+import six
 
+from ..splunktalib.rest import splunkd_request, code_to_msg
+from ..splunktalib.common import util as sc_util
+
+from .common import log as stulog
+from .common import UCCException
+from urllib.parse import quote
 
 LOGGING_STOPPED = False
 
@@ -134,7 +135,7 @@ class Config(object):
                     ret[ep_id] = self._parse_content(ep_id, cont)
                 except ConfigException as exc:
                     log(exc, level=logging.WARNING, need_tb=True)
-                    if retry < retries - 1:
+                    if retry < retries-1:
                         time.sleep(waiting_time[retry])
                 else:
                     break

@@ -48,7 +48,7 @@ class TestPgen2Caching(support.TestCase):
         tmpdir = tempfile.mkdtemp()
         try:
             grammar_copy = os.path.join(
-                tmpdir, os.path.basename(support.grammar_path))
+                    tmpdir, os.path.basename(support.grammar_path))
             shutil.copy(support.grammar_path, grammar_copy)
             pickle_name = pgen2_driver._generate_pickle_name(grammar_copy)
 
@@ -73,7 +73,7 @@ class TestPgen2Caching(support.TestCase):
             shutil.copy(support.grammar_path, grammar_sub_copy)
             pickle_name = pgen2_driver._generate_pickle_name(grammar_copy)
             pickle_sub_name = pgen2_driver._generate_pickle_name(
-                grammar_sub_copy)
+                     grammar_sub_copy)
             self.assertNotEqual(pickle_name, pickle_sub_name)
 
             # Generate a pickle file from this process.
@@ -85,11 +85,11 @@ class TestPgen2Caching(support.TestCase):
             sub_env = dict(os.environ)
             sub_env['PYTHONHASHSEED'] = 'random'
             subprocess.check_call(
-                [sys.executable, '-c', """
+                    [sys.executable, '-c', """
 from lib2to3.pgen2 import driver as pgen2_driver
 pgen2_driver.load_grammar(%r, save=True, force=True)
                     """ % (grammar_sub_copy,)],
-                env=sub_env)
+                    env=sub_env)
             self.assertTrue(os.path.exists(pickle_sub_name))
 
             with open(pickle_name, 'rb') as pickle_f_1, \
@@ -103,11 +103,9 @@ pgen2_driver.load_grammar(%r, save=True, force=True)
 
     def test_load_packaged_grammar(self):
         modname = __name__ + '.load_test'
-
         class MyLoader:
             def get_data(self, where):
                 return pickle.dumps({'elephant': 19})
-
         class MyModule:
             __file__ = 'parsertestmodule'
             __spec__ = importlib.util.spec_from_loader(modname, MyLoader())
@@ -497,16 +495,16 @@ class TestExcept(GrammarTest):
 
 class TestStringLiterals(GrammarTest):
     prefixes = ("'", '"',
-                "r'", 'r"', "R'", 'R"',
-                "u'", 'u"', "U'", 'U"',
-                "b'", 'b"', "B'", 'B"',
-                "f'", 'f"', "F'", 'F"',
-                "ur'", 'ur"', "Ur'", 'Ur"',
-                "uR'", 'uR"', "UR'", 'UR"',
-                "br'", 'br"', "Br'", 'Br"',
-                "bR'", 'bR"', "BR'", 'BR"',
-                "rb'", 'rb"', "Rb'", 'Rb"',
-                "rB'", 'rB"', "RB'", 'RB"',)
+        "r'", 'r"', "R'", 'R"',
+        "u'", 'u"', "U'", 'U"',
+        "b'", 'b"', "B'", 'B"',
+        "f'", 'f"', "F'", 'F"',
+        "ur'", 'ur"', "Ur'", 'Ur"',
+        "uR'", 'uR"', "UR'", 'UR"',
+        "br'", 'br"', "Br'", 'Br"',
+        "bR'", 'bR"', "BR'", 'BR"',
+        "rb'", 'rb"', "Rb'", 'Rb"',
+        "rB'", 'rB"', "RB'", 'RB"',)
 
     def test_lit(self):
         for pre in self.prefixes:

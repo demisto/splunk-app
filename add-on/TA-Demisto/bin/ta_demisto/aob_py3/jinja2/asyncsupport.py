@@ -21,7 +21,6 @@ from jinja2.runtime import LoopContextBase, _last_iteration
 
 async def concat_async(async_gen):
     rv = []
-
     async def collect():
         async for event in async_gen:
             rv.append(event)
@@ -45,11 +44,10 @@ def wrap_generate_func(original_generate):
     def _convert_generator(self, loop, args, kwargs):
         async_gen = self.generate_async(*args, **kwargs)
         try:
-            while True:
+            while 1:
                 yield loop.run_until_complete(async_gen.__anext__())
         except StopAsyncIteration:
             pass
-
     def generate(self, *args, **kwargs):
         if not self.environment.is_async:
             return original_generate(self, *args, **kwargs)

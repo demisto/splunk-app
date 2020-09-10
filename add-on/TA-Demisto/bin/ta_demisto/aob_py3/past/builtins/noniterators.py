@@ -94,7 +94,7 @@ if PY3:
         return result
 
         ############################
-        # For reference, the source code for Py2.7 map function:
+        ### For reference, the source code for Py2.7 map function:
         # static PyObject *
         # builtin_map(PyObject *self, PyObject *args)
         # {

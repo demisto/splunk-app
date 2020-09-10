@@ -11,7 +11,7 @@ from mako.cache import CacheImpl
 
 try:
     from beaker import cache as beaker_cache
-except BaseException:
+except:
     has_beaker = False
 else:
     has_beaker = True

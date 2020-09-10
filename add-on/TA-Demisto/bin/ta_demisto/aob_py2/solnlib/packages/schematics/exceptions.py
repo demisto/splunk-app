@@ -84,7 +84,7 @@ class BaseError(Exception):
         return hash(self.errors)
 
     def __eq__(self, other):
-        if isinstance(self, type(other)):
+        if type(self) is type(other):
             return self.errors == other.errors
         else:
             return self.errors == other
@@ -148,7 +148,7 @@ class FieldError(BaseError, Sequence):
 
     def __init__(self, *args, **kwargs):
 
-        if isinstance(self, FieldError):
+        if type(self) is FieldError:
             raise NotImplementedError("Please raise either ConversionError or ValidationError.")
         if len(args) == 0:
             raise TypeError("Please provide at least one error or error message.")
@@ -173,7 +173,7 @@ class FieldError(BaseError, Sequence):
             elif isinstance(item, self.__class__):
                 errors.extend(item.errors)
             else:
-                raise TypeError("'{0}()' object is neither a {1} nor an error message."
+                raise TypeError("'{0}()' object is neither a {1} nor an error message."\
                                 .format(type(item).__name__, type(self).__name__))
         for error in errors:
             error.type = self.type or type(self)
@@ -235,7 +235,6 @@ class MockCreationError(ValueError):
 
 class UndefinedValueError(AttributeError, KeyError):
     """Exception raised when accessing a field with an undefined value."""
-
     def __init__(self, model, name):
         msg = "'%s' instance has no value for field '%s'" % (model.__class__.__name__, name)
         super(UndefinedValueError, self).__init__(msg)
@@ -243,7 +242,6 @@ class UndefinedValueError(AttributeError, KeyError):
 
 class UnknownFieldError(KeyError):
     """Exception raised when attempting to access a nonexistent field using the subscription syntax."""
-
     def __init__(self, model, name):
         msg = "Model '%s' has no field named '%s'" % (model.__class__.__name__, name)
         super(UnknownFieldError, self).__init__(msg)

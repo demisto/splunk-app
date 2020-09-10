@@ -16,7 +16,7 @@ import warnings
 from itertools import groupby, chain
 from collections import namedtuple
 from jinja2.utils import Markup, escape, pformat, urlize, soft_unicode, \
-    unicode_urlencode, htmlsafe_json_dumps
+     unicode_urlencode, htmlsafe_json_dumps
 from jinja2.runtime import Undefined
 from jinja2.exceptions import FilterArgumentError
 from jinja2._compat import imap, string_types, text_type, iteritems, PY2
@@ -629,8 +629,8 @@ def do_wordwrap(environment, s, width=79, break_long_words=True,
         wrapstring = environment.newline_sequence
     import textwrap
     return wrapstring.join(textwrap.wrap(s, width=width, expand_tabs=False,
-                                         replace_whitespace=False,
-                                         break_long_words=break_long_words))
+                                   replace_whitespace=False,
+                                   break_long_words=break_long_words))
 
 
 def do_wordcount(s):
@@ -791,7 +791,7 @@ def do_round(value, precision=0, method='common'):
         {{ 42.55|round|int }}
             -> 43
     """
-    if method not in ('common', 'ceil', 'floor'):
+    if not method in ('common', 'ceil', 'floor'):
         raise FilterArgumentError('method must be common, ceil or floor')
     if method == 'common':
         return round(value, precision)
@@ -807,7 +807,6 @@ def do_round(value, precision=0, method='common'):
 _GroupTuple = namedtuple('_GroupTuple', ['grouper', 'list'])
 _GroupTuple.__repr__ = tuple.__repr__
 _GroupTuple.__str__ = tuple.__str__
-
 
 @environmentfilter
 def do_groupby(environment, value, attribute):
@@ -1087,7 +1086,7 @@ def prepare_map(args, kwargs):
         attribute = kwargs.pop('attribute')
         if kwargs:
             raise FilterArgumentError('Unexpected keyword argument %r' %
-                                      next(iter(kwargs)))
+                next(iter(kwargs)))
         func = make_attrgetter(context.environment, attribute)
     else:
         try:
@@ -1095,7 +1094,7 @@ def prepare_map(args, kwargs):
             args = args[3:]
         except LookupError:
             raise FilterArgumentError('map requires a filter argument')
-        def func(item): return context.environment.call_filter(
+        func = lambda item: context.environment.call_filter(
             name, item, args, kwargs, context=context)
 
     return seq, func
@@ -1113,12 +1112,12 @@ def prepare_select_or_reject(args, kwargs, modfunc, lookup_attr):
         off = 1
     else:
         off = 0
-        def transfunc(x): return x
+        transfunc = lambda x: x
 
     try:
         name = args[2 + off]
         args = args[3 + off:]
-        def func(item): return context.environment.call_test(
+        func = lambda item: context.environment.call_test(
             name, item, args, kwargs)
     except LookupError:
         func = bool
@@ -1135,57 +1134,57 @@ def select_or_reject(args, kwargs, modfunc, lookup_attr):
 
 
 FILTERS = {
-    'abs': abs,
-    'attr': do_attr,
-    'batch': do_batch,
-    'capitalize': do_capitalize,
-    'center': do_center,
-    'count': len,
-    'd': do_default,
-    'default': do_default,
-    'dictsort': do_dictsort,
-    'e': escape,
-    'escape': escape,
-    'filesizeformat': do_filesizeformat,
-    'first': do_first,
-    'float': do_float,
-    'forceescape': do_forceescape,
-    'format': do_format,
-    'groupby': do_groupby,
-    'indent': do_indent,
-    'int': do_int,
-    'join': do_join,
-    'last': do_last,
-    'length': len,
-    'list': do_list,
-    'lower': do_lower,
-    'map': do_map,
-    'min': do_min,
-    'max': do_max,
-    'pprint': do_pprint,
-    'random': do_random,
-    'reject': do_reject,
-    'rejectattr': do_rejectattr,
-    'replace': do_replace,
-    'reverse': do_reverse,
-    'round': do_round,
-    'safe': do_mark_safe,
-    'select': do_select,
-    'selectattr': do_selectattr,
-    'slice': do_slice,
-    'sort': do_sort,
-    'string': soft_unicode,
-    'striptags': do_striptags,
-    'sum': do_sum,
-    'title': do_title,
-    'trim': do_trim,
-    'truncate': do_truncate,
-    'unique': do_unique,
-    'upper': do_upper,
-    'urlencode': do_urlencode,
-    'urlize': do_urlize,
-    'wordcount': do_wordcount,
-    'wordwrap': do_wordwrap,
-    'xmlattr': do_xmlattr,
-    'tojson': do_tojson,
+    'abs':                  abs,
+    'attr':                 do_attr,
+    'batch':                do_batch,
+    'capitalize':           do_capitalize,
+    'center':               do_center,
+    'count':                len,
+    'd':                    do_default,
+    'default':              do_default,
+    'dictsort':             do_dictsort,
+    'e':                    escape,
+    'escape':               escape,
+    'filesizeformat':       do_filesizeformat,
+    'first':                do_first,
+    'float':                do_float,
+    'forceescape':          do_forceescape,
+    'format':               do_format,
+    'groupby':              do_groupby,
+    'indent':               do_indent,
+    'int':                  do_int,
+    'join':                 do_join,
+    'last':                 do_last,
+    'length':               len,
+    'list':                 do_list,
+    'lower':                do_lower,
+    'map':                  do_map,
+    'min':                  do_min,
+    'max':                  do_max,
+    'pprint':               do_pprint,
+    'random':               do_random,
+    'reject':               do_reject,
+    'rejectattr':           do_rejectattr,
+    'replace':              do_replace,
+    'reverse':              do_reverse,
+    'round':                do_round,
+    'safe':                 do_mark_safe,
+    'select':               do_select,
+    'selectattr':           do_selectattr,
+    'slice':                do_slice,
+    'sort':                 do_sort,
+    'string':               soft_unicode,
+    'striptags':            do_striptags,
+    'sum':                  do_sum,
+    'title':                do_title,
+    'trim':                 do_trim,
+    'truncate':             do_truncate,
+    'unique':               do_unique,
+    'upper':                do_upper,
+    'urlencode':            do_urlencode,
+    'urlize':               do_urlize,
+    'wordcount':            do_wordcount,
+    'wordwrap':             do_wordwrap,
+    'xmlattr':              do_xmlattr,
+    'tojson':               do_tojson,
 }

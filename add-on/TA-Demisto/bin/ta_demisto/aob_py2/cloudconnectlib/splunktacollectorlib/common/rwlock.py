@@ -69,3 +69,4 @@ class RWLock(object):
     @property
     def writer_lock(self):
         return _WriteLocker(self)
+

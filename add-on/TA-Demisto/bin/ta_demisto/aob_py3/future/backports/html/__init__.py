@@ -14,7 +14,6 @@ _escape_map_full = {ord('&'): '&amp;', ord('<'): '&lt;', ord('>'): '&gt;',
 
 # NB: this is a candidate for a bytes/string polymorphic interface
 
-
 def escape(s, quote=True):
     """
     Replace special characters "&", "<" and ">" to HTML-safe sequences.

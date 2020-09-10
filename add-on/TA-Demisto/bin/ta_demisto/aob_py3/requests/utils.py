@@ -55,10 +55,10 @@ if sys.platform == 'win32':
 
         try:
             internetSettings = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                                              r'Software\Microsoft\Windows\CurrentVersion\Internet Settings')
+                r'Software\Microsoft\Windows\CurrentVersion\Internet Settings')
             # ProxyEnable could be REG_SZ or REG_DWORD, normalizing it
             proxyEnable = int(winreg.QueryValueEx(internetSettings,
-                                                  'ProxyEnable')[0])
+                                              'ProxyEnable')[0])
             # ProxyOverride is almost always a string
             proxyOverride = winreg.QueryValueEx(internetSettings,
                                                 'ProxyOverride')[0]
@@ -699,7 +699,7 @@ def should_bypass_proxies(url, no_proxy):
     """
     # Prioritize lowercase environment variables over uppercase
     # to keep a consistent behaviour with other http projects (curl, wget).
-    def get_proxy(k): return os.environ.get(k) or os.environ.get(k.upper())
+    get_proxy = lambda k: os.environ.get(k) or os.environ.get(k.upper())
 
     # First check whether no_proxy is defined. If it is, check that the URL
     # we're getting isn't in the no_proxy list.

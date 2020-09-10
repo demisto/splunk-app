@@ -22,8 +22,8 @@ from ..fixer_util import Name, Call, Comma, String
 
 
 parend_expr = patcomp.compile_pattern(
-    """atom< '(' [atom|STRING|NAME] ')' >"""
-)
+              """atom< '(' [atom|STRING|NAME] ')' >"""
+              )
 
 
 class FixPrint(fixer_base.BaseFix):
@@ -42,7 +42,7 @@ class FixPrint(fixer_base.BaseFix):
         if bare_print:
             # Special-case print all by itself
             bare_print.replace(Call(Name("print"), [],
-                                    prefix=bare_print.prefix))
+                               prefix=bare_print.prefix))
             return
         assert node.children[0] == Name("print")
         args = node.children[1:]
@@ -58,7 +58,7 @@ class FixPrint(fixer_base.BaseFix):
         if args and args[0] == pytree.Leaf(token.RIGHTSHIFT, ">>"):
             assert len(args) >= 2
             file = args[1].clone()
-            args = args[3:]  # Strip a possible comma after the file expression
+            args = args[3:] # Strip a possible comma after the file expression
         # Now synthesize a print(args, sep=..., end=..., file=...) node.
         l_args = [arg.clone() for arg in args]
         if l_args:

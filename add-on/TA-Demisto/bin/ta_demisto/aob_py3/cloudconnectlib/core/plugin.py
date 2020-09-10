@@ -36,7 +36,7 @@ def cce_pipeline_plugin(func):
         else:
             _extension_functions[func.__name__] = func
             logger.debug("Added function %s to pipeline plugin system",
-                         func.__name__)
+                        func.__name__)
 
     def pipeline_func(*args, **kwargs):
         return func(*args, **kwargs)

@@ -1,11 +1,11 @@
-from ..common import log
-import queue
-import random
-from time import time
-import threading
-from builtins import object
 from future import standard_library
 standard_library.install_aliases()
+from builtins import object
+import threading
+from time import time
+import random
+import queue
+from ..common import log
 
 
 class Scheduler(object):
@@ -51,7 +51,7 @@ class Scheduler(object):
         self._wakeup_q.put(True)
 
     def _do_jobs(self):
-        while True:
+        while 1:
             (sleep_time, jobs) = self.get_ready_jobs()
             self._do_execution(jobs)
             try:

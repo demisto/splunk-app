@@ -137,10 +137,6 @@ class EventingCommand(SearchCommand):
 
         def iteritems(self):
             iteritems = SearchCommand.ConfigurationSettings.iteritems(self)
-            return imap(
-                lambda name_value: (
-                    name_value[0],
-                    'events' if name_value[0] == 'type' else name_value[1]),
-                iteritems)
+            return imap(lambda name_value: (name_value[0], 'events' if name_value[0] == 'type' else name_value[1]), iteritems)
 
         # endregion

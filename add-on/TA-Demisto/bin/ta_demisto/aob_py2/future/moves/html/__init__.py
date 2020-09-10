@@ -20,7 +20,7 @@ else:
         characters, both double quote (") and single quote (') characters are also
         translated.
         """
-        s = s.replace("&", "&amp;")  # Must be done first!
+        s = s.replace("&", "&amp;") # Must be done first!
         s = s.replace("<", "&lt;")
         s = s.replace(">", "&gt;")
         if quote:

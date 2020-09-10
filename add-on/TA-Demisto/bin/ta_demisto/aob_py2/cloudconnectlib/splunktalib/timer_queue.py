@@ -2,15 +2,16 @@
 A timer queue implementation
 """
 
-from .common import log
-from .timer import Timer
-import traceback
-from time import time
-import queue
-import threading
-from builtins import object
 from future import standard_library
 standard_library.install_aliases()
+from builtins import object
+import threading
+import queue
+from time import time
+import traceback
+
+from .timer import Timer
+from .common import log
 
 
 class TimerQueue(object):
@@ -74,7 +75,7 @@ class TimerQueue(object):
 
     def _check_and_execute(self):
         wakeup_queue = self._wakeup_queue
-        while True:
+        while 1:
             (next_expired_time, expired_timers) = self._get_expired_timers()
             for timer in expired_timers:
                 try:

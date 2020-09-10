@@ -18,9 +18,9 @@ try:
     sorted
 except NameError:
     def sorted(lst):
-        l = sorted(lst)
+        l = list(lst)
+        l.sort()
         return l
-
 
 class TestNodes(support.TestCase):
 

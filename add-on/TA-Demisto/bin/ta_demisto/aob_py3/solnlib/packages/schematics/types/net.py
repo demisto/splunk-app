@@ -5,11 +5,11 @@ from __future__ import unicode_literals, absolute_import
 import random
 import re
 
-try:  # PY3
+try: # PY3
     from urllib.request import urlopen
     from urllib.parse import urlunsplit, quote as urlquote
     from urllib.error import URLError
-except ImportError:  # PY2
+except ImportError: # PY2
     from urllib2 import urlopen, URLError
     from urlparse import urlunsplit
     from urllib import quote as urlquote
@@ -23,14 +23,14 @@ from .base import StringType, fill_template
 __all__ = ['IPAddressType', 'IPv4Type', 'IPv6Type', 'MACAddressType', 'URLType', 'EmailType']
 
 
-# Character ranges
+### Character ranges
 
-HEX = '0-9A-F'
-ALPHA = 'A-Z'
+HEX      = '0-9A-F'
+ALPHA    = 'A-Z'
 ALPHANUM = 'A-Z0-9'
 
 
-# IP address patterns
+### IP address patterns
 
 IPV4_OCTET = '( 25[0-5] | 2[0-4][0-9] | [0-1]?[0-9]{1,2} )'
 IPV4 = r'( ((%(oct)s\.){3} %(oct)s) )' % {'oct': IPV4_OCTET}
@@ -90,7 +90,7 @@ class IPv6Type(IPAddressType):
         )
 
 
-# MAC address
+### MAC address
 
 class MACAddressType(StringType):
     """A field that stores a valid MAC address."""
@@ -114,21 +114,20 @@ class MACAddressType(StringType):
 
     def to_primitive(self, value, context=None):
         value = value.replace(':', '').replace('.', '').replace('-', '')
-        return ':'.join(value[i:i + 2] for i in range(0, len(value), 2))
+        return ':'.join(value[i:i+2] for i in range(0, len(value), 2))
 
 
-# URI patterns
+### URI patterns
 
 GEN_DELIMS = set(':/?#[]@')
 SUB_DELIMS = set('!$&\'()*+,;=')
 UNRESERVED = set('-_.~')
 PCHAR = SUB_DELIMS | UNRESERVED | set('%:@')
-QUERY_EXTRAS = set('[]')  # nonstandard
+QUERY_EXTRAS = set('[]') # nonstandard
 
 VALID_CHARS = GEN_DELIMS | SUB_DELIMS | UNRESERVED | set('%')
 VALID_CHAR_STRING = py_native_string(str.join('', VALID_CHARS))
 UNSAFE_CHAR_STRING = '\x00-\x20<>{}|"`\\^\x7F-\x9F'
-
 
 def _chrcls(allowed_chars):
     """
@@ -142,17 +141,16 @@ def _chrcls(allowed_chars):
                                                        .replace(']', r'\]')
                                                        .replace('-', r'\-'))
 
-
 URI_PATTERNS = {
-    'scheme': r'[%s]+' % ('A-Z0-9.+-'),
-    'user': r'[%s]+' % _chrcls(UNRESERVED | SUB_DELIMS | set('%:')),
-    'port': r'[0-9]{2,5}',
-    'host4': IPV4,
-    'host6': r'[%s]+' % (HEX + ':'),
-    'hostn': r'[%s]+' % _chrcls(set('.-')),
-    'path': r'[%s]*' % _chrcls(PCHAR | set('/')),
-    'query': r'[%s]*' % _chrcls(PCHAR | set('/?') | QUERY_EXTRAS),
-    'frag': r'[%s]*' % _chrcls(PCHAR | set('/?')),
+    'scheme' : r'[%s]+' % ('A-Z0-9.+-'),
+    'user'   : r'[%s]+' % _chrcls(UNRESERVED | SUB_DELIMS | set('%:')),
+    'port'   : r'[0-9]{2,5}',
+    'host4'  : IPV4,
+    'host6'  : r'[%s]+' % (HEX + ':'),
+    'hostn'  : r'[%s]+' % _chrcls(set('.-')),
+    'path'   : r'[%s]*' % _chrcls(PCHAR | set('/')),
+    'query'  : r'[%s]*' % _chrcls(PCHAR | set('/?') | QUERY_EXTRAS),
+    'frag'   : r'[%s]*' % _chrcls(PCHAR | set('/?')),
 }
 
 
@@ -233,7 +231,7 @@ class URLType(StringType):
                 return False
         if self.fqdn:
             if len(labels) == 1 \
-                    or not self.TLD_REGEX.match(labels[-1]):
+              or not self.TLD_REGEX.match(labels[-1]):
                 return False
 
         url['hostn_enc'] = hostname
@@ -251,7 +249,7 @@ class URLType(StringType):
                 url['path'],
                 url['query'],
                 url['frag'])
-            ).encode('utf-8'), safe=VALID_CHAR_STRING)
+                ).encode('utf-8'), safe=VALID_CHAR_STRING)
             try:
                 urlopen(url_string)
             except URLError:
@@ -270,12 +268,12 @@ class EmailType(StringType):
     EMAIL_REGEX = re.compile(r"""^(
         ( ( [%(atext)s]+ (\.[%(atext)s]+)* ) | ("( [%(qtext)s\s] | \\[%(vchar)s\s] )*") )
         @((?!-)[A-Z0-9-]{1,63}(?<!-)\.)+[A-Z]{2,63})$"""
-                             % {
-                                 'atext': '-A-Z0-9!#$%&\'*+/=?^_`{|}~',
-                                 'qtext': '\x21\x23-\x5B\\\x5D-\x7E',
-                                 'vchar': '\x21-\x7E'
-                             },
-                             re.I + re.X)
+        % {
+            'atext': '-A-Z0-9!#$%&\'*+/=?^_`{|}~',
+            'qtext': '\x21\x23-\x5B\\\x5D-\x7E',
+            'vchar': '\x21-\x7E'
+        },
+        re.I + re.X)
 
     def _mock(self, context=None):
         return fill_template('%s@example.com', self.min_length,

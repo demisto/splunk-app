@@ -31,7 +31,6 @@ class ValidationDefinition(object):
     ``v = ValidationDefinition()``
 
     """
-
     def __init__(self):
         self.metadata = {}
         self.parameters = {}

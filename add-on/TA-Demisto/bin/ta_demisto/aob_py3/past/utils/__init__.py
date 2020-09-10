@@ -49,7 +49,6 @@ def with_metaclass(meta, *bases):
     class metaclass(meta):
         __call__ = type.__call__
         __init__ = type.__init__
-
         def __new__(cls, name, this_bases, d):
             if this_bases is None:
                 return type.__new__(cls, name, (), d)
@@ -94,6 +93,5 @@ def old_div(a, b):
         return a // b
     else:
         return a / b
-
 
 __all__ = ['PY3', 'PY2', 'PYPY', 'with_metaclass', 'native', 'old_div']

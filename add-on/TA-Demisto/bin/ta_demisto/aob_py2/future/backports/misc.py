@@ -13,8 +13,6 @@ for Python 2.6/2.7.
 """
 
 from __future__ import absolute_import
-from socket import _GLOBAL_DEFAULT_TIMEOUT
-from itertools import islice
 
 import subprocess
 from math import ceil as oldceil
@@ -39,9 +37,10 @@ def ceil(x):
 
 
 ########################################################################
-# reprlib.recursive_repr decorator from Py3.4
+###  reprlib.recursive_repr decorator from Py3.4
 ########################################################################
 
+from itertools import islice
 
 if PY3:
     try:
@@ -83,12 +82,11 @@ def recursive_repr(fillvalue='...'):
 
 
 ################################################################################
-# OrderedDict
+### OrderedDict
 ################################################################################
 
 class _Link(object):
     __slots__ = 'prev', 'next', 'key', '__weakref__'
-
 
 class OrderedDict(dict):
     'Dictionary that remembers insertion order'
@@ -310,16 +308,14 @@ except ImportError:
     pass
 
 ########################################################################
-# Counter
+###  Counter
 ########################################################################
-
 
 def _count_elements(mapping, iterable):
     'Tally elements from the iterable.'
     mapping_get = mapping.get
     for elem in iterable:
         mapping[elem] = mapping_get(elem, 0) + 1
-
 
 class Counter(dict):
     '''Dict subclass for counting hashable items.  Sometimes called a bag
@@ -477,7 +473,7 @@ class Counter(dict):
                     for elem, count in iterable.items():
                         self[elem] = count + self_get(elem, 0)
                 else:
-                    super(Counter, self).update(iterable)  # fast path when counter is empty
+                    super(Counter, self).update(iterable) # fast path when counter is empty
             else:
                 _count_elements(self, iterable)
         if kwds:
@@ -730,9 +726,9 @@ def count(start=0, step=1):
 
 
 ########################################################################
-# ChainMap (helper for configparser and string.Template)
-# From the Py3.4 source code. See also:
-# https://github.com/kkxue/Py2ChainMap/blob/master/py2chainmap.py
+###  ChainMap (helper for configparser and string.Template)
+###  From the Py3.4 source code. See also:
+###    https://github.com/kkxue/Py2ChainMap/blob/master/py2chainmap.py
 ########################################################################
 
 class ChainMap(MutableMapping):
@@ -843,6 +839,7 @@ class ChainMap(MutableMapping):
 
 
 # Re-use the same sentinel as in the Python stdlib socket module:
+from socket import _GLOBAL_DEFAULT_TIMEOUT
 # Was: _GLOBAL_DEFAULT_TIMEOUT = object()
 
 
@@ -887,38 +884,27 @@ def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
         raise error("getaddrinfo returns an empty list")
 
 # Backport from Py2.7 for Py2.6:
-
-
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     class K(object):
         __slots__ = ['obj']
-
         def __init__(self, obj, *args):
             self.obj = obj
-
         def __lt__(self, other):
             return mycmp(self.obj, other.obj) < 0
-
         def __gt__(self, other):
             return mycmp(self.obj, other.obj) > 0
-
         def __eq__(self, other):
             return mycmp(self.obj, other.obj) == 0
-
         def __le__(self, other):
             return mycmp(self.obj, other.obj) <= 0
-
         def __ge__(self, other):
             return mycmp(self.obj, other.obj) >= 0
-
         def __ne__(self, other):
             return mycmp(self.obj, other.obj) != 0
-
         def __hash__(self):
             raise TypeError('hash not implemented')
     return K
-
 
 # Back up our definitions above in case they're useful
 _OrderedDict = OrderedDict

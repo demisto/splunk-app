@@ -29,7 +29,7 @@ MAPPING = {u"reprlib": u"repr",
            u"http.client": u"httplib",
            u"http.cookies": u"Cookie",
            u"http.cookiejar": u"cookielib",
-           #          "tkinter": "Tkinter",
+#          "tkinter": "Tkinter",
            u"tkinter.dialog": u"Dialog",
            u"tkinter._fix": u"FixTk",
            u"tkinter.scrolledtext": u"ScrolledText",
@@ -46,7 +46,7 @@ MAPPING = {u"reprlib": u"repr",
            u"urllib.robotparser": u"robotparser",
            u"xmlrpc.client": u"xmlrpclib",
            u"builtins": u"__builtin__",
-           }
+}
 
 # generic strings to help build patterns
 # these variables mean (with http.client.HTTPConnection as an example):
@@ -75,7 +75,6 @@ from_import_submod_match = u"from_import_submod=import_from< 'from' %s 'import' 
 name_import_match = u"name_import=import_name< 'import' %s > | name_import=import_name< 'import' dotted_as_name< %s 'as' renamed=any > >"
 # helps match 'import http.client, winreg'
 multiple_name_import_match = u"name_import=import_name< 'import' dotted_as_names< names=any* > >"
-
 
 def all_patterns(name):
     u"""

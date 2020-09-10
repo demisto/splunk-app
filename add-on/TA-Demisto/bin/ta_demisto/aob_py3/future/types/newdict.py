@@ -38,7 +38,6 @@ class newdict(with_metaclass(BaseNewDict, _builtin_dict)):
     """
     A backport of the Python 3 dict object to Py2
     """
-
     def items(self):
         """
         On Python 2.7+:
@@ -96,7 +95,7 @@ class newdict(with_metaclass(BaseNewDict, _builtin_dict)):
 
         if len(args) == 0:
             return super(newdict, cls).__new__(cls)
-        elif isinstance(args[0], newdict):
+        elif type(args[0]) == newdict:
             value = args[0]
         else:
             value = args[0]

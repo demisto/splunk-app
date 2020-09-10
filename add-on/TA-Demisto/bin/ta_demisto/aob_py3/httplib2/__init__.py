@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Small, fast HTTP client library for Python."""
 
-from httplib2 import certs
 __author__ = "Joe Gregorio (joe@bitworking.org)"
 __copyright__ = "Copyright 2006, Joe Gregorio"
 __contributors__ = [
@@ -162,6 +161,7 @@ HOP_BY_HOP = [
     "upgrade",
 ]
 
+from httplib2 import certs
 CA_CERTS = certs.where()
 
 # PROTOCOL_TLS is python 3.5.3+. PROTOCOL_SSLv23 is deprecated.
@@ -172,7 +172,6 @@ CA_CERTS = certs.where()
 DEFAULT_TLS_VERSION = getattr(ssl, "PROTOCOL_TLS", None) or getattr(
     ssl, "PROTOCOL_SSLv23"
 )
-
 
 def _build_ssl_context(
     disable_ssl_certificate_validation, ca_certs, cert_file=None, key_file=None,
@@ -423,7 +422,7 @@ def _entry_disposition(response_headers, request_headers):
                 freshness_lifetime = 0
         elif "expires" in response_headers:
             expires = email.utils.parsedate_tz(response_headers["expires"])
-            if None is expires:
+            if None == expires:
                 freshness_lifetime = 0
             else:
                 freshness_lifetime = max(0, calendar.timegm(expires) - date)
@@ -569,7 +568,7 @@ class Authentication(object):
 
     def depth(self, request_uri):
         (scheme, authority, path, query, fragment) = parse_uri(request_uri)
-        return request_uri[len(self.path):].count("/")
+        return request_uri[len(self.path) :].count("/")
 
     def inscope(self, host, request_uri):
         # XXX Should we normalize the request_uri?
@@ -667,8 +666,8 @@ class DigestAuthentication(Authentication):
 
     def request(self, method, request_uri, headers, content, cnonce=None):
         """Modify the request headers"""
-        def H(x): return _md5(x.encode("utf-8")).hexdigest()
-        def KD(s, d): return H("%s:%s" % (s, d))
+        H = lambda x: _md5(x.encode("utf-8")).hexdigest()
+        KD = lambda s, d: H("%s:%s" % (s, d))
         A2 = "".join([method, ":", request_uri])
         self.challenge["cnonce"] = cnonce or _cnonce()
         request_digest = '"%s"' % KD(
@@ -1005,7 +1004,14 @@ class ProxyInfo(object):
         if isinstance(proxy_pass, str):
             proxy_pass = proxy_pass.encode()
         self.proxy_type, self.proxy_host, self.proxy_port, self.proxy_rdns, self.proxy_user, self.proxy_pass, self.proxy_headers = (
-            proxy_type, proxy_host, proxy_port, proxy_rdns, proxy_user, proxy_pass, proxy_headers, )
+            proxy_type,
+            proxy_host,
+            proxy_port,
+            proxy_rdns,
+            proxy_user,
+            proxy_pass,
+            proxy_headers,
+        )
 
     def astuple(self):
         return (
@@ -1019,7 +1025,7 @@ class ProxyInfo(object):
         )
 
     def isgood(self):
-        return socks and (self.proxy_host is not None) and (self.proxy_port is not None)
+        return socks and (self.proxy_host != None) and (self.proxy_port != None)
 
     def applies_to(self, hostname):
         return not self.bypass_host(hostname)
@@ -1658,7 +1664,7 @@ class Http(object):
                     if "location" in response:
                         location = response["location"]
                         (scheme, authority, path, query, fragment) = parse_uri(location)
-                        if authority is None:
+                        if authority == None:
                             response["location"] = urllib.parse.urljoin(
                                 absolute_uri, location
                             )
@@ -1889,10 +1895,10 @@ a string that contains the response entity body.
                         if (
                             "etag" in info
                             and not self.ignore_etag
-                            and "if-none-match" not in headers
+                            and not "if-none-match" in headers
                         ):
                             headers["if-none-match"] = info["etag"]
-                        if "last-modified" in info and "last-modified" not in headers:
+                        if "last-modified" in info and not "last-modified" in headers:
                             headers["if-modified-since"] = info["last-modified"]
                     elif entry_disposition == "TRANSPARENT":
                         pass

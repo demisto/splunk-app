@@ -13,7 +13,6 @@ from ..pgen2 import token
 from .. import fixer_base
 from ..fixer_util import Name, Call, ArgList, Attr, is_tuple
 
-
 class FixThrow(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = """

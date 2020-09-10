@@ -29,14 +29,12 @@ def match_division(node):
     """
     slash = token.SLASH
     return node.type == slash and not node.next_sibling.type == slash and \
-        not node.prev_sibling.type == slash
-
+                                  not node.prev_sibling.type == slash
 
 const_re = re.compile('^[0-9]*[.][0-9]*$')
 
-
 def is_floaty(node, div_idx):
-    return _is_floaty(node.children[0:div_idx]) or _is_floaty(node.children[div_idx + 1:])
+    return _is_floaty(node.children[0:div_idx]) or _is_floaty(node.children[div_idx+1:])
 
 
 def _is_floaty(expr):
@@ -52,13 +50,11 @@ def _is_floaty(expr):
             return expr.children[0].value == u'float'
     return False
 
-
 def find_division(node):
     for i, child in enumerate(node.children):
         if match_division(child):
             return i
     return False
-
 
 def clone_div_operands(node, div_idx):
     children = []
@@ -72,7 +68,6 @@ def clone_div_operands(node, div_idx):
     children[0].prefix = u''
 
     return children
-
 
 class FixDivisionSafe(fixer_base.BaseFix):
     # BM_compatible = True

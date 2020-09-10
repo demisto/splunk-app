@@ -14,7 +14,7 @@ from inspect import isfunction
 
 __all__ = [
     'Validator',
-    # 'ValidationError',
+    #'ValidationError',
     'AnyOf',
     'AllOf',
     'RequiresIf',
@@ -276,7 +276,7 @@ class Number(Validator):
             '%(min_val)s & %(max_val)s should be numbers' % {
                 'min_val': min_val,
                 'max_val': max_val
-        }
+            }
 
         super(Number, self).__init__()
         self._min_val = min_val
@@ -338,7 +338,7 @@ class String(Validator):
             '%(min_len)s & %(max_len)s should be numbers' % {
                 'min_len': min_len,
                 'max_len': max_len
-        }
+            }
 
         super(String, self).__init__()
         self._min_len, self._max_len = min_len, max_len
@@ -375,7 +375,6 @@ class Datetime(Validator):
     """
     Date time validation.
     """
-
     def __init__(self, datetime_format):
         """
 
@@ -421,7 +420,6 @@ class Host(Pattern):
     """
     A validator that accepts strings that represent network hostname.
     """
-
     def __init__(self):
         regexp = (
             r'^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*'
@@ -435,7 +433,6 @@ class Port(Number):
     """
     Port number.
     """
-
     def __init__(self):
         super(Port, self).__init__(
             min_val=0,

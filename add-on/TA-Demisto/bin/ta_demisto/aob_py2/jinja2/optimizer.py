@@ -43,7 +43,7 @@ class Optimizer(NodeTransformer):
             return node
 
     visit_Add = visit_Sub = visit_Mul = visit_Div = visit_FloorDiv = \
-        visit_Pow = visit_Mod = visit_And = visit_Or = visit_Pos = visit_Neg = \
-        visit_Not = visit_Compare = visit_Getitem = visit_Getattr = visit_Call = \
-        visit_Filter = visit_Test = visit_CondExpr = fold
+    visit_Pow = visit_Mod = visit_And = visit_Or = visit_Pos = visit_Neg = \
+    visit_Not = visit_Compare = visit_Getitem = visit_Getattr = visit_Call = \
+    visit_Filter = visit_Test = visit_CondExpr = fold
     del fold

@@ -166,7 +166,7 @@ class HTTPDigestAuth(AuthBase):
                 return hashlib.sha512(x).hexdigest()
             hash_utf8 = sha512_utf8
 
-        def KD(s, d): return hash_utf8("%s:%s" % (s, d))
+        KD = lambda s, d: hash_utf8("%s:%s" % (s, d))
 
         if hash_utf8 is None:
             return None

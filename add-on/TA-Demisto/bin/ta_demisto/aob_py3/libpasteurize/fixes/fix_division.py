@@ -5,7 +5,6 @@ Fixer for division: from __future__ import division if needed
 from lib2to3 import fixer_base
 from libfuturize.fixer_util import token, future_import
 
-
 def match_division(node):
     u"""
     __future__.division redefines the meaning of a single slash for division,
@@ -13,8 +12,7 @@ def match_division(node):
     """
     slash = token.SLASH
     return node.type == slash and not node.next_sibling.type == slash and \
-        not node.prev_sibling.type == slash
-
+                                  not node.prev_sibling.type == slash
 
 class FixDivision(fixer_base.BaseFix):
     run_order = 4    # this seems to be ignored?

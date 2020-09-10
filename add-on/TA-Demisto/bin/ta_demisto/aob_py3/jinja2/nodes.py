@@ -25,30 +25,30 @@ _context_function_types = (types.FunctionType, types.MethodType)
 
 
 _binop_to_func = {
-    '*': operator.mul,
-    '/': operator.truediv,
-    '//': operator.floordiv,
-    '**': operator.pow,
-    '%': operator.mod,
-    '+': operator.add,
-    '-': operator.sub
+    '*':        operator.mul,
+    '/':        operator.truediv,
+    '//':       operator.floordiv,
+    '**':       operator.pow,
+    '%':        operator.mod,
+    '+':        operator.add,
+    '-':        operator.sub
 }
 
 _uaop_to_func = {
-    'not': operator.not_,
-    '+': operator.pos,
-    '-': operator.neg
+    'not':      operator.not_,
+    '+':        operator.pos,
+    '-':        operator.neg
 }
 
 _cmpop_to_func = {
-    'eq': operator.eq,
-    'ne': operator.ne,
-    'gt': operator.gt,
-    'gteq': operator.ge,
-    'lt': operator.lt,
-    'lteq': operator.le,
-    'in': lambda a, b: a in b,
-    'notin': lambda a, b: a not in b
+    'eq':       operator.eq,
+    'ne':       operator.ne,
+    'gt':       operator.gt,
+    'gteq':     operator.ge,
+    'lt':       operator.lt,
+    'lteq':     operator.le,
+    'in':       lambda a, b: a in b,
+    'notin':    lambda a, b: a not in b
 }
 
 
@@ -226,8 +226,8 @@ class Node(with_metaclass(NodeType, object)):
         return self
 
     def __eq__(self, other):
-        return isinstance(self, type(other)) and \
-            tuple(self.iter_fields()) == tuple(other.iter_fields())
+        return type(self) is type(other) and \
+               tuple(self.iter_fields()) == tuple(other.iter_fields())
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -269,6 +269,7 @@ class Node(with_metaclass(NodeType, object)):
         buf = []
         _dump(self)
         return ''.join(buf)
+
 
 
 class Stmt(Node):
@@ -491,7 +492,7 @@ class Const(Literal):
 
     def as_const(self, eval_ctx=None):
         rv = self.value
-        if PY2 and isinstance(rv, text_type) and \
+        if PY2 and type(rv) is text_type and \
            self.environment.policies['compiler.ascii_str']:
             try:
                 rv = rv.encode('ascii')
@@ -744,7 +745,6 @@ class Slice(Expr):
 
     def as_const(self, eval_ctx=None):
         eval_ctx = get_eval_context(self, eval_ctx)
-
         def const(obj):
             if obj is None:
                 return None
@@ -786,11 +786,10 @@ class Operand(Helper):
     """Holds an operator and an expression."""
     fields = ('op', 'expr')
 
-
 if __debug__:
     Operand.__doc__ += '\nThe following operators are available: ' + \
         ', '.join(sorted('``%s``' % x for x in set(_binop_to_func) |
-                         set(_uaop_to_func) | set(_cmpop_to_func)))
+                  set(_uaop_to_func) | set(_cmpop_to_func)))
 
 
 class Mul(BinExpr):
@@ -997,7 +996,4 @@ class ScopedEvalContextModifier(EvalContextModifier):
 # make sure nobody creates custom nodes
 def _failing_new(*args, **kwargs):
     raise TypeError('can\'t create custom node types')
-
-
-NodeType.__new__ = staticmethod(_failing_new)
-del _failing_new
+NodeType.__new__ = staticmethod(_failing_new); del _failing_new

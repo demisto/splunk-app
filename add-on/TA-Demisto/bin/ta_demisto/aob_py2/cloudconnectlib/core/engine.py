@@ -241,7 +241,7 @@ class Job(object):
         authorizer = request.auth
         self._get_checkpoint()
 
-        while True:
+        while 1:
             if self._check_should_stop():
                 return
 
@@ -309,8 +309,8 @@ class Job(object):
 
         error_log = ('The response status=%s for request which url=%s and'
                      ' method=%s.') % (
-            status, request.url, request.method
-        )
+                        status, request.url, request.method
+                    )
 
         if status in defaults.warning_statuses:
             _logger.warning(error_log)

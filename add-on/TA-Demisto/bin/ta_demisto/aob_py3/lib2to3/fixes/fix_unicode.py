@@ -11,8 +11,7 @@ r"""Fixer for unicode.
 from ..pgen2 import token
 from .. import fixer_base
 
-_mapping = {"unichr": "chr", "unicode": "str"}
-
+_mapping = {"unichr" : "chr", "unicode" : "str"}
 
 class FixUnicode(fixer_base.BaseFix):
     BM_compatible = True

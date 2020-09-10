@@ -106,7 +106,6 @@ class SortedDict(dict):
     Sorted dicts may only be compared for equality and inequality.
 
     """
-
     def __init__(self, *args, **kwargs):
         """Initialize sorted dict instance.
 
@@ -193,6 +192,7 @@ class SortedDict(dict):
 
         self._update(*args, **kwargs)
 
+
     @property
     def key(self):
         """Function used to extract comparison key from keys.
@@ -201,6 +201,7 @@ class SortedDict(dict):
 
         """
         return self._key
+
 
     @property
     def iloc(self):
@@ -223,7 +224,9 @@ class SortedDict(dict):
             _iloc = self._iloc = SortedKeysView(self)
             return _iloc
 
+
     def clear(self):
+
         """Remove all items from sorted dict.
 
         Runtime complexity: `O(n)`
@@ -231,6 +234,7 @@ class SortedDict(dict):
         """
         self._dict_clear()
         self._list_clear()
+
 
     def __delitem__(self, key):
         """Remove item from sorted dict identified by `key`.
@@ -255,6 +259,7 @@ class SortedDict(dict):
         self._dict_delitem(key)
         self._list_remove(key)
 
+
     def __iter__(self):
         """Return an iterator over the keys of the sorted dict.
 
@@ -266,6 +271,7 @@ class SortedDict(dict):
         """
         return self._list_iter()
 
+
     def __reversed__(self):
         """Return a reverse iterator over the keys of the sorted dict.
 
@@ -276,6 +282,7 @@ class SortedDict(dict):
 
         """
         return self._list_reversed()
+
 
     def __setitem__(self, key, value):
         """Store item in sorted dict with `key` and corresponding `value`.
@@ -301,6 +308,7 @@ class SortedDict(dict):
 
     _setitem = __setitem__
 
+
     def copy(self):
         """Return a shallow copy of the sorted dict.
 
@@ -312,6 +320,7 @@ class SortedDict(dict):
         return self.__class__(self._key, self.items())
 
     __copy__ = copy
+
 
     @classmethod
     def fromkeys(cls, iterable, value=None):
@@ -327,6 +336,7 @@ class SortedDict(dict):
         """
         return cls((key, value) for key in iterable)
 
+
     def keys(self):
         """Return new sorted keys view of the sorted dict's keys.
 
@@ -336,6 +346,7 @@ class SortedDict(dict):
 
         """
         return SortedKeysView(self)
+
 
     def items(self):
         """Return new sorted items view of the sorted dict's items.
@@ -347,6 +358,7 @@ class SortedDict(dict):
         """
         return SortedItemsView(self)
 
+
     def values(self):
         """Return new sorted values view of the sorted dict's values.
 
@@ -357,6 +369,7 @@ class SortedDict(dict):
         """
         return SortedValuesView(self)
 
+
     if sys.hexversion < 0x03000000:
         def __make_raise_attributeerror(original, alternate):
             # pylint: disable=no-self-argument
@@ -364,7 +377,6 @@ class SortedDict(dict):
                 'SortedDict.{original}() is not implemented.'
                 ' Use SortedDict.{alternate}() instead.'
             ).format(original=original, alternate=alternate)
-
             def method(self):
                 # pylint: disable=missing-docstring,unused-argument
                 raise AttributeError(message)
@@ -378,6 +390,7 @@ class SortedDict(dict):
         viewitems = __make_raise_attributeerror('viewitems', 'items')
         viewkeys = __make_raise_attributeerror('viewkeys', 'keys')
         viewvalues = __make_raise_attributeerror('viewvalues', 'values')
+
 
     class _NotGiven(object):
         # pylint: disable=too-few-public-methods
@@ -419,6 +432,7 @@ class SortedDict(dict):
             else:
                 return default
 
+
     def popitem(self, index=-1):
         """Remove and return ``(key, value)`` pair at `index` from sorted dict.
 
@@ -454,6 +468,7 @@ class SortedDict(dict):
         value = self._dict_pop(key)
         return (key, value)
 
+
     def peekitem(self, index=-1):
         """Return ``(key, value)`` pair at `index` in sorted dict.
 
@@ -484,6 +499,7 @@ class SortedDict(dict):
         key = self._list[index]
         return key, self[key]
 
+
     def setdefault(self, key, default=None):
         """Return value for item identified by `key` in sorted dict.
 
@@ -513,6 +529,7 @@ class SortedDict(dict):
         self._dict_setitem(key, default)
         self._list_add(key)
         return default
+
 
     def update(self, *args, **kwargs):
         """Update sorted dict with items from `args` and `kwargs`.
@@ -547,6 +564,7 @@ class SortedDict(dict):
 
     _update = update
 
+
     def __reduce__(self):
         """Support for pickle.
 
@@ -555,6 +573,7 @@ class SortedDict(dict):
 
         """
         return (self.__class__, (self._key, list(self.items())))
+
 
     @recursive_repr()
     def __repr__(self):
@@ -571,6 +590,7 @@ class SortedDict(dict):
         item_format = '{0!r}: {1!r}'.format
         items = ', '.join(item_format(key, self[key]) for key in self._list)
         return '{0}({1}{{{2}}})'.format(type_name, key_arg, items)
+
 
     def _check(self):
         """Check invariants of sorted dict.
@@ -632,9 +652,11 @@ class SortedKeysView(KeysView, Sequence):
     """
     __slots__ = ()
 
+
     @classmethod
     def _from_iterable(cls, it):
         return SortedSet(it)
+
 
     def __getitem__(self, index):
         """Lookup key at `index` in sorted keys views.
@@ -665,6 +687,7 @@ class SortedKeysView(KeysView, Sequence):
         """
         return self._mapping._list[index]
 
+
     __delitem__ = _view_delitem
 
 
@@ -678,9 +701,11 @@ class SortedItemsView(ItemsView, Sequence):
     """
     __slots__ = ()
 
+
     @classmethod
     def _from_iterable(cls, it):
         return SortedSet(it)
+
 
     def __getitem__(self, index):
         """Lookup item at `index` in sorted items view.
@@ -719,6 +744,7 @@ class SortedItemsView(ItemsView, Sequence):
         key = _mapping_list[index]
         return key, _mapping[key]
 
+
     __delitem__ = _view_delitem
 
 
@@ -731,6 +757,7 @@ class SortedValuesView(ValuesView, Sequence):
 
     """
     __slots__ = ()
+
 
     def __getitem__(self, index):
         """Lookup value at `index` in sorted values view.
@@ -768,5 +795,6 @@ class SortedValuesView(ValuesView, Sequence):
 
         key = _mapping_list[index]
         return _mapping[key]
+
 
     __delitem__ = _view_delitem

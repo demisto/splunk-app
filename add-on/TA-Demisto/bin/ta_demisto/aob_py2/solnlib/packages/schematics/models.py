@@ -118,7 +118,7 @@ class ModelMeta(type):
 
         # Parse meta data into new schema
         klass._schema = schema.Schema(name, model=klass, options=options,
-                                      validators=validator_functions, *(schema.Field(k, t) for k, t in iteritems(fields)))
+            validators=validator_functions, *(schema.Field(k, t) for k, t in iteritems(fields)))
 
         return klass
 
@@ -230,9 +230,9 @@ class Model(object):
 
         self._data = ModelDict(valid=trusted_data)
         data = self._convert(raw_data,
-                             trusted_data=trusted_data, mapping=deserialize_mapping,
-                             partial=partial, strict=strict, validate=validate, new=True,
-                             app_data=app_data, **kwargs)
+            trusted_data=trusted_data, mapping=deserialize_mapping,
+            partial=partial, strict=strict, validate=validate, new=True,
+            app_data=app_data, **kwargs)
         self._data.converted = data
         if validate:
             self.validate(partial=partial, app_data=app_data, **kwargs)
@@ -255,7 +255,7 @@ class Model(object):
             return  # no new input data to validate
         try:
             data = self._convert(validate=True,
-                                 partial=partial, convert=convert, app_data=app_data, **kwargs)
+                partial=partial, convert=convert, app_data=app_data, **kwargs)
             self._data.valid = data
         except DataError as e:
             valid = dict(self._data.valid)
@@ -328,7 +328,7 @@ class Model(object):
 
     def __iter__(self):
         return (k for k in self._schema.fields if k in self._data
-                and getattr(self._schema.fields[k], 'fset', None) is None)
+            and getattr(self._schema.fields[k], 'fset', None) is None)
 
     def keys(self):
         return list(iter(self))
@@ -408,7 +408,7 @@ class Model(object):
     def __eq__(self, other, memo=set()):
         if self is other:
             return True
-        if not isinstance(self, type(other)):
+        if type(self) is not type(other):
             return NotImplemented
         key = (id(self), id(other), get_ident())
         if key in memo:

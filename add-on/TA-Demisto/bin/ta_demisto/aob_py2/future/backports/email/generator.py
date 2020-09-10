@@ -41,11 +41,8 @@ class Generator(object):
     #
 
     def __init__(self, outfp, mangle_from_=True, maxheaderlen=None, **_3to2kwargs):
-        if 'policy' in _3to2kwargs:
-            policy = _3to2kwargs['policy']
-            del _3to2kwargs['policy']
-        else:
-            policy = None
+        if 'policy' in _3to2kwargs: policy = _3to2kwargs['policy']; del _3to2kwargs['policy']
+        else: policy = None
         """Create the generator for message flattening.
 
         outfp is the output file-like object for writing the message to.  It
@@ -127,7 +124,7 @@ class Generator(object):
         """Clone this generator with the exact same options."""
         return self.__class__(fp,
                               self._mangle_from_,
-                              None,  # Use policy setting, which we've adjusted
+                              None, # Use policy setting, which we've adjusted
                               policy=self.policy)
 
     #
@@ -382,7 +379,6 @@ class Generator(object):
     def _compile_re(cls, s, flags):
         return re.compile(s, flags)
 
-
 class BytesGenerator(Generator):
     """Generates a bytes version of a Message object tree.
 
@@ -422,12 +418,12 @@ class BytesGenerator(Generator):
         # just write it back out.
         if msg._payload is None:
             return
-        if _has_surrogates(msg._payload) and not self.policy.cte_type == '7bit':
+        if _has_surrogates(msg._payload) and not self.policy.cte_type=='7bit':
             if self._mangle_from_:
                 msg._payload = fcre.sub(">From ", msg._payload)
             self._write_lines(msg._payload)
         else:
-            super(BytesGenerator, self)._handle_text(msg)
+            super(BytesGenerator,self)._handle_text(msg)
 
     # Default body handler
     _writeBody = _handle_text
@@ -439,14 +435,12 @@ class BytesGenerator(Generator):
 
 _FMT = '[Non-text (%(type)s) part of message omitted, filename %(filename)s]'
 
-
 class DecodedGenerator(Generator):
     """Generates a text representation of a message.
 
     Like the Generator base class, except that non-text parts are substituted
     with a format string representing the part.
     """
-
     def __init__(self, outfp, mangle_from_=True, maxheaderlen=78, fmt=None):
         """Like Generator.__init__() except that an additional optional
         argument is allowed.
@@ -485,19 +479,19 @@ class DecodedGenerator(Generator):
                 pass
             else:
                 print(self._fmt % {
-                    'type': part.get_content_type(),
-                    'maintype': part.get_content_maintype(),
-                    'subtype': part.get_content_subtype(),
-                    'filename': part.get_filename('[no filename]'),
+                    'type'       : part.get_content_type(),
+                    'maintype'   : part.get_content_maintype(),
+                    'subtype'    : part.get_content_subtype(),
+                    'filename'   : part.get_filename('[no filename]'),
                     'description': part.get('Content-Description',
                                             '[no description]'),
-                    'encoding': part.get('Content-Transfer-Encoding',
-                                         '[no encoding]'),
-                }, file=self)
+                    'encoding'   : part.get('Content-Transfer-Encoding',
+                                            '[no encoding]'),
+                    }, file=self)
 
 
 # Helper used by Generator._make_boundary
-_width = len(repr(sys.maxsize - 1))
+_width = len(repr(sys.maxsize-1))
 _fmt = '%%0%dd' % _width
 
 # Backward compatibility
