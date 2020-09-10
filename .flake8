@@ -8,5 +8,5 @@ exclude =
     add-on/TA-Demisto/bin/ta_demisto/alert_actions_base.py,
     add-on/TA-Demisto/bin/TA_Demisto_rh_account.py,
     add-on/TA-Demisto/bin/TA_Demisto_rh_settings.py,
-    on/TA-Demisto/bin/create_xsoar_incident.py,
+    add-on/TA-Demisto/bin/create_xsoar_incident.py
 
