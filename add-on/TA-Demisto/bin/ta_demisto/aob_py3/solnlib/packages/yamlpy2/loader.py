@@ -8,6 +8,7 @@ from composer import *
 from constructor import *
 from resolver import *
 
+
 class BaseLoader(Reader, Scanner, Parser, Composer, BaseConstructor, BaseResolver):
 
     def __init__(self, stream):
@@ -17,6 +18,7 @@ class BaseLoader(Reader, Scanner, Parser, Composer, BaseConstructor, BaseResolve
         Composer.__init__(self)
         BaseConstructor.__init__(self)
         BaseResolver.__init__(self)
+
 
 class FullLoader(Reader, Scanner, Parser, Composer, FullConstructor, Resolver):
 
@@ -28,6 +30,7 @@ class FullLoader(Reader, Scanner, Parser, Composer, FullConstructor, Resolver):
         FullConstructor.__init__(self)
         Resolver.__init__(self)
 
+
 class SafeLoader(Reader, Scanner, Parser, Composer, SafeConstructor, Resolver):
 
     def __init__(self, stream):
@@ -37,6 +40,7 @@ class SafeLoader(Reader, Scanner, Parser, Composer, SafeConstructor, Resolver):
         Composer.__init__(self)
         SafeConstructor.__init__(self)
         Resolver.__init__(self)
+
 
 class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
 
@@ -52,6 +56,8 @@ class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
 # untrusted input). Use of either Loader or UnsafeLoader should be rare, since
 # FullLoad should be able to load almost all YAML safely. Loader is left intact
 # to ensure backwards compatability.
+
+
 class UnsafeLoader(Reader, Scanner, Parser, Composer, Constructor, Resolver):
 
     def __init__(self, stream):

@@ -14,23 +14,23 @@ import weakref
 from functools import reduce, partial
 from jinja2 import nodes
 from jinja2.defaults import BLOCK_START_STRING, \
-     BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, \
-     COMMENT_START_STRING, COMMENT_END_STRING, LINE_STATEMENT_PREFIX, \
-     LINE_COMMENT_PREFIX, TRIM_BLOCKS, NEWLINE_SEQUENCE, \
-     DEFAULT_FILTERS, DEFAULT_TESTS, DEFAULT_NAMESPACE, \
-     DEFAULT_POLICIES, KEEP_TRAILING_NEWLINE, LSTRIP_BLOCKS
+    BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, \
+    COMMENT_START_STRING, COMMENT_END_STRING, LINE_STATEMENT_PREFIX, \
+    LINE_COMMENT_PREFIX, TRIM_BLOCKS, NEWLINE_SEQUENCE, \
+    DEFAULT_FILTERS, DEFAULT_TESTS, DEFAULT_NAMESPACE, \
+    DEFAULT_POLICIES, KEEP_TRAILING_NEWLINE, LSTRIP_BLOCKS
 from jinja2.lexer import get_lexer, TokenStream
 from jinja2.parser import Parser
 from jinja2.nodes import EvalContext
 from jinja2.compiler import generate, CodeGenerator
 from jinja2.runtime import Undefined, new_context, Context
 from jinja2.exceptions import TemplateSyntaxError, TemplateNotFound, \
-     TemplatesNotFound, TemplateRuntimeError
+    TemplatesNotFound, TemplateRuntimeError
 from jinja2.utils import import_string, LRUCache, Markup, missing, \
-     concat, consume, internalcode, have_async_gen
+    concat, consume, internalcode, have_async_gen
 from jinja2._compat import imap, ifilter, string_types, iteritems, \
-     text_type, reraise, implements_iterator, implements_to_string, \
-     encode_filename, PY2, PYPY
+    text_type, reraise, implements_iterator, implements_to_string, \
+    encode_filename, PY2, PYPY
 
 
 # for direct template usage we have up to ten living environments
@@ -70,7 +70,7 @@ def copy_cache(cache):
     """Create an empty copy of the given cache."""
     if cache is None:
         return None
-    elif type(cache) is dict:
+    elif isinstance(cache, dict):
         return {}
     return LRUCache(cache.capacity)
 
@@ -663,7 +663,7 @@ class Environment(object):
         from jinja2.loaders import ModuleLoader
 
         if log_function is None:
-            log_function = lambda x: None
+            def log_function(x): return None
 
         if py_compile:
             if not PY2 or PYPY:
@@ -751,8 +751,8 @@ class Environment(object):
             if filter_func is not None:
                 raise TypeError('either extensions or filter_func '
                                 'can be passed, but not both')
-            filter_func = lambda x: '.' in x and \
-                                    x.rsplit('.', 1)[1] in extensions
+            def filter_func(x): return '.' in x and \
+                x.rsplit('.', 1)[1] in extensions
         if filter_func is not None:
             x = list(ifilter(filter_func, x))
         return x
@@ -950,8 +950,8 @@ class Template(object):
         is used by the loaders and environment to create a template object.
         """
         namespace = {
-            'environment':  environment,
-            '__file__':     code.co_filename
+            'environment': environment,
+            '__file__': code.co_filename
         }
         exec(code, namespace)
         rv = cls._from_namespace(environment, namespace, globals)
@@ -1242,7 +1242,7 @@ class TemplateStream(object):
         c_size = 0
         push = buf.append
 
-        while 1:
+        while True:
             try:
                 while c_size < size:
                     c = next(self._gen)

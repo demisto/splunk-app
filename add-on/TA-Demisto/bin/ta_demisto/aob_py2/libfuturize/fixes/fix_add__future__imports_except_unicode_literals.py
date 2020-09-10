@@ -13,6 +13,7 @@ Stage 2 adds ``unicode_literals``.
 from lib2to3 import fixer_base
 from libfuturize.fixer_util import future_import
 
+
 class FixAddFutureImportsExceptUnicodeLiterals(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = "file_input"

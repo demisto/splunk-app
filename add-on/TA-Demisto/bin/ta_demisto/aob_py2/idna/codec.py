@@ -4,6 +4,7 @@ import re
 
 _unicode_dots_re = re.compile(u'[\u002e\u3002\uff0e\uff61]')
 
+
 class Codec(codecs.Codec):
 
     def encode(self, data, errors='strict'):
@@ -25,6 +26,7 @@ class Codec(codecs.Codec):
             return u"", 0
 
         return decode(data), len(data)
+
 
 class IncrementalEncoder(codecs.BufferedIncrementalEncoder):
     def _buffer_encode(self, data, errors, final):
@@ -58,6 +60,7 @@ class IncrementalEncoder(codecs.BufferedIncrementalEncoder):
         result = ".".join(result) + trailing_dot
         size += len(trailing_dot)
         return (result, size)
+
 
 class IncrementalDecoder(codecs.BufferedIncrementalDecoder):
     def _buffer_decode(self, data, errors, final):
@@ -103,8 +106,10 @@ class IncrementalDecoder(codecs.BufferedIncrementalDecoder):
 class StreamWriter(Codec, codecs.StreamWriter):
     pass
 
+
 class StreamReader(Codec, codecs.StreamReader):
     pass
+
 
 def getregentry():
     return codecs.CodecInfo(

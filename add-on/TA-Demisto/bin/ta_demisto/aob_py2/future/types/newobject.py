@@ -48,6 +48,7 @@ class newobject(object):
     Subclasses of this class can merely define the Python 3 methods (__next__,
     __str__, and __bool__).
     """
+
     def next(self):
         if hasattr(self, '__next__'):
             return type(self).__next__(self)

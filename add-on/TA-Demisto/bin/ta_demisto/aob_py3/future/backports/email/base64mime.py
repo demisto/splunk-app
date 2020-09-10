@@ -36,7 +36,7 @@ __all__ = [
     'decodestring',
     'header_encode',
     'header_length',
-    ]
+]
 
 
 from base64 import b64encode

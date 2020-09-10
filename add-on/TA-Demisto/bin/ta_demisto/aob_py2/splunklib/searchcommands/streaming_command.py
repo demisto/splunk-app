@@ -182,7 +182,12 @@ class StreamingCommand(SearchCommand):
                 iteritems = ifilter(lambda name_value2: name_value2[0] != 'distributed', iteritems)
                 if not self.distributed:
                     iteritems = imap(
-                        lambda name_value1: (name_value1[0], 'stateful') if name_value1[0] == 'type' else (name_value1[0], name_value1[1]), iteritems)
+                        lambda name_value1: (
+                            name_value1[0],
+                            'stateful') if name_value1[0] == 'type' else (
+                            name_value1[0],
+                            name_value1[1]),
+                        iteritems)
             return iteritems
 
         # endregion

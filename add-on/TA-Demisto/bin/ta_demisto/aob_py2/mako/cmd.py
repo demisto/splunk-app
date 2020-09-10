@@ -61,7 +61,7 @@ def cmdline(argv=None):
                 lookup=lookup,
                 output_encoding=output_encoding,
             )
-        except:
+        except BaseException:
             _exit()
     else:
         filename = options.input
@@ -75,13 +75,13 @@ def cmdline(argv=None):
                 lookup=lookup,
                 output_encoding=output_encoding,
             )
-        except:
+        except BaseException:
             _exit()
 
     kw = dict([varsplit(var) for var in options.var])
     try:
         sys.stdout.write(template.render(**kw))
-    except:
+    except BaseException:
         _exit()
 
 

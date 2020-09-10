@@ -5,6 +5,7 @@ Environment support.
 """
 
 from __future__ import print_function
+from httplib2 import certs
 
 __author__ = "Joe Gregorio (joe@bitworking.org)"
 __copyright__ = "Copyright 2006, Joe Gregorio"
@@ -269,7 +270,6 @@ class NotRunningAppEngineEnvironment(HttpLib2Error):
 # requesting that URI again.
 DEFAULT_MAX_REDIRECTS = 5
 
-from httplib2 import certs
 CA_CERTS = certs.where()
 
 # Which headers are hop-by-hop headers by default
@@ -489,7 +489,7 @@ def _entry_disposition(response_headers, request_headers):
                 freshness_lifetime = 0
         elif "expires" in response_headers:
             expires = email.Utils.parsedate_tz(response_headers["expires"])
-            if None == expires:
+            if None is expires:
                 freshness_lifetime = 0
             else:
                 freshness_lifetime = max(0, calendar.timegm(expires) - date)
@@ -608,7 +608,7 @@ class Authentication(object):
 
     def depth(self, request_uri):
         (scheme, authority, path, query, fragment) = parse_uri(request_uri)
-        return request_uri[len(self.path) :].count("/")
+        return request_uri[len(self.path):].count("/")
 
     def inscope(self, host, request_uri):
         # XXX Should we normalize the request_uri?
@@ -685,8 +685,8 @@ class DigestAuthentication(Authentication):
 
     def request(self, method, request_uri, headers, content, cnonce=None):
         """Modify the request headers"""
-        H = lambda x: _md5(x).hexdigest()
-        KD = lambda s, d: H("%s:%s" % (s, d))
+        def H(x): return _md5(x).hexdigest()
+        def KD(s, d): return H("%s:%s" % (s, d))
         A2 = "".join([method, ":", request_uri])
         self.challenge["cnonce"] = cnonce or _cnonce()
         request_digest = '"%s"' % KD(
@@ -1038,7 +1038,7 @@ class ProxyInfo(object):
         )
 
     def isgood(self):
-        return (self.proxy_host != None) and (self.proxy_port != None)
+        return (self.proxy_host is not None) and (self.proxy_port is not None)
 
     def applies_to(self, hostname):
         return not self.bypass_host(hostname)
@@ -1309,7 +1309,7 @@ class HTTPSConnectionWithTimeout(httplib.HTTPSConnection):
         """
         hosts = self._GetValidHostsForCert(cert)
         for host in hosts:
-            host_re = host.replace(".", "\.").replace("*", "[^.]*")
+            host_re = host.replace(".", r"\.").replace("*", "[^.]*")
             if re.search("^%s$" % (host_re,), hostname, re.I):
                 return True
         return False
@@ -1533,7 +1533,7 @@ def is_gae_instance():
     server_software = os.environ.get('SERVER_SOFTWARE', '')
     if (server_software.startswith('Google App Engine/') or
         server_software.startswith('Development/') or
-        server_software.startswith('testutil/')):
+            server_software.startswith('testutil/')):
         return True
     return False
 
@@ -1838,7 +1838,7 @@ class Http(object):
                     if "location" in response:
                         location = response["location"]
                         (scheme, authority, path, query, fragment) = parse_uri(location)
-                        if authority == None:
+                        if authority is None:
                             response["location"] = urlparse.urljoin(
                                 absolute_uri, location
                             )
@@ -1925,7 +1925,7 @@ class Http(object):
         a string that contains the response entity body.
         """
         conn_key = ''
-        
+
         try:
             if headers is None:
                 headers = {}
@@ -2073,10 +2073,10 @@ class Http(object):
                         if (
                             "etag" in info
                             and not self.ignore_etag
-                            and not "if-none-match" in headers
+                            and "if-none-match" not in headers
                         ):
                             headers["if-none-match"] = info["etag"]
-                        if "last-modified" in info and not "last-modified" in headers:
+                        if "last-modified" in info and "last-modified" not in headers:
                             headers["if-modified-since"] = info["last-modified"]
                     elif entry_disposition == "TRANSPARENT":
                         pass
@@ -2140,7 +2140,7 @@ class Http(object):
                 conn = self.connections.pop(conn_key, None)
                 if conn:
                     conn.close()
-                    
+
             if self.force_exception_to_status_code:
                 if isinstance(e, HttpLib2ErrorWithResponse):
                     response = e.response

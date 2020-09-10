@@ -46,5 +46,3 @@ def reset_logger(name):
 
     global logger
     logger = stclog.Logs().get_logger(name)
-
-

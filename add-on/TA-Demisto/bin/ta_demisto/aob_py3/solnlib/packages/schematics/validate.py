@@ -51,12 +51,12 @@ def validate(schema, mutable, raw_data=None, trusted_data=None,
         raw_data = mutable
 
     context = context or get_validation_context(partial=partial, strict=strict,
-        convert=convert)
+                                                convert=convert)
 
     errors = {}
     try:
         data = import_loop(schema, mutable, raw_data, trusted_data=trusted_data,
-            context=context, **kwargs)
+                           context=context, **kwargs)
     except DataError as exc:
         errors = dict(exc.errors)
         data = exc.partial_data
@@ -86,7 +86,7 @@ def _validate_model(schema, mutable, data, context):
     errors = {}
     invalid_fields = []
 
-    has_validator = lambda atom: (
+    def has_validator(atom): return (
         atom.value is not Undefined and
         atom.name in schema._validator_functions
     )

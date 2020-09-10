@@ -2,15 +2,17 @@
 Copyright (C) 2005-2015 Splunk Inc. All Rights Reserved.
 """
 
+import urllib.error
+import urllib.parse
+import urllib.request
+import gc
+import sys
+import datetime
+import os.path as op
+import os
+from builtins import str
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-import os
-import os.path as op
-import datetime
-import sys
-import gc
-import urllib.request, urllib.parse, urllib.error
 
 
 def handle_tear_down_signals(callback):
@@ -66,7 +68,7 @@ def get_appname_from_path(absolute_path):
             except IndexError:
                 pass
             continue
-    #return None
+    # return None
     return "-"
 
 

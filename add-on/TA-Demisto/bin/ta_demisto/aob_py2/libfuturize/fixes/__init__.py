@@ -19,7 +19,7 @@ lib2to3_fix_names_stage1 = set([
     'lib2to3.fixes.fix_methodattrs',
     'lib2to3.fixes.fix_ne',
     # 'lib2to3.fixes.fix_next',         # would replace ``next`` method names
-                                        # with ``__next__``.
+    # with ``__next__``.
     'lib2to3.fixes.fix_numliterals',    # turns 1L into 1, 0755 into 0o755
     'lib2to3.fixes.fix_paren',
     # 'lib2to3.fixes.fix_print',        # see the libfuturize fixer that also
@@ -59,7 +59,8 @@ lib2to3_fix_names_stage2 = set([
     # 'lib2to3.fixes.fix_metaclass', # causes SyntaxError in Py2! Use the one from ``six`` instead
     'lib2to3.fixes.fix_next',
     'lib2to3.fixes.fix_nonzero',     # TODO: cause this to import ``object`` and/or add a decorator for mapping __bool__ to __nonzero__
-    'lib2to3.fixes.fix_operator',    # we will need support for this by e.g. extending the Py2 operator module to provide those functions in Py3
+    # we will need support for this by e.g. extending the Py2 operator module to provide those functions in Py3
+    'lib2to3.fixes.fix_operator',
     'lib2to3.fixes.fix_raw_input',
     # 'lib2to3.fixes.fix_unicode',   # strips off the u'' prefix, which removes a potentially helpful source of information for disambiguating unicode/byte strings
     # 'lib2to3.fixes.fix_urllib',    # included in libfuturize.fix_future_standard_library_urllib

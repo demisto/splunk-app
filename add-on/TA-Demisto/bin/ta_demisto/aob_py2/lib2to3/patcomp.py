@@ -72,7 +72,7 @@ class PatternCompiler(object):
         # XXX Optimize certain Wildcard-containing-Wildcard patterns
         # that can be merged
         if node.type == self.syms.Matcher:
-            node = node.children[0] # Avoid unneeded recursion
+            node = node.children[0]  # Avoid unneeded recursion
 
         if node.type == self.syms.Alternatives:
             # Skip the odd children since they are just '|' tokens
@@ -121,7 +121,7 @@ class PatternCompiler(object):
                 max = pytree.HUGE
             elif child.type == token.LBRACE:
                 assert children[-1].type == token.RBRACE
-                assert  len(children) in (3, 5)
+                assert len(children) in (3, 5)
                 min = max = self.get_int(children[1])
                 if len(children) == 5:
                     max = self.get_int(children[3])
@@ -157,7 +157,7 @@ class PatternCompiler(object):
                     type = getattr(self.pysyms, value, None)
                     if type is None:
                         raise PatternSyntaxError("Invalid symbol: %r" % value)
-                if nodes[1:]: # Details present
+                if nodes[1:]:  # Details present
                     content = [self.compile_node(nodes[1].children[1])]
                 else:
                     content = None

@@ -23,15 +23,15 @@ try:
     sorted
 except NameError:
     def sorted(lst):
-        l = list(lst)
-        l.sort()
+        l = sorted(lst)
         return l
+
 
 class TestNodes(support.TestCase):
 
     """Unit tests for nodes (Base, Leaf, Node)."""
 
-    if sys.version_info >= (2,6):
+    if sys.version_info >= (2, 6):
         # warnings.catch_warnings is new in 2.6.
         def test_deprecated_prefix_methods(self):
             l = pytree.Leaf(100, "foo")
@@ -43,10 +43,10 @@ class TestNodes(support.TestCase):
             self.assertEqual(len(w), 2)
             for warning in w:
                 self.assertTrue(warning.category is DeprecationWarning)
-            self.assertEqual(str(w[0].message), "get_prefix() is deprecated; " \
-                                 "use the prefix property")
-            self.assertEqual(str(w[1].message), "set_prefix() is deprecated; " \
-                                 "use the prefix property")
+            self.assertEqual(str(w[0].message), "get_prefix() is deprecated; "
+                             "use the prefix property")
+            self.assertEqual(str(w[1].message), "set_prefix() is deprecated; "
+                             "use the prefix property")
 
     def test_instantiate_base(self):
         if __debug__:

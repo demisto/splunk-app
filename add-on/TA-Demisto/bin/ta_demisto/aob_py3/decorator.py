@@ -275,7 +275,7 @@ def decorator(caller, _func=None):
         doc = caller.__doc__
         nargs = caller.__code__.co_argcount
         ndefs = len(caller.__defaults__ or ())
-        defaultargs = ', '.join(caller.__code__.co_varnames[nargs-ndefs:nargs])
+        defaultargs = ', '.join(caller.__code__.co_varnames[nargs - ndefs:nargs])
         if defaultargs:
             defaultargs += ','
         defaults = caller.__defaults__

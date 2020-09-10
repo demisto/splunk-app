@@ -13,6 +13,7 @@ def insert_object(node, idx):
     node.insert_child(idx, Name(u"object"))
     node.insert_child(idx, LParen())
 
+
 class FixNewstyle(fixer_base.BaseFix):
 
     # Match:
@@ -25,9 +26,9 @@ class FixNewstyle(fixer_base.BaseFix):
     def transform(self, node, results):
         colon = results[u"colon"]
         idx = node.children.index(colon)
-        if (node.children[idx-2].value == '(' and
-            node.children[idx-1].value == ')'):
-            del node.children[idx-2:idx]
+        if (node.children[idx - 2].value == '(' and
+                node.children[idx - 1].value == ')'):
+            del node.children[idx - 2:idx]
             idx -= 2
         insert_object(node, idx)
         touch_import_top(u'builtins', 'object', node)

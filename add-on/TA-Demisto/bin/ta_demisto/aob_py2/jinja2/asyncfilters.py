@@ -27,13 +27,14 @@ async def async_select_or_reject(args, kwargs, modfunc, lookup_attr):
 def dualfilter(normal_filter, async_filter):
     wrap_evalctx = False
     if getattr(normal_filter, 'environmentfilter', False):
-        is_async = lambda args: args[0].is_async
+        def is_async(args): return args[0].is_async
         wrap_evalctx = False
     else:
         if not getattr(normal_filter, 'evalcontextfilter', False) and \
            not getattr(normal_filter, 'contextfilter', False):
             wrap_evalctx = True
-        is_async = lambda args: args[0].environment.is_async
+
+        def is_async(args): return args[0].environment.is_async
 
     @wraps(normal_filter)
     def wrapper(*args, **kwargs):
@@ -118,7 +119,7 @@ async def do_sum(environment, iterable, attribute=None, start=0):
     if attribute is not None:
         func = filters.make_attrgetter(environment, attribute)
     else:
-        func = lambda x: x
+        def func(x): return x
     async for item in auto_aiter(iterable):
         rv += func(item)
     return rv
@@ -130,17 +131,17 @@ async def do_slice(value, slices, fill_with=None):
 
 
 ASYNC_FILTERS = {
-    'first':        do_first,
-    'groupby':      do_groupby,
-    'join':         do_join,
-    'list':         do_list,
+    'first': do_first,
+    'groupby': do_groupby,
+    'join': do_join,
+    'list': do_list,
     # we intentionally do not support do_last because that would be
     # ridiculous
-    'reject':       do_reject,
-    'rejectattr':   do_rejectattr,
-    'map':          do_map,
-    'select':       do_select,
-    'selectattr':   do_selectattr,
-    'sum':          do_sum,
-    'slice':        do_slice,
+    'reject': do_reject,
+    'rejectattr': do_rejectattr,
+    'map': do_map,
+    'select': do_select,
+    'selectattr': do_selectattr,
+    'sum': do_sum,
+    'slice': do_slice,
 }

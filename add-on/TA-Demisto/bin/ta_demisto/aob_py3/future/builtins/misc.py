@@ -85,9 +85,9 @@ if utils.PY2:
                 return _builtin_pow(x, y, z)
         except ValueError:
             if z == _SENTINEL:
-                return _builtin_pow(x+0j, y)
+                return _builtin_pow(x + 0j, y)
             else:
-                return _builtin_pow(x+0j, y, z)
+                return _builtin_pow(x + 0j, y, z)
 
     # ``future`` doesn't support Py3.0/3.1. If we ever did, we'd add this:
     #     callable = __builtin__.callable

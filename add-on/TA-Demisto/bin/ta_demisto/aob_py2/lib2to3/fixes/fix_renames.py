@@ -10,9 +10,10 @@ Fixes:
 from .. import fixer_base
 from ..fixer_util import Name, attr_chain
 
-MAPPING = {"sys":  {"maxint" : "maxsize"},
-          }
+MAPPING = {"sys": {"maxint": "maxsize"},
+           }
 LOOKUP = {}
+
 
 def alternates(members):
     return "(" + "|".join(map(repr, members)) + ")"
@@ -23,9 +24,9 @@ def build_pattern():
     for module, replace in MAPPING.items():
         for old_attr, new_attr in replace.items():
             LOOKUP[(module, old_attr)] = new_attr
-            #bare.add(module)
-            #bare.add(old_attr)
-            #yield """
+            # bare.add(module)
+            # bare.add(old_attr)
+            # yield """
             #      import_name< 'import' (module=%r
             #          | dotted_as_names< any* module=%r any* >) >
             #      """ % (module, module)
@@ -36,14 +37,14 @@ def build_pattern():
             yield """
                   power< module_name=%r trailer< '.' attr_name=%r > any* >
                   """ % (module, old_attr)
-    #yield """bare_name=%s""" % alternates(bare)
+    # yield """bare_name=%s""" % alternates(bare)
 
 
 class FixRenames(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = "|".join(build_pattern())
 
-    order = "pre" # Pre-order tree traversal
+    order = "pre"  # Pre-order tree traversal
 
     # Don't match the node if it's within another match
     def match(self, node):
@@ -55,7 +56,7 @@ class FixRenames(fixer_base.BaseFix):
             return results
         return False
 
-    #def start_tree(self, tree, filename):
+    # def start_tree(self, tree, filename):
     #    super(FixRenames, self).start_tree(tree, filename)
     #    self.replace = {}
 

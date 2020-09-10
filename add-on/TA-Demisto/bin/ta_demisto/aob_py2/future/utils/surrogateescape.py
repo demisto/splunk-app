@@ -18,11 +18,13 @@ FS_ERRORS = 'surrogateescape'
 #     # -- Python 2/3 compatibility -------------------------------------
 #     FS_ERRORS = 'my_surrogateescape'
 
+
 def u(text):
     if utils.PY3:
         return text
     else:
         return text.decode('unicode_escape')
+
 
 def b(data):
     if utils.PY3:
@@ -30,12 +32,14 @@ def b(data):
     else:
         return data
 
+
 if utils.PY3:
     _unichr = chr
-    bytes_chr = lambda code: bytes((code,))
+    def bytes_chr(code): return bytes((code,))
 else:
     _unichr = unichr
     bytes_chr = chr
+
 
 def surrogateescape_handler(exc):
     """
@@ -136,8 +140,8 @@ def encodefilename(fn):
                 ch = bytes_chr(code - 0xDC00)
             else:
                 raise UnicodeEncodeError(FS_ENCODING,
-                    fn, index, index+1,
-                    'ordinal not in range(128)')
+                                         fn, index, index + 1,
+                                         'ordinal not in range(128)')
             encoded.append(ch)
         return bytes().join(encoded)
     elif FS_ENCODING == 'utf-8':
@@ -153,7 +157,7 @@ def encodefilename(fn):
                 else:
                     raise UnicodeEncodeError(
                         FS_ENCODING,
-                        fn, index, index+1, 'surrogates not allowed')
+                        fn, index, index + 1, 'surrogates not allowed')
             else:
                 ch_utf8 = ch.encode('utf-8')
                 encoded.append(ch_utf8)
@@ -161,10 +165,14 @@ def encodefilename(fn):
     else:
         return fn.encode(FS_ENCODING, FS_ERRORS)
 
+
 def decodefilename(fn):
     return fn.decode(FS_ENCODING, FS_ERRORS)
 
-FS_ENCODING = 'ascii'; fn = b('[abc\xff]'); encoded = u('[abc\udcff]')
+
+FS_ENCODING = 'ascii'
+fn = b('[abc\xff]')
+encoded = u('[abc\udcff]')
 # FS_ENCODING = 'cp932'; fn = b('[abc\x81\x00]'); encoded = u('[abc\udc81\x00]')
 # FS_ENCODING = 'UTF-8'; fn = b('[abc\xff]'); encoded = u('[abc\udcff]')
 

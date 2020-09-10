@@ -10,24 +10,27 @@ from jsonpath_rw.lexer import JsonPathLexer
 
 logger = logging.getLogger(__name__)
 
+
 def parse(string):
     return JsonPathParser().parse(string)
+
 
 class JsonPathParser(object):
     '''
     An LALR-parser for JsonPath
     '''
-    
+
     tokens = JsonPathLexer.tokens
 
     def __init__(self, debug=False, lexer_class=None):
-        if self.__doc__ == None:
-            raise Exception('Docstrings have been removed! By design of PLY, jsonpath-rw requires docstrings. You must not use PYTHONOPTIMIZE=2 or python -OO.')
+        if self.__doc__ is None:
+            raise Exception(
+                'Docstrings have been removed! By design of PLY, jsonpath-rw requires docstrings. You must not use PYTHONOPTIMIZE=2 or python -OO.')
 
         self.debug = debug
-        self.lexer_class = lexer_class or JsonPathLexer # Crufty but works around statefulness in PLY
+        self.lexer_class = lexer_class or JsonPathLexer  # Crufty but works around statefulness in PLY
 
-    def parse(self, string, lexer = None):
+    def parse(self, string, lexer=None):
         lexer = lexer or self.lexer_class()
         return self.parse_token_stream(lexer.tokenize(string))
 
@@ -38,24 +41,24 @@ class JsonPathParser(object):
         output_directory = os.path.dirname(__file__)
         try:
             module_name = os.path.splitext(os.path.split(__file__)[1])[0]
-        except:
+        except BaseException:
             module_name = __name__
-        
+
         parsing_table_module = '_'.join([module_name, start_symbol, 'parsetab'])
 
         # And we regenerate the parse table every time; it doesn't actually take that long!
         new_parser = ply.yacc.yacc(module=self,
                                    debug=self.debug,
-                                   tabmodule = parsing_table_module,
-                                   outputdir = output_directory,
+                                   tabmodule=parsing_table_module,
+                                   outputdir=output_directory,
                                    write_tables=0,
-                                   start = start_symbol,
-                                   errorlog = logger)
+                                   start=start_symbol,
+                                   errorlog=logger)
 
-        return new_parser.parse(lexer = IteratorToTokenStream(token_iterator))
+        return new_parser.parse(lexer=IteratorToTokenStream(token_iterator))
 
     # ===================== PLY Parser specification =====================
-    
+
     precedence = [
         ('left', ','),
         ('left', 'DOUBLEDOT'),
@@ -66,10 +69,10 @@ class JsonPathParser(object):
     ]
 
     def p_error(self, t):
-        raise Exception('Parse error at %s:%s near token %s (%s)' % (t.lineno, t.col, t.value, t.type)) 
+        raise Exception('Parse error at %s:%s near token %s (%s)' % (t.lineno, t.col, t.value, t.type))
 
     def p_jsonpath_binop(self, p):
-        """jsonpath : jsonpath '.' jsonpath 
+        """jsonpath : jsonpath '.' jsonpath
                     | jsonpath DOUBLEDOT jsonpath
                     | jsonpath WHERE jsonpath
                     | jsonpath '|' jsonpath
@@ -134,7 +137,7 @@ class JsonPathParser(object):
 
     # Because fields in brackets cannot be '*' - that is reserved for array indices
     def p_fields_or_any(self, p):
-        """fields_or_any : fields 
+        """fields_or_any : fields
                          | '*'    """
         if p[1] == '*':
             p[0] = ['*']
@@ -157,7 +160,7 @@ class JsonPathParser(object):
         "slice : '*'"
         p[0] = Slice()
 
-    def p_slice(self, p): # Currently does not support `step`
+    def p_slice(self, p):  # Currently does not support `step`
         "slice : maybe_int ':' maybe_int"
         p[0] = Slice(start=p[1], end=p[3])
 
@@ -165,10 +168,11 @@ class JsonPathParser(object):
         """maybe_int : NUMBER
                      | empty"""
         p[0] = p[1]
-    
+
     def p_empty(self, p):
         'empty :'
         p[0] = None
+
 
 class IteratorToTokenStream(object):
     def __init__(self, iterator):

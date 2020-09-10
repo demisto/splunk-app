@@ -256,7 +256,7 @@ class CCESplitTask(BaseTask):
 
         try:
             invoke_results = self._process_handler.execute(context)
-        except:
+        except BaseException:
             logger.exception("Task=%s encountered exception", self)
             raise CCESplitError
         if not invoke_results or not \
@@ -434,8 +434,8 @@ class CCEHTTPRequestTask(BaseTask):
 
         error_log = ('The response status=%s for request which url=%s and'
                      ' method=%s.') % (
-                        status, request.url, request.method
-                    )
+            status, request.url, request.method
+        )
 
         if status in defaults.warning_statuses:
             logger.warning(error_log)

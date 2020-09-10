@@ -1,13 +1,13 @@
+from .common import log
+from collections import Iterable
+import sys
+import threading
+import multiprocessing
+import queue
+from builtins import object
+from six import string_types
 from future import standard_library
 standard_library.install_aliases()
-from six import string_types
-from builtins import object
-import queue
-import multiprocessing
-import threading
-import sys
-from collections import Iterable
-from .common import log
 
 
 class EventWriter(object):
@@ -56,7 +56,7 @@ class EventWriter(object):
         write = sys.stdout.write
         got_shutdown_signal = False
 
-        while 1:
+        while True:
             try:
                 event = event_queue.get(timeout=3)
                 if event is not None:
@@ -84,7 +84,7 @@ class EventWriter(object):
                 log.logger.exception("EventWriter encounter exception which may"
                                      "cause data loss, queue leftsize={"
                                      "}".format(
-                                     event_queue.qsize()))
+                                         event_queue.qsize()))
                 self._exception = True
                 break
 

@@ -26,6 +26,7 @@ from lib2to3 import pytree, fixer_base
 from lib2to3.pgen2 import token
 from lib2to3.fixer_util import Name, Call, is_tuple
 
+
 class FixRaise(fixer_base.BaseFix):
 
     BM_compatible = True

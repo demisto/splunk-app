@@ -52,7 +52,7 @@ class FixExitfunc(fixer_base.BaseFix):
         if self.sys_import is None:
             # That's interesting.
             self.warning(node, "Can't find sys import; Please add an atexit "
-                             "import at the top of your file.")
+                         "import at the top of your file.")
             return
 
         # Now add an atexit import after the sys import.
@@ -65,8 +65,8 @@ class FixExitfunc(fixer_base.BaseFix):
             position = containing_stmt.children.index(self.sys_import)
             stmt_container = containing_stmt.parent
             new_import = pytree.Node(syms.import_name,
-                              [Name(u"import"), Name(u"atexit", u" ")]
-                              )
+                                     [Name(u"import"), Name(u"atexit", u" ")]
+                                     )
             new = pytree.Node(syms.simple_stmt, [new_import])
             containing_stmt.insert_child(position + 1, Newline())
             containing_stmt.insert_child(position + 2, new)

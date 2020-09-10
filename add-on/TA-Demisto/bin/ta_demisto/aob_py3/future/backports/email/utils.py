@@ -26,7 +26,7 @@ __all__ = [
     'parsedate_tz',
     'parsedate_to_datetime',
     'unquote',
-    ]
+]
 
 import os
 import re
@@ -69,6 +69,8 @@ _has_surrogates = re.compile(
 
 # How to deal with a string containing bytes before handing it to the
 # application through the 'normal' interface.
+
+
 def _sanitize(string):
     # Turn any escaped bytes into unicode 'unknown' char.
     original_bytes = string.encode('ascii', 'surrogateescape')
@@ -110,13 +112,11 @@ def formataddr(pair, charset='utf-8'):
     return address
 
 
-
 def getaddresses(fieldvalues):
     """Return a list of (REALNAME, EMAIL) for each fieldvalue."""
     all = COMMASPACE.join(fieldvalues)
     a = _AddressList(all)
     return a.addresslist
-
 
 
 ecre = re.compile(r'''
@@ -138,6 +138,7 @@ def _format_timetuple_and_zone(timetuple, zone):
          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][timetuple[1] - 1],
         timetuple[0], timetuple[3], timetuple[4], timetuple[5],
         zone)
+
 
 def formatdate(timeval=None, localtime=False, usegmt=False):
     """Returns a date string as specified by RFC 2822, e.g.:
@@ -183,6 +184,7 @@ def formatdate(timeval=None, localtime=False, usegmt=False):
         else:
             zone = '-0000'
     return _format_timetuple_and_zone(now, zone)
+
 
 def format_datetime(dt, usegmt=False):
     """Turn a datetime into a date string as specified in RFC 2822.
@@ -233,7 +235,7 @@ def parsedate_to_datetime(data):
     if tz is None:
         return datetime.datetime(*dtuple[:6])
     return datetime.datetime(*dtuple[:6],
-            tzinfo=datetime.timezone(datetime.timedelta(seconds=tz)))
+                             tzinfo=datetime.timezone(datetime.timedelta(seconds=tz)))
 
 
 def parseaddr(addr):
@@ -252,7 +254,6 @@ def unquote(str):
         if str.startswith('<') and str.endswith('>'):
             return str[1:-1]
     return str
-
 
 
 # RFC2231-related functions - parameter encoding and decoding
@@ -280,7 +281,8 @@ def encode_rfc2231(s, charset=None, language=None):
 
 
 rfc2231_continuation = re.compile(r'^(?P<name>\w+)\*((?P<num>[0-9]+)\*?)?$',
-    re.ASCII)
+                                  re.ASCII)
+
 
 def decode_params(params):
     """Decode parameters list according to RFC 2231.
@@ -337,6 +339,7 @@ def decode_params(params):
             else:
                 new_params.append((name, '"%s"' % value))
     return new_params
+
 
 def collapse_rfc2231_value(value, errors='replace',
                            fallback_charset='us-ascii'):

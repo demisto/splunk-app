@@ -13,6 +13,7 @@ how this parsing engine works.
 # Local imports
 from . import token
 
+
 class ParseError(Exception):
     """Exception to signal the parser is stuck."""
 
@@ -23,6 +24,7 @@ class ParseError(Exception):
         self.type = type
         self.value = value
         self.context = context
+
 
 class Parser(object):
     """Parser engine.
@@ -108,7 +110,7 @@ class Parser(object):
         stackentry = (self.grammar.dfas[start], 0, newnode)
         self.stack = [stackentry]
         self.rootnode = None
-        self.used_names = set() # Aliased to self.rootnode.used_names in pop()
+        self.used_names = set()  # Aliased to self.rootnode.used_names in pop()
 
     def addtoken(self, type, value, context):
         """Add a token; return True iff this is the end of the program."""
@@ -145,7 +147,7 @@ class Parser(object):
                     if ilabel in itsfirst:
                         # Push a symbol
                         self.push(t, self.grammar.dfas[t], newstate, context)
-                        break # To continue the outer while loop
+                        break  # To continue the outer while loop
             else:
                 if (0, state) in arcs:
                     # An accepting state, pop it and try something else

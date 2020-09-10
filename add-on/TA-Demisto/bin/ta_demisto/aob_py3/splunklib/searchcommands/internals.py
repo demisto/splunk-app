@@ -346,6 +346,7 @@ class InputHeader(dict):
     """ Represents a Splunk input header as a collection of name/value pairs.
 
     """
+
     def __str__(self):
         return '\n'.join([name + ':' + value for name, value in six.iteritems(self)])
 
@@ -373,7 +374,8 @@ class InputHeader(dict):
                 # continuation of the current item
                 value += urllib.parse.unquote(line)
 
-        if name is not None: self[name] = value[:-1] if value[-1] == '\n' else value
+        if name is not None:
+            self[name] = value[:-1] if value[-1] == '\n' else value
 
 
 Message = namedtuple('Message', ('type', 'text'))

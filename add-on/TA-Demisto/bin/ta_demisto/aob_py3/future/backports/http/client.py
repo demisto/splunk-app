@@ -256,6 +256,7 @@ class HTTPMessage(email_message.Message):
                 lst.append(line)
         return lst
 
+
 def parse_headers(fp, _class=HTTPMessage):
     """Parses only RFC2822 headers from a file pointer.
 
@@ -282,6 +283,7 @@ def parse_headers(fp, _class=HTTPMessage):
 
 _strict_sentinel = object()
 
+
 class HTTPResponse(io.RawIOBase):
 
     # See RFC 2616 sec 19.6 and RFC 1945 sec 6 for details.
@@ -303,8 +305,8 @@ class HTTPResponse(io.RawIOBase):
         self.debuglevel = debuglevel
         if strict is not _strict_sentinel:
             warnings.warn("the 'strict' argument isn't supported anymore; "
-                "http.client now always assumes HTTP/1.x compliant servers.",
-                DeprecationWarning, 2)
+                          "http.client now always assumes HTTP/1.x compliant servers.",
+                          DeprecationWarning, 2)
         self._method = method
 
         # The HTTPResponse object is returned via urllib.  The clients
@@ -316,7 +318,7 @@ class HTTPResponse(io.RawIOBase):
         self.headers = self.msg = None
 
         # from the Status-Line of the response
-        self.version = _UNKNOWN # HTTP-Version
+        self.version = _UNKNOWN  # HTTP-Version
         self.status = _UNKNOWN  # Status-Code
         self.reason = _UNKNOWN  # Reason-Phrase
 
@@ -410,7 +412,7 @@ class HTTPResponse(io.RawIOBase):
         self.length = None
         length = self.headers.get("content-length")
 
-         # are we using the chunked-style of transfer encoding?
+        # are we using the chunked-style of transfer encoding?
         tr_enc = self.headers.get("transfer-encoding")
         if length and not self.chunked:
             try:
@@ -426,7 +428,7 @@ class HTTPResponse(io.RawIOBase):
         # does the body have a fixed length? (of zero)
         if (status == NO_CONTENT or status == NOT_MODIFIED or
             100 <= status < 200 or      # 1xx codes
-            self._method == "HEAD"):
+                self._method == "HEAD"):
             self.length = 0
 
         # if the connection remains open, and we aren't using chunked, and
@@ -434,7 +436,7 @@ class HTTPResponse(io.RawIOBase):
         # WILL close.
         if (not self.will_close and
             not self.chunked and
-            self.length is None):
+                self.length is None):
             self.will_close = True
 
     def _check_close(self):
@@ -473,7 +475,7 @@ class HTTPResponse(io.RawIOBase):
         fp.close()
 
     def close(self):
-        super().close() # set "closed" flag
+        super().close()  # set "closed" flag
         if self.fp:
             self._close_conn()
 
@@ -577,7 +579,7 @@ class HTTPResponse(io.RawIOBase):
             raise LineTooLong("chunk size")
         i = line.find(b";")
         if i >= 0:
-            line = line[:i] # strip chunk-extensions
+            line = line[:i]  # strip chunk-extensions
         try:
             return int(line, 16)
         except ValueError:
@@ -588,7 +590,7 @@ class HTTPResponse(io.RawIOBase):
 
     def _read_and_discard_trailer(self):
         # read and discard trailer up to the CRLF terminator
-        ### note: we shouldn't have any trailers!
+        # note: we shouldn't have any trailers!
         while True:
             line = self.fp.readline(_MAXLINE + 1)
             if len(line) > _MAXLINE:
@@ -739,6 +741,7 @@ class HTTPResponse(io.RawIOBase):
     def getcode(self):
         return self.status
 
+
 class HTTPConnection(object):
 
     _http_vsn = 11
@@ -753,8 +756,8 @@ class HTTPConnection(object):
                  timeout=socket._GLOBAL_DEFAULT_TIMEOUT, source_address=None):
         if strict is not _strict_sentinel:
             warnings.warn("the 'strict' argument isn't supported anymore; "
-                "http.client now always assumes HTTP/1.x compliant servers.",
-                DeprecationWarning, 2)
+                          "http.client now always assumes HTTP/1.x compliant servers.",
+                          DeprecationWarning, 2)
         self.timeout = timeout
         self.source_address = source_address
         self.sock = None
@@ -787,12 +790,12 @@ class HTTPConnection(object):
             j = host.rfind(']')         # ipv6 addresses have [...]
             if i > j:
                 try:
-                    port = int(host[i+1:])
+                    port = int(host[i + 1:])
                 except ValueError:
-                    if host[i+1:] == "": # http://foo.com:/ == http://foo.com/
+                    if host[i + 1:] == "":  # http://foo.com:/ == http://foo.com/
                         port = self.default_port
                     else:
-                        raise InvalidURL("nonnumeric port: '%s'" % host[i+1:])
+                        raise InvalidURL("nonnumeric port: '%s'" % host[i + 1:])
                 host = host[:i]
             else:
                 port = self.default_port
@@ -834,7 +837,7 @@ class HTTPConnection(object):
 
     def connect(self):
         """Connect to the host and port specified in __init__."""
-        self.sock = socket_create_connection((self.host,self.port),
+        self.sock = socket_create_connection((self.host, self.port),
                                              self.timeout, self.source_address)
         if self._tunnel_host:
             self._tunnel()
@@ -940,7 +943,6 @@ class HTTPConnection(object):
         # if a prior response has been completed, then forget about it.
         if self.__response and self.__response.isclosed():
             self.__response = None
-
 
         # in certain cases, we cannot issue another request on this connection.
         # this occurs when:
@@ -1094,7 +1096,8 @@ class HTTPConnection(object):
                 thelen = str(os.fstat(body.fileno()).st_size)
             except (AttributeError, OSError):
                 # Don't send a length if this failed
-                if self.debuglevel > 0: print("Cannot stat!!")
+                if self.debuglevel > 0:
+                    print("Cannot stat!!")
 
         if thelen is not None:
             self.putheader('Content-Length', thelen)
@@ -1175,6 +1178,7 @@ class HTTPConnection(object):
 
         return response
 
+
 try:
     import ssl
     from ssl import SSLContext
@@ -1191,10 +1195,16 @@ else:
         def __init__(self, host, port=None, key_file=None, cert_file=None,
                      strict=_strict_sentinel, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                      source_address=None, **_3to2kwargs):
-            if 'check_hostname' in _3to2kwargs: check_hostname = _3to2kwargs['check_hostname']; del _3to2kwargs['check_hostname']
-            else: check_hostname = None
-            if 'context' in _3to2kwargs: context = _3to2kwargs['context']; del _3to2kwargs['context']
-            else: context = None
+            if 'check_hostname' in _3to2kwargs:
+                check_hostname = _3to2kwargs['check_hostname']
+                del _3to2kwargs['check_hostname']
+            else:
+                check_hostname = None
+            if 'context' in _3to2kwargs:
+                context = _3to2kwargs['context']
+                del _3to2kwargs['context']
+            else:
+                context = None
             super(HTTPSConnection, self).__init__(host, port, strict, timeout,
                                                   source_address)
             self.key_file = key_file
@@ -1237,7 +1247,6 @@ else:
 
     __all__.append("HTTPSConnection")
 
-
     # ######################################
     # # We use the old HTTPSConnection class from Py2.7, because ssl.SSLContext
     # # doesn't exist in the Py2.7 stdlib
@@ -1273,48 +1282,61 @@ class HTTPException(Exception):
     # or define self.args.  Otherwise, str() will fail.
     pass
 
+
 class NotConnected(HTTPException):
     pass
 
+
 class InvalidURL(HTTPException):
     pass
+
 
 class UnknownProtocol(HTTPException):
     def __init__(self, version):
         self.args = version,
         self.version = version
 
+
 class UnknownTransferEncoding(HTTPException):
     pass
 
+
 class UnimplementedFileMode(HTTPException):
     pass
+
 
 class IncompleteRead(HTTPException):
     def __init__(self, partial, expected=None):
         self.args = partial,
         self.partial = partial
         self.expected = expected
+
     def __repr__(self):
         if self.expected is not None:
             e = ', %i more expected' % self.expected
         else:
             e = ''
         return 'IncompleteRead(%i bytes read%s)' % (len(self.partial), e)
+
     def __str__(self):
         return repr(self)
+
 
 class ImproperConnectionState(HTTPException):
     pass
 
+
 class CannotSendRequest(ImproperConnectionState):
     pass
+
 
 class CannotSendHeader(ImproperConnectionState):
     pass
 
+
 class ResponseNotReady(ImproperConnectionState):
     pass
+
 
 class BadStatusLine(HTTPException):
     def __init__(self, line):
@@ -1323,10 +1345,12 @@ class BadStatusLine(HTTPException):
         self.args = line,
         self.line = line
 
+
 class LineTooLong(HTTPException):
     def __init__(self, line_type):
         HTTPException.__init__(self, "got more than %d bytes when reading %s"
                                      % (_MAXLINE, line_type))
+
 
 # for backwards compatibility
 error = HTTPException

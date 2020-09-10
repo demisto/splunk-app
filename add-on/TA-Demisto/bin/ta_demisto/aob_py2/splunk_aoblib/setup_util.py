@@ -139,9 +139,9 @@ class Setup_Util(object):
                 if s_k == PROXY_SETTINGS:
                     proxy_enabled = s_v.get(PROXY_ENABLE_KEY)
                     proxy_rdns = s_v.get(PROXY_RDNS_KEY)
-                    if type(proxy_enabled) != bool:
+                    if not isinstance(proxy_enabled, bool):
                         s_v[PROXY_ENABLE_KEY] = utils.is_true(proxy_enabled)
-                    if type(proxy_rdns) != bool:
+                    if not isinstance(proxy_rdns, bool):
                         s_v[PROXY_RDNS_KEY] = utils.is_true(proxy_rdns)
                     self.__cached_global_settings[PROXY_SETTINGS] = s_v
                 elif s_k == LOG_SETTINGS:
@@ -290,7 +290,6 @@ class Setup_Util(object):
             raise Exception("Type of this customized setting is corrupted. Value: {}, type: {}"
                             .format(value, field_type))
 
-
     '''
     # the following methods is used by AoB internally
     # user should not use this
@@ -339,6 +338,7 @@ class Setup_Util(object):
   ]
 }
     '''
+
     def get_ucc_log_setting(self):
         return {UCC_LOGGING: self._parse_conf(LOG_SETTINGS)}
 
@@ -348,7 +348,6 @@ class Setup_Util(object):
         return {
             UCC_PROXY: p
         }
-
 
     def get_ucc_customized_setting(self):
         customized_settings = self._parse_conf(CUSTOMIZED_SETTINGS)

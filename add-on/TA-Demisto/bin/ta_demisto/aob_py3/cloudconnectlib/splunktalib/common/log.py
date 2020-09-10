@@ -39,6 +39,7 @@ def check_add_stderr_handler():
     env_var = os.environ.get('splunk.cloudconnect.settings.logging.type')
     return env_var and env_var == "stderr"
 
+
 @singleton
 class Logs(object):
 
@@ -87,7 +88,7 @@ class Logs(object):
             if not handler_exists:
                 file_handler = handlers.RotatingFileHandler(
                     logfile, mode="a", maxBytes=maxBytes, backupCount=backupCount)
-                formatter = logging.Formatter(__LOG_FORMAT__ )
+                formatter = logging.Formatter(__LOG_FORMAT__)
                 file_handler.setFormatter(formatter)
                 logger.addHandler(file_handler)
                 logger.setLevel(level)
@@ -124,6 +125,7 @@ class Logs(object):
         else:
             name = "{}.log" .format(name)
         return name
+
 
 # Global logger
 logger = Logs().get_logger("util")

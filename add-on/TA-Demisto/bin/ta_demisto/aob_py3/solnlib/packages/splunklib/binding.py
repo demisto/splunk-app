@@ -64,13 +64,14 @@ DEFAULT_HOST = "localhost"
 DEFAULT_PORT = "8089"
 DEFAULT_SCHEME = "https"
 
+
 def _log_duration(f):
     @wraps(f)
     def new_f(*args, **kwargs):
         start_time = datetime.now()
         val = f(*args, **kwargs)
         end_time = datetime.now()
-        logging.debug("Operation took %s", end_time-start_time)
+        logging.debug("Operation took %s", end_time - start_time)
         return val
     return new_f
 
@@ -115,6 +116,8 @@ def _make_cookie_header(cookies):
     return "; ".join("%s=%s" % (key, value) for key, value in cookies)
 
 # Singleton values to eschew None
+
+
 class _NoAuthenticationToken(object):
     """The value stored in a :class:`Context` or :class:`splunklib.client.Service`
     class that is not logged in.
@@ -163,6 +166,7 @@ class UrlEncoded(str):
         UrlEncoded('ab c') + 'de f' == UrlEncoded('ab cde f')
         'ab c' + UrlEncoded('de f') == UrlEncoded('ab cde f')
     """
+
     def __new__(self, val='', skip_encode=False, encode_slash=False):
         if isinstance(val, UrlEncoded):
             # Don't urllib.quote something already URL encoded.
@@ -206,8 +210,10 @@ class UrlEncoded(str):
         ``TypeError``.
         """
         raise TypeError("Cannot interpolate into a UrlEncoded object.")
+
     def __repr__(self):
         return "UrlEncoded(%s)" % repr(urllib.parse.unquote(str(self)))
+
 
 @contextmanager
 def _handle_auth_error(msg):
@@ -234,6 +240,7 @@ def _handle_auth_error(msg):
             raise AuthenticationError(msg, he)
         else:
             raise
+
 
 def _authentication(request_fun):
     """Decorator to handle autologin and authentication errors.
@@ -352,6 +359,8 @@ def _authority(scheme=DEFAULT_SCHEME, host=DEFAULT_HOST, port=DEFAULT_PORT):
     return UrlEncoded("%s://%s:%s" % (scheme, host, port), skip_encode=True)
 
 # kwargs: sharing, owner, app
+
+
 def namespace(sharing=None, owner=None, app=None, **kwargs):
     """This function constructs a Splunk namespace.
 
@@ -404,7 +413,7 @@ def namespace(sharing=None, owner=None, app=None, **kwargs):
         n = binding.namespace(sharing="global", app="search")
     """
     if sharing in ["system"]:
-        return record({'sharing': sharing, 'owner': "nobody", 'app': "system" })
+        return record({'sharing': sharing, 'owner': "nobody", 'app': "system"})
     if sharing in ["global", "app"]:
         return record({'sharing': sharing, 'owner': "nobody", 'app': app})
     if sharing in ["user", None]:
@@ -466,11 +475,12 @@ class Context(object):
         # Or if you already have a valid cookie
         c = binding.Context(cookie="splunkd_8089=...")
     """
+
     def __init__(self, handler=None, **kwargs):
         self.http = HttpLib(handler, kwargs.get("verify", False), key_file=kwargs.get("key_file"),
                             cert_file=kwargs.get("cert_file"))  # Default to False for backward compat
         self.token = kwargs.get("token", _NoAuthenticationToken)
-        if self.token is None: # In case someone explicitly passes token=None
+        if self.token is None:  # In case someone explicitly passes token=None
             self.token = _NoAuthenticationToken
         self.scheme = kwargs.get("scheme", DEFAULT_SCHEME)
         self.host = kwargs.get("host", DEFAULT_HOST)
@@ -819,8 +829,8 @@ class Context(object):
                       method, path, str(all_headers), repr(body))
         response = self.http.request(path,
                                      {'method': method,
-                                     'headers': all_headers,
-                                     'body': body})
+                                      'headers': all_headers,
+                                      'body': body})
         return response
 
     def login(self):
@@ -869,7 +879,7 @@ class Context(object):
                 username=self.username,
                 password=self.password,
                 headers=self.additional_headers,
-                cookie="1") # In Splunk 6.2+, passing "cookie=1" will return the "set-cookie" header
+                cookie="1")  # In Splunk 6.2+, passing "cookie=1" will return the "set-cookie" header
 
             body = response.body.read()
             session = XML(body).findtext("./sessionKey")
@@ -888,7 +898,7 @@ class Context(object):
         return self
 
     def _abspath(self, path_segment,
-                owner=None, app=None, sharing=None):
+                 owner=None, app=None, sharing=None):
         """Qualifies *path_segment* into an absolute path for a URL.
 
         If *path_segment* is already absolute, returns it unchanged.
@@ -999,8 +1009,11 @@ def connect(**kwargs):
 # Note: the error response schema supports multiple messages but we only
 # return the first, although we do return the body so that an exception
 # handler that wants to read multiple messages can do so.
+
+
 class HTTPError(Exception):
     """This exception is raised for HTTP responses that return an error."""
+
     def __init__(self, response, _message=None):
         status = response.status
         reason = response.reason
@@ -1018,6 +1031,7 @@ class HTTPError(Exception):
         self.body = body
         self._response = response
 
+
 class AuthenticationError(HTTPError):
     """Raised when a login request to Splunk fails.
 
@@ -1025,6 +1039,7 @@ class AuthenticationError(HTTPError):
     in a call to :meth:`Context.login` or :meth:`splunklib.client.Service.login`,
     this exception is raised.
     """
+
     def __init__(self, message, cause):
         # Put the body back in the response so that HTTPError's constructor can
         # read it again.
@@ -1057,6 +1072,8 @@ class AuthenticationError(HTTPError):
 # a list value as a sequence of assignemnts to the corresponding arg name,
 # for example an argument such as 'foo=[1,2,3]' will be encoded as
 # 'foo=1&foo=2&foo=3'.
+
+
 def _encode(**kwargs):
     items = []
     for key, value in six.iteritems(kwargs):
@@ -1067,18 +1084,24 @@ def _encode(**kwargs):
     return urllib.parse.urlencode(items)
 
 # Crack the given url into (scheme, host, port, path)
+
+
 def _spliturl(url):
     parsed_url = urllib.parse.urlparse(url)
     host = parsed_url.hostname
     port = parsed_url.port
     path = '?'.join((parsed_url.path, parsed_url.query)) if parsed_url.query else parsed_url.path
     # Strip brackets if its an IPv6 address
-    if host.startswith('[') and host.endswith(']'): host = host[1:-1]
-    if port is None: port = DEFAULT_PORT
+    if host.startswith('[') and host.endswith(']'):
+        host = host[1:-1]
+    if port is None:
+        port = DEFAULT_PORT
     return parsed_url.scheme, host, port, path
 
 # Given an HTTP request handler, this wrapper objects provides a related
 # family of convenience methods built using that handler.
+
+
 class HttpLib(object):
     """A set of convenient methods for making HTTP calls.
 
@@ -1121,6 +1144,7 @@ class HttpLib(object):
 
     If using the default handler, SSL verification can be disabled by passing verify=False.
     """
+
     def __init__(self, custom_handler=None, verify=False, key_file=None, cert_file=None):
         if custom_handler is None:
             self.handler = handler(verify=verify, key_file=key_file, cert_file=cert_file)
@@ -1145,7 +1169,8 @@ class HttpLib(object):
             its structure).
         :rtype: ``dict``
         """
-        if headers is None: headers = []
+        if headers is None:
+            headers = []
         if kwargs:
             # url is already a UrlEncoded. We have to manually declare
             # the query to be encoded or it will get automatically URL
@@ -1174,13 +1199,14 @@ class HttpLib(object):
             its structure).
         :rtype: ``dict``
         """
-        if headers is None: headers = []
+        if headers is None:
+            headers = []
         if kwargs:
             # url is already a UrlEncoded. We have to manually declare
             # the query to be encoded or it will get automatically URL
             # encoded by being appended to url.
             url = url + UrlEncoded('?' + _encode(**kwargs), skip_encode=True)
-        return self.request(url, { 'method': "GET", 'headers': headers })
+        return self.request(url, {'method': "GET", 'headers': headers})
 
     def post(self, url, headers=None, **kwargs):
         """Sends a POST request to a URL.
@@ -1200,7 +1226,8 @@ class HttpLib(object):
             its structure).
         :rtype: ``dict``
         """
-        if headers is None: headers = []
+        if headers is None:
+            headers = []
 
         # We handle GET-style arguments and an unstructured body. This is here
         # to support the receivers/stream endpoint.
@@ -1268,6 +1295,7 @@ class ResponseReader(io.RawIOBase):
     # For testing, you can use a StringIO as the argument to
     # ``ResponseReader`` instead of an ``httplib.HTTPResponse``. It
     # will work equally well.
+
     def __init__(self, response, connection=None):
         self._response = response
         self._connection = connection
@@ -1300,7 +1328,7 @@ class ResponseReader(io.RawIOBase):
             self._connection.close()
         self._response.close()
 
-    def read(self, size = None):
+    def read(self, size=None):
         """Reads a given number of characters from the response.
 
         :param size: The number of characters to read, or "None" to read the
@@ -1349,15 +1377,18 @@ def handler(key_file=None, cert_file=None, timeout=None, verify=False):
 
     def connect(scheme, host, port):
         kwargs = {}
-        if timeout is not None: kwargs['timeout'] = timeout
+        if timeout is not None:
+            kwargs['timeout'] = timeout
         if scheme == "http":
             return six.moves.http_client.HTTPConnection(host, port, **kwargs)
         if scheme == "https":
-            if key_file is not None: kwargs['key_file'] = key_file
-            if cert_file is not None: kwargs['cert_file'] = cert_file
+            if key_file is not None:
+                kwargs['key_file'] = key_file
+            if cert_file is not None:
+                kwargs['cert_file'] = cert_file
 
             # If running Python 2.7.9+, disable SSL certificate validation
-            if (sys.version_info >= (2,7,9) and key_file is None and cert_file is None) and not verify:
+            if (sys.version_info >= (2, 7, 9) and key_file is None and cert_file is None) and not verify:
                 kwargs['context'] = ssl._create_unverified_context()
             return six.moves.http_client.HTTPSConnection(host, port, **kwargs)
         raise ValueError("unsupported scheme: %s" % scheme)
@@ -1371,7 +1402,7 @@ def handler(key_file=None, cert_file=None, timeout=None, verify=False):
             "User-Agent": "splunk-sdk-python/1.6.6",
             "Accept": "*/*",
             "Connection": "Close",
-        } # defaults
+        }  # defaults
         for key, value in message["headers"]:
             head[key] = value
         method = message.get("method", "GET")

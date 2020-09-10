@@ -1,15 +1,14 @@
+import urllib.error
+import urllib.parse
+import urllib.request
+from httplib2 import (socks, ProxyInfo, Http)
+from .common import log as log
+from .common import util as scu
+from traceback import format_exc
+import json
+from builtins import range
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
-import urllib.request, urllib.parse, urllib.error
-import json
-from traceback import format_exc
-
-from .common import util as scu
-from .common import log as log
-
-
-from httplib2 import (socks, ProxyInfo, Http)
 
 
 def splunkd_request(splunkd_uri, session_key, method="GET",

@@ -195,7 +195,7 @@ def main(args=None):
                             options.processes)
             except refactor.MultiprocessingUnsupported:
                 assert options.processes > 1
-                print("Sorry, -j isn't " \
+                print("Sorry, -j isn't "
                       "supported on this platform.", file=sys.stderr)
                 return 1
         rt.summarize()

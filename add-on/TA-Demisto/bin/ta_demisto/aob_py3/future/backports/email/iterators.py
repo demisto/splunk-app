@@ -13,7 +13,7 @@ __all__ = [
     'typed_subpart_iterator',
     'walk',
     # Do not include _structure() since it's part of the debugging API.
-    ]
+]
 
 import sys
 from io import StringIO
@@ -71,4 +71,4 @@ def _structure(msg, fp=None, level=0, include_default=False):
         print(file=fp)
     if msg.is_multipart():
         for subpart in msg.get_payload():
-            _structure(subpart, fp, level+1, include_default)
+            _structure(subpart, fp, level + 1, include_default)

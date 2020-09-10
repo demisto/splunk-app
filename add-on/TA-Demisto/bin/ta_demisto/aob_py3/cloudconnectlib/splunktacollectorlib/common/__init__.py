@@ -49,4 +49,3 @@ class UCCException(Exception):
     """
 
     pass
-

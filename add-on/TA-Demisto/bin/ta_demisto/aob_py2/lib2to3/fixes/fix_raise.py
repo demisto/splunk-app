@@ -28,6 +28,7 @@ from ..pgen2 import token
 from .. import fixer_base
 from ..fixer_util import Name, Call, Attr, ArgList, is_tuple
 
+
 class FixRaise(fixer_base.BaseFix):
 
     BM_compatible = True

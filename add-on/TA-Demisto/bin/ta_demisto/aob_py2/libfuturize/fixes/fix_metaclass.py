@@ -72,8 +72,8 @@ def fixup_parse_tree(cls_node):
 
     # move everything into a suite node
     suite = Node(syms.suite, [])
-    while cls_node.children[i+1:]:
-        move_node = cls_node.children[i+1]
+    while cls_node.children[i + 1:]:
+        move_node = cls_node.children[i + 1]
         suite.append_child(move_node.clone())
         move_node.remove()
     cls_node.append_child(suite)
@@ -86,12 +86,12 @@ def fixup_simple_stmt(parent, i, stmt_node):
         everything efter the semi-colon into its own simple_stmt node
     """
     for semi_ind, node in enumerate(stmt_node.children):
-        if node.type == token.SEMI: # *sigh*
+        if node.type == token.SEMI:  # *sigh*
             break
     else:
         return
 
-    node.remove() # kill the semicolon
+    node.remove()  # kill the semicolon
     new_expr = Node(syms.expr_stmt, [])
     new_stmt = Node(syms.simple_stmt, [new_expr])
     while stmt_node.children[semi_ind:]:
@@ -173,7 +173,7 @@ class FixMetaclass(fixer_base.BaseFix):
             last_metaclass = stmt
             stmt.remove()
 
-        text_type = node.children[0].type # always Leaf(nnn, 'class')
+        text_type = node.children[0].type  # always Leaf(nnn, 'class')
 
         # figure out what kind of classdef we have
         if len(node.children) == 7:
@@ -254,8 +254,8 @@ class FixMetaclass(fixer_base.BaseFix):
             node.append_child(Leaf(token.NEWLINE, u'\n'))
 
         elif len(suite.children) > 1 and \
-                 (suite.children[-2].type == token.INDENT and
-                  suite.children[-1].type == token.DEDENT):
+            (suite.children[-2].type == token.INDENT and
+             suite.children[-1].type == token.DEDENT):
             # there was only one line in the class body and it was __metaclass__
             pass_leaf = Leaf(text_type, u'pass')
             suite.insert_child(-1, pass_leaf)

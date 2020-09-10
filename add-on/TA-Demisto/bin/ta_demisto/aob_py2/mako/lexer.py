@@ -92,7 +92,7 @@ class Lexer(object):
             else:
                 self.match_position = end
             self.matched_lineno = self.lineno
-            lines = re.findall(r"\n", self.text[mp : self.match_position])
+            lines = re.findall(r"\n", self.text[mp: self.match_position])
             cp = mp - 1
             while cp >= 0 and cp < self.textlength and self.text[cp] != "\n":
                 cp -= 1
@@ -126,7 +126,7 @@ class Lexer(object):
             ):
                 return (
                     self.text[
-                        startpos : self.match_position - len(match.group(1))
+                        startpos: self.match_position - len(match.group(1))
                     ],
                     match.group(1),
                 )
@@ -205,7 +205,7 @@ class Lexer(object):
             return encoding, text
 
         if text.startswith(codecs.BOM_UTF8):
-            text = text[len(codecs.BOM_UTF8) :]
+            text = text[len(codecs.BOM_UTF8):]
             parsed_encoding = "utf-8"
             m = self._coding_re.match(text.decode("utf-8", "ignore"))
             if m is not None and m.group(1) != "utf-8":

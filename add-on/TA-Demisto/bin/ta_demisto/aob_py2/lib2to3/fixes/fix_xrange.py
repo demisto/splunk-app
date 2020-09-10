@@ -41,7 +41,7 @@ class FixXrange(fixer_base.BaseFix):
 
     def transform_range(self, node, results):
         if (id(node) not in self.transformed_xranges and
-            not self.in_special_context(node)):
+                not self.in_special_context(node)):
             range_call = Call(Name(u"range"), [results["args"].clone()])
             # Encase the range call in list().
             list_call = Call(Name(u"list"), [range_call],
@@ -65,8 +65,8 @@ class FixXrange(fixer_base.BaseFix):
             return False
         results = {}
         if (node.parent.parent is not None and
-               self.p1.match(node.parent.parent, results) and
-               results["node"] is node):
+            self.p1.match(node.parent.parent, results) and
+                results["node"] is node):
             # list(d.keys()) -> list(d.keys()), etc.
             return results["func"].value in consuming_calls
         # for ... in d.iterkeys() -> for ... in d.keys(), etc.

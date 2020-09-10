@@ -44,7 +44,7 @@ if not utils.PY3:
                'ascii', 'chr', 'hex', 'input', 'next', 'oct', 'open', 'pow',
                'round', 'super',
                'bytes', 'dict', 'int', 'list', 'object', 'range', 'str',
-              ]
+               ]
 
 else:
     # No namespace pollution on Py3

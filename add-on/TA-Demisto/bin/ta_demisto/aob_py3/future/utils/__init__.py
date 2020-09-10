@@ -133,6 +133,7 @@ def with_metaclass(meta, *bases):
     class metaclass(meta):
         __call__ = type.__call__
         __init__ = type.__init__
+
         def __new__(cls, name, this_bases, d):
             if this_bases is None:
                 return type.__new__(cls, name, (), d)
@@ -144,11 +145,13 @@ def with_metaclass(meta, *bases):
 if PY3:
     def bchr(s):
         return bytes([s])
+
     def bstr(s):
         if isinstance(s, str):
             return bytes(s, 'latin-1')
         else:
             return bytes(s)
+
     def bord(s):
         return s
 
@@ -162,8 +165,10 @@ else:
     # Python 2
     def bchr(s):
         return chr(s)
+
     def bstr(s):
         return str(s)
+
     def bord(s):
         return ord(s)
 
@@ -467,7 +472,7 @@ def raise_with_traceback(exc, traceback=Ellipsis):
 
 
 raise_with_traceback.__doc__ = (
-"""Raise exception with existing traceback.
+    """Raise exception with existing traceback.
 If traceback is not passed, uses sys.exc_info() to get traceback."""
 )
 
@@ -499,10 +504,11 @@ def implements_iterator(cls):
         del cls.__next__
         return cls
 
+
 if PY3:
-    get_next = lambda x: x.next
+    def get_next(x): return x.next
 else:
-    get_next = lambda x: x.__next__
+    def get_next(x): return x.__next__
 
 
 def encode_filename(filename):
@@ -523,6 +529,7 @@ def is_new_style(cls):
     """
     return hasattr(cls, '__class__') and ('__dict__' in dir(cls)
                                           or hasattr(cls, '__slots__'))
+
 
 # The native platform string and bytes types. Useful because ``str`` and
 # ``bytes`` are redefined on Py2 by ``from future.builtins import *``.
@@ -560,7 +567,7 @@ def isnewbytes(obj):
     # TODO: generalize this so that it works with subclasses of newbytes
     # Import is here to avoid circular imports:
     from future.types.newbytes import newbytes
-    return type(obj) == newbytes
+    return isinstance(obj, newbytes)
 
 
 def isint(obj):
@@ -675,6 +682,7 @@ def as_native_str(encoding='utf-8'):
             return wrapper
         return encoder
 
+
 # listvalues and listitems definitions from Nick Coghlan's (withdrawn)
 # PEP 496:
 try:
@@ -683,12 +691,14 @@ except AttributeError:
     # Python 3
     def listvalues(d):
         return list(d.values())
+
     def listitems(d):
         return list(d.items())
 else:
     # Python 2
     def listvalues(d):
         return d.values()
+
     def listitems(d):
         return d.items()
 
@@ -738,4 +748,4 @@ __all__ = ['PY2', 'PY26', 'PY3', 'PYPY',
            'raise_with_traceback', 'reraise', 'text_to_native_str',
            'tobytes', 'viewitems', 'viewkeys', 'viewvalues',
            'with_metaclass'
-          ]
+           ]

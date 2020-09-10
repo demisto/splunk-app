@@ -34,8 +34,9 @@ from ..fixer_util import Call, Comma, Name, Node, BlankLine, syms
 CMP = "(n='!=' | '==' | 'is' | n=comp_op< 'is' 'not' >)"
 TYPE = "power< 'type' trailer< '(' x=any ')' > >"
 
+
 class FixIdioms(fixer_base.BaseFix):
-    explicit = True # The user must ask for this fixer
+    explicit = True  # The user must ask for this fixer
 
     PATTERN = r"""
         isinstance=comparison< %s %s T=any >
@@ -98,8 +99,8 @@ class FixIdioms(fixer_base.BaseFix):
             raise RuntimeError("Invalid match")
 
     def transform_isinstance(self, node, results):
-        x = results["x"].clone() # The thing inside of type()
-        T = results["T"].clone() # The type being compared against
+        x = results["x"].clone()  # The thing inside of type()
+        T = results["T"].clone()  # The type being compared against
         x.prefix = ""
         T.prefix = " "
         test = Call(Name("isinstance"), [x, Comma(), T])

@@ -18,6 +18,8 @@ from io import StringIO
 HUGE = 0x7FFFFFFF  # maximum repeat count, default max
 
 _type_reprs = {}
+
+
 def type_repr(type_num):
     global _type_reprs
     if not _type_reprs:
@@ -25,8 +27,10 @@ def type_repr(type_num):
         # printing tokens is possible but not as useful
         # from .pgen2 import token // token.__dict__.items():
         for name, val in python_symbols.__dict__.items():
-            if type(val) == int: _type_reprs[val] = name
+            if isinstance(val, int):
+                _type_reprs[val] = name
     return _type_reprs.setdefault(type_num, type_num)
+
 
 class Base(object):
 
@@ -61,7 +65,7 @@ class Base(object):
             return NotImplemented
         return self._eq(other)
 
-    __hash__ = None # For Py3 compatibility.
+    __hash__ = None  # For Py3 compatibility.
 
     def _eq(self, other):
         """
@@ -161,7 +165,7 @@ class Base(object):
         for i, child in enumerate(self.parent.children):
             if child is self:
                 try:
-                    return self.parent.children[i+1]
+                    return self.parent.children[i + 1]
                 except IndexError:
                     return None
 
@@ -179,7 +183,7 @@ class Base(object):
             if child is self:
                 if i == 0:
                     return None
-                return self.parent.children[i-1]
+                return self.parent.children[i - 1]
 
     def leaves(self):
         for child in self.children:
@@ -204,11 +208,12 @@ class Base(object):
         def __str__(self):
             return str(self).encode("ascii")
 
+
 class Node(Base):
 
     """Concrete implementation for interior nodes."""
 
-    def __init__(self,type, children,
+    def __init__(self, type, children,
                  context=None,
                  prefix=None,
                  fixers_applied=None):
@@ -391,6 +396,7 @@ class Leaf(Base):
     def prefix(self, prefix):
         self.changed()
         self._prefix = prefix
+
 
 def convert(gr, raw_node):
     """
@@ -645,7 +651,7 @@ class WildcardPattern(BasePattern):
             # Check sanity of alternatives
             assert len(content), repr(content)  # Can't have zero alternatives
             for alt in content:
-                assert len(alt), repr(alt) # Can have empty alternatives
+                assert len(alt), repr(alt)  # Can have empty alternatives
         self.content = content
         self.min = min
         self.max = max
@@ -655,18 +661,18 @@ class WildcardPattern(BasePattern):
         """Optimize certain stacked wildcard patterns."""
         subpattern = None
         if (self.content is not None and
-            len(self.content) == 1 and len(self.content[0]) == 1):
+                len(self.content) == 1 and len(self.content[0]) == 1):
             subpattern = self.content[0][0]
         if self.min == 1 and self.max == 1:
             if self.content is None:
                 return NodePattern(name=self.name)
-            if subpattern is not None and  self.name == subpattern.name:
+            if subpattern is not None and self.name == subpattern.name:
                 return subpattern.optimize()
         if (self.min <= 1 and isinstance(subpattern, WildcardPattern) and
-            subpattern.min <= 1 and self.name == subpattern.name):
+                subpattern.min <= 1 and self.name == subpattern.name):
             return WildcardPattern(subpattern.content,
-                                   self.min*subpattern.min,
-                                   self.max*subpattern.max,
+                                   self.min * subpattern.min,
+                                   self.max * subpattern.max,
                                    subpattern.name)
         return self
 
@@ -783,7 +789,7 @@ class WildcardPattern(BasePattern):
         if count < self.max:
             for alt in self.content:
                 for c0, r0 in generate_matches(alt, nodes):
-                    for c1, r1 in self._recursive_matches(nodes[c0:], count+1):
+                    for c1, r1 in self._recursive_matches(nodes[c0:], count + 1):
                         r = {}
                         r.update(r0)
                         r.update(r1)

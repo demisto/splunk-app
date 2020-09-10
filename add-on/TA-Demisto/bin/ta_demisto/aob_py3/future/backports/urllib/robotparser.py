@@ -21,6 +21,7 @@ urllib.request = _request
 
 __all__ = ["RobotFileParser"]
 
+
 class RobotFileParser(object):
     """ This class provides a set of methods to read, parse and answer
     questions about a single robots.txt file.
@@ -129,7 +130,6 @@ class RobotFileParser(object):
         if state == 2:
             self._add_entry(entry)
 
-
     def can_fetch(self, useragent, url):
         """using the parsed robots.txt decide if useragent can fetch url"""
         if self.disallow_all:
@@ -139,8 +139,8 @@ class RobotFileParser(object):
         # search for given user agent matches
         # the first match counts
         parsed_url = urllib.parse.urlparse(urllib.parse.unquote(url))
-        url = urllib.parse.urlunparse(('','',parsed_url.path,
-            parsed_url.params,parsed_url.query, parsed_url.fragment))
+        url = urllib.parse.urlunparse(('', '', parsed_url.path,
+                                       parsed_url.params, parsed_url.query, parsed_url.fragment))
         url = urllib.parse.quote(url)
         if not url:
             url = "/"
@@ -160,6 +160,7 @@ class RobotFileParser(object):
 class RuleLine(object):
     """A rule line is a single "Allow:" (allowance==True) or "Disallow:"
        (allowance==False) followed by a path."""
+
     def __init__(self, path, allowance):
         if path == '' and not allowance:
             # an empty value means allow all
@@ -176,6 +177,7 @@ class RuleLine(object):
 
 class Entry(object):
     """An entry has one or more user-agents and zero or more rulelines"""
+
     def __init__(self):
         self.useragents = []
         self.rulelines = []

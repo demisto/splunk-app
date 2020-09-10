@@ -284,7 +284,7 @@ class TimerQueue(object):
 
     def _check_and_execute(self):
         wakeup_queue = self._wakeup_queue
-        while 1:
+        while True:
             (next_expired_time, expired_timers) = self._get_expired_timers()
             for timer in expired_timers:
                 try:

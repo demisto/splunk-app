@@ -22,6 +22,7 @@ def _valid_init_args(type_):
             break
     return args
 
+
 def _filter_kwargs(valid_args, kwargs):
     return dict((k, v) for k, v in kwargs.items() if k in valid_args)
 

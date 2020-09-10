@@ -34,7 +34,7 @@ from future.backports.email._policybase import compat32
 
 NLCRE = re.compile('\r\n|\r|\n')
 NLCRE_bol = re.compile('(\r\n|\r|\n)')
-NLCRE_eol = re.compile('(\r\n|\r|\n)\Z')
+NLCRE_eol = re.compile(r'(\r\n|\r|\n)\Z')
 NLCRE_crack = re.compile('(\r\n|\r|\n)')
 # RFC 2822 $3.6.8 Optional fields.  ftext is %d33-57 / %d59-126, Any character
 # except controls, SP, and ":".
@@ -54,6 +54,7 @@ class BufferedSubFile(object):
     (i.e. empty string) is returned instead.  This lets the parser adhere to a
     simple abstraction -- it parses until EOF closes the current message.
     """
+
     def __init__(self):
         # The last partial line pushed into this object.
         self._partial = ''
@@ -110,16 +111,16 @@ class BufferedSubFile(object):
         # data after the final RE.  In the case of a NL/CR terminated string,
         # this is the empty string.
         self._partial = parts.pop()
-        #GAN 29Mar09  bugs 1555570, 1721862  Confusion at 8K boundary ending with \r:
+        # GAN 29Mar09  bugs 1555570, 1721862  Confusion at 8K boundary ending with \r:
         # is there a \n to follow later?
         if not self._partial and parts and parts[-1].endswith('\r'):
-            self._partial = parts.pop(-2)+parts.pop()
+            self._partial = parts.pop(-2) + parts.pop()
         # parts is a list of strings, alternating between the line contents
         # and the eol character(s).  Gather up a list of lines after
         # re-attaching the newlines.
         lines = []
         for i in range(len(parts) // 2):
-            lines.append(parts[i*2] + parts[i*2+1])
+            lines.append(parts[i * 2] + parts[i * 2 + 1])
         self.pushlines(lines)
 
     def pushlines(self, lines):
@@ -140,8 +141,11 @@ class FeedParser(object):
     """A feed-style parser of email."""
 
     def __init__(self, _factory=message.Message, **_3to2kwargs):
-        if 'policy' in _3to2kwargs: policy = _3to2kwargs['policy']; del _3to2kwargs['policy']
-        else: policy = compat32
+        if 'policy' in _3to2kwargs:
+            policy = _3to2kwargs['policy']
+            del _3to2kwargs['policy']
+        else:
+            policy = compat32
         """_factory is called with no arguments to create a new message obj
 
         The policy keyword specifies a policy object that controls a number of
@@ -190,7 +194,7 @@ class FeedParser(object):
         assert not self._msgstack
         # Look for final set of defects
         if root.get_content_maintype() == 'multipart' \
-               and not root.is_multipart():
+                and not root.is_multipart():
             defect = errors.MultipartInvariantViolationDefect()
             self.policy.handle_defect(root, defect)
         return root
@@ -510,7 +514,7 @@ class FeedParser(object):
             # There will always be a colon, because if there wasn't the part of
             # the parser that calls us would have started parsing the body.
             i = line.find(':')
-            assert i>0, "_parse_headers fed line with no : and no leading WS"
+            assert i > 0, "_parse_headers fed line with no : and no leading WS"
             lastheader = line[:i]
             lastvalue = [line]
         # Done with all the lines, so handle the last header.

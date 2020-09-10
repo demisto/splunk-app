@@ -67,6 +67,7 @@ def make_frame_proxy(frame):
     proxy = TracebackFrameProxy(frame)
     if tproxy is None:
         return proxy
+
     def operation_handler(operation, *args, **kwargs):
         if operation in ('__getattribute__', '__getattr__'):
             return getattr(proxy, args[0])
@@ -124,7 +125,7 @@ class ProcessedTraceback(object):
         tb = self.frames[0]
         # the frame will be an actual traceback (or transparent proxy) if
         # we are on pypy or a python implementation with support for tproxy
-        if type(tb) is not TracebackType:
+        if not isinstance(tb, TracebackType):
             tb = tb.tb
         return self.exc_type, self.exc_value, tb
 
@@ -241,14 +242,14 @@ def fake_exc_info(exc_info, filename, lineno):
 
     # assamble fake globals we need
     globals = {
-        '__name__':             filename,
-        '__file__':             filename,
-        '__jinja_exception__':  exc_info[:2],
+        '__name__': filename,
+        '__file__': filename,
+        '__jinja_exception__': exc_info[:2],
 
         # we don't want to keep the reference to the template around
         # to not cause circular dependencies, but we mark it as Jinja
         # frame for the ProcessedTraceback
-        '__jinja_template__':   None
+        '__jinja_template__': None
     }
 
     # and fake the exception
@@ -287,7 +288,7 @@ def fake_exc_info(exc_info, filename, lineno):
     # execute the code and catch the new traceback
     try:
         exec(code, globals, locals)
-    except:
+    except BaseException:
         exc_info = sys.exc_info()
         new_tb = exc_info[2].tb_next
 
@@ -367,6 +368,6 @@ tb_set_next = None
 if tproxy is None:
     try:
         tb_set_next = _init_ugly_crap()
-    except:
+    except BaseException:
         pass
     del _init_ugly_crap

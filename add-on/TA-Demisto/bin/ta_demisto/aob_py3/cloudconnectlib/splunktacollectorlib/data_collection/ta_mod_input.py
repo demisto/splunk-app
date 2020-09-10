@@ -192,15 +192,15 @@ def run(collector_cls, settings, checkpoint_cls=None, config_cls=None,
             checkpoint_cls=checkpoint_cls or cpmgr.TACheckPointMgr
         )
         for task_config in task_configs
-        ]
+    ]
 
     loader.run(jobs)
 
 
 def _is_checkpoint_dir_length_exceed_limit(config, checkpoint_dir):
     return platform.system() == 'Windows' \
-           and not config.is_search_head() \
-           and len(checkpoint_dir) >= __CHECKPOINT_DIR_MAX_LEN__
+        and not config.is_search_head() \
+        and len(checkpoint_dir) >= __CHECKPOINT_DIR_MAX_LEN__
 
 
 def validate_config():

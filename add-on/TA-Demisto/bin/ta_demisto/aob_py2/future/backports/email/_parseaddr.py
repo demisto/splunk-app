@@ -17,9 +17,10 @@ __all__ = [
     'parsedate',
     'parsedate_tz',
     'quote',
-    ]
+]
 
-import time, calendar
+import time
+import calendar
 
 SPACE = ' '
 EMPTYSTRING = ''
@@ -39,7 +40,7 @@ _daynames = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 # zones.  RFC1123 recommends that numeric timezone indicators be used
 # instead of timezone names.
 
-_timezones = {'UT':0, 'UTC':0, 'GMT':0, 'Z':0,
+_timezones = {'UT': 0, 'UTC': 0, 'GMT': 0, 'Z': 0,
               'AST': -400, 'ADT': -300,  # Atlantic (used in Canada)
               'EST': -500, 'EDT': -400,  # Eastern
               'CST': -600, 'CDT': -500,  # Central
@@ -59,6 +60,7 @@ def parsedate_tz(data):
     if res[9] is None:
         res[9] = 0
     return tuple(res)
+
 
 def _parsedate_tz(data):
     """Convert date to extended time tuple.
@@ -81,8 +83,8 @@ def _parsedate_tz(data):
     else:
         i = data[0].rfind(',')
         if i >= 0:
-            data[0] = data[0][i+1:]
-    if len(data) == 3: # RFC 850 date, deprecated
+            data[0] = data[0][i + 1:]
+    if len(data) == 3:  # RFC 850 date, deprecated
         stuff = data[0].split('-')
         if len(stuff) == 3:
             data = stuff + data[1:]
@@ -94,7 +96,7 @@ def _parsedate_tz(data):
         if i > 0:
             data[3:] = [s[:i], s[i:]]
         else:
-            data.append('') # Dummy tz
+            data.append('')  # Dummy tz
     if len(data) < 5:
         return None
     data = data[:5]
@@ -163,7 +165,7 @@ def _parsedate_tz(data):
             tzoffset = int(tz)
         except ValueError:
             pass
-        if tzoffset==0 and tz.startswith('-'):
+        if tzoffset == 0 and tz.startswith('-'):
             tzoffset = None
     # Convert a timezone offset into seconds ; -0500 -> -18000
     if tzoffset:
@@ -172,7 +174,7 @@ def _parsedate_tz(data):
             tzoffset = -tzoffset
         else:
             tzsign = 1
-        tzoffset = tzsign * ( (tzoffset//100)*3600 + (tzoffset % 100)*60)
+        tzoffset = tzsign * ((tzoffset // 100) * 3600 + (tzoffset % 100) * 60)
     # Daylight Saving Time flag is set to -1, since DST is unknown.
     return [yy, mm, dd, thh, tmm, tss, 0, 1, -1, tzoffset]
 
@@ -498,8 +500,10 @@ class AddrlistClass(object):
 
         return plist
 
+
 class AddressList(AddrlistClass):
     """An AddressList encapsulates a list of parsed RFC 2822 addresses."""
+
     def __init__(self, field):
         AddrlistClass.__init__(self, field)
         if field:
@@ -515,14 +519,14 @@ class AddressList(AddrlistClass):
         newaddr = AddressList(None)
         newaddr.addresslist = self.addresslist[:]
         for x in other.addresslist:
-            if not x in self.addresslist:
+            if x not in self.addresslist:
                 newaddr.addresslist.append(x)
         return newaddr
 
     def __iadd__(self, other):
         # Set union, in-place
         for x in other.addresslist:
-            if not x in self.addresslist:
+            if x not in self.addresslist:
                 self.addresslist.append(x)
         return self
 
@@ -530,7 +534,7 @@ class AddressList(AddrlistClass):
         # Set difference
         newaddr = AddressList(None)
         for x in self.addresslist:
-            if not x in other.addresslist:
+            if x not in other.addresslist:
                 newaddr.addresslist.append(x)
         return newaddr
 

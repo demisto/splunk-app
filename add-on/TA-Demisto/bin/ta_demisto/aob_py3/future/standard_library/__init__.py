@@ -59,6 +59,7 @@ We don't currently support these modules, but would like to::
 """
 
 from __future__ import absolute_import, division, print_function
+from future.utils import PY2, PY3
 
 import sys
 import logging
@@ -77,7 +78,6 @@ _handler.setFormatter(_formatter)
 flog.addHandler(_handler)
 flog.setLevel(logging.WARN)
 
-from future.utils import PY2, PY3
 
 # The modules that are defined under the same names on Py3 but with
 # different contents in a significant way (e.g. submodules) are:
@@ -98,66 +98,66 @@ REPLACED_MODULES = set(['test', 'urllib', 'pickle', 'dbm'])  # add email and dbm
 # Keys: Py2 / real module names
 # Values: Py3 / simulated module names
 RENAMES = {
-           # 'cStringIO': 'io',  # there's a new io module in Python 2.6
-                                 # that provides StringIO and BytesIO
-           # 'StringIO': 'io',   # ditto
-           # 'cPickle': 'pickle',
-           '__builtin__': 'builtins',
-           'copy_reg': 'copyreg',
-           'Queue': 'queue',
-           'future.moves.socketserver': 'socketserver',
-           'ConfigParser': 'configparser',
-           'repr': 'reprlib',
-           # 'FileDialog': 'tkinter.filedialog',
-           # 'tkFileDialog': 'tkinter.filedialog',
-           # 'SimpleDialog': 'tkinter.simpledialog',
-           # 'tkSimpleDialog': 'tkinter.simpledialog',
-           # 'tkColorChooser': 'tkinter.colorchooser',
-           # 'tkCommonDialog': 'tkinter.commondialog',
-           # 'Dialog': 'tkinter.dialog',
-           # 'Tkdnd': 'tkinter.dnd',
-           # 'tkFont': 'tkinter.font',
-           # 'tkMessageBox': 'tkinter.messagebox',
-           # 'ScrolledText': 'tkinter.scrolledtext',
-           # 'Tkconstants': 'tkinter.constants',
-           # 'Tix': 'tkinter.tix',
-           # 'ttk': 'tkinter.ttk',
-           # 'Tkinter': 'tkinter',
-           '_winreg': 'winreg',
-           'thread': '_thread',
-           'dummy_thread': '_dummy_thread',
-           # 'anydbm': 'dbm',   # causes infinite import loop
-           # 'whichdb': 'dbm',  # causes infinite import loop
-           # anydbm and whichdb are handled by fix_imports2
-           # 'dbhash': 'dbm.bsd',
-           # 'dumbdbm': 'dbm.dumb',
-           # 'dbm': 'dbm.ndbm',
-           # 'gdbm': 'dbm.gnu',
-           'future.moves.xmlrpc': 'xmlrpc',
-           # 'future.backports.email': 'email',    # for use by urllib
-           # 'DocXMLRPCServer': 'xmlrpc.server',
-           # 'SimpleXMLRPCServer': 'xmlrpc.server',
-           # 'httplib': 'http.client',
-           # 'htmlentitydefs' : 'html.entities',
-           # 'HTMLParser' : 'html.parser',
-           # 'Cookie': 'http.cookies',
-           # 'cookielib': 'http.cookiejar',
-           # 'BaseHTTPServer': 'http.server',
-           # 'SimpleHTTPServer': 'http.server',
-           # 'CGIHTTPServer': 'http.server',
-           # 'future.backports.test': 'test',  # primarily for renaming test_support to support
-           # 'commands': 'subprocess',
-           # 'urlparse' : 'urllib.parse',
-           # 'robotparser' : 'urllib.robotparser',
-           # 'abc': 'collections.abc',   # for Py33
-           # 'future.utils.six.moves.html': 'html',
-           # 'future.utils.six.moves.http': 'http',
-           'future.moves.html': 'html',
-           'future.moves.http': 'http',
-           # 'future.backports.urllib': 'urllib',
-           # 'future.utils.six.moves.urllib': 'urllib',
-           'future.moves._markupbase': '_markupbase',
-          }
+    # 'cStringIO': 'io',  # there's a new io module in Python 2.6
+    # that provides StringIO and BytesIO
+    # 'StringIO': 'io',   # ditto
+    # 'cPickle': 'pickle',
+    '__builtin__': 'builtins',
+    'copy_reg': 'copyreg',
+    'Queue': 'queue',
+    'future.moves.socketserver': 'socketserver',
+    'ConfigParser': 'configparser',
+    'repr': 'reprlib',
+    # 'FileDialog': 'tkinter.filedialog',
+    # 'tkFileDialog': 'tkinter.filedialog',
+    # 'SimpleDialog': 'tkinter.simpledialog',
+    # 'tkSimpleDialog': 'tkinter.simpledialog',
+    # 'tkColorChooser': 'tkinter.colorchooser',
+    # 'tkCommonDialog': 'tkinter.commondialog',
+    # 'Dialog': 'tkinter.dialog',
+    # 'Tkdnd': 'tkinter.dnd',
+    # 'tkFont': 'tkinter.font',
+    # 'tkMessageBox': 'tkinter.messagebox',
+    # 'ScrolledText': 'tkinter.scrolledtext',
+    # 'Tkconstants': 'tkinter.constants',
+    # 'Tix': 'tkinter.tix',
+    # 'ttk': 'tkinter.ttk',
+    # 'Tkinter': 'tkinter',
+    '_winreg': 'winreg',
+    'thread': '_thread',
+    'dummy_thread': '_dummy_thread',
+    # 'anydbm': 'dbm',   # causes infinite import loop
+    # 'whichdb': 'dbm',  # causes infinite import loop
+    # anydbm and whichdb are handled by fix_imports2
+    # 'dbhash': 'dbm.bsd',
+    # 'dumbdbm': 'dbm.dumb',
+    # 'dbm': 'dbm.ndbm',
+    # 'gdbm': 'dbm.gnu',
+    'future.moves.xmlrpc': 'xmlrpc',
+    # 'future.backports.email': 'email',    # for use by urllib
+    # 'DocXMLRPCServer': 'xmlrpc.server',
+    # 'SimpleXMLRPCServer': 'xmlrpc.server',
+    # 'httplib': 'http.client',
+    # 'htmlentitydefs' : 'html.entities',
+    # 'HTMLParser' : 'html.parser',
+    # 'Cookie': 'http.cookies',
+    # 'cookielib': 'http.cookiejar',
+    # 'BaseHTTPServer': 'http.server',
+    # 'SimpleHTTPServer': 'http.server',
+    # 'CGIHTTPServer': 'http.server',
+    # 'future.backports.test': 'test',  # primarily for renaming test_support to support
+    # 'commands': 'subprocess',
+    # 'urlparse' : 'urllib.parse',
+    # 'robotparser' : 'urllib.robotparser',
+    # 'abc': 'collections.abc',   # for Py33
+    # 'future.utils.six.moves.html': 'html',
+    # 'future.utils.six.moves.http': 'http',
+    'future.moves.html': 'html',
+    'future.moves.http': 'http',
+    # 'future.backports.urllib': 'urllib',
+    # 'future.utils.six.moves.urllib': 'urllib',
+    'future.moves._markupbase': '_markupbase',
+}
 
 
 # It is complicated and apparently brittle to mess around with the
@@ -179,17 +179,17 @@ assert len(set(RENAMES.values()) & set(REPLACED_MODULES)) == 0
 # (New module name, new object name, old module name, old object name)
 MOVES = [('collections', 'UserList', 'UserList', 'UserList'),
          ('collections', 'UserDict', 'UserDict', 'UserDict'),
-         ('collections', 'UserString','UserString', 'UserString'),
+         ('collections', 'UserString', 'UserString', 'UserString'),
          ('collections', 'ChainMap', 'future.backports.misc', 'ChainMap'),
-         ('itertools', 'filterfalse','itertools', 'ifilterfalse'),
-         ('itertools', 'zip_longest','itertools', 'izip_longest'),
-         ('sys', 'intern','__builtin__', 'intern'),
+         ('itertools', 'filterfalse', 'itertools', 'ifilterfalse'),
+         ('itertools', 'zip_longest', 'itertools', 'izip_longest'),
+         ('sys', 'intern', '__builtin__', 'intern'),
          # The re module has no ASCII flag in Py2, but this is the default.
          # Set re.ASCII to a zero constant. stat.ST_MODE just happens to be one
          # (and it exists on Py2.6+).
-         ('re', 'ASCII','stat', 'ST_MODE'),
-         ('base64', 'encodebytes','base64', 'encodestring'),
-         ('base64', 'decodebytes','base64', 'decodestring'),
+         ('re', 'ASCII', 'stat', 'ST_MODE'),
+         ('base64', 'encodebytes', 'base64', 'encodestring'),
+         ('base64', 'decodebytes', 'base64', 'decodestring'),
          ('subprocess', 'getoutput', 'commands', 'getoutput'),
          ('subprocess', 'getstatusoutput', 'commands', 'getstatusoutput'),
          ('subprocess', 'check_output', 'future.backports.misc', 'check_output'),
@@ -201,13 +201,13 @@ MOVES = [('collections', 'UserList', 'UserList', 'UserList'),
          ('reprlib', 'recursive_repr', 'future.backports.misc', 'recursive_repr'),
          ('functools', 'cmp_to_key', 'future.backports.misc', 'cmp_to_key'),
 
-# This is no use, since "import urllib.request" etc. still fails:
-#          ('urllib', 'error', 'future.moves.urllib', 'error'),
-#          ('urllib', 'parse', 'future.moves.urllib', 'parse'),
-#          ('urllib', 'request', 'future.moves.urllib', 'request'),
-#          ('urllib', 'response', 'future.moves.urllib', 'response'),
-#          ('urllib', 'robotparser', 'future.moves.urllib', 'robotparser'),
-        ]
+         # This is no use, since "import urllib.request" etc. still fails:
+         #          ('urllib', 'error', 'future.moves.urllib', 'error'),
+         #          ('urllib', 'parse', 'future.moves.urllib', 'parse'),
+         #          ('urllib', 'request', 'future.moves.urllib', 'request'),
+         #          ('urllib', 'response', 'future.moves.urllib', 'response'),
+         #          ('urllib', 'robotparser', 'future.moves.urllib', 'robotparser'),
+         ]
 
 
 # A minimal example of an import hook:
@@ -251,7 +251,7 @@ class RenameImport(object):
         both = set(old_to_new.keys()) & set(old_to_new.values())
         assert (len(both) == 0 and
                 len(set(old_to_new.values())) == len(old_to_new.values())), \
-               'Ambiguity in renaming (handler not implemented)'
+            'Ambiguity in renaming (handler not implemented)'
         self.new_to_old = dict((new, old) for (old, new) in old_to_new.items())
 
     def find_module(self, fullname, path=None):
@@ -318,6 +318,7 @@ class hooks(object):
     continue to be accessible in the current namespace but not from any
     imported modules (like requests).
     """
+
     def __enter__(self):
         # flog.debug('Entering hooks context manager')
         self.old_sys_modules = copy.copy(sys.modules)
@@ -333,6 +334,7 @@ class hooks(object):
             remove_hooks()
         # scrub_future_sys_modules()
 
+
 # Sanity check for is_py2_stdlib_module(): We aren't replacing any
 # builtin modules names:
 if PY2:
@@ -346,14 +348,14 @@ def is_py2_stdlib_module(m):
     """
     if PY3:
         return False
-    if not 'stdlib_path' in is_py2_stdlib_module.__dict__:
+    if 'stdlib_path' not in is_py2_stdlib_module.__dict__:
         stdlib_files = [contextlib.__file__, os.__file__, copy.__file__]
         stdlib_paths = [os.path.split(f)[0] for f in stdlib_files]
         if not len(set(stdlib_paths)) == 1:
             # This seems to happen on travis-ci.org. Very strange. We'll try to
             # ignore it.
             flog.warn('Multiple locations found for the Python standard '
-                         'library: %s' % stdlib_paths)
+                      'library: %s' % stdlib_paths)
         # Choose the first one arbitrarily
         is_py2_stdlib_module.stdlib_path = stdlib_paths[0]
 
@@ -363,7 +365,7 @@ def is_py2_stdlib_module(m):
     if hasattr(m, '__file__'):
         modpath = os.path.split(m.__file__)
         if (modpath[0].startswith(is_py2_stdlib_module.stdlib_path) and
-            'site-packages' not in modpath[0]):
+                'site-packages' not in modpath[0]):
             return True
 
     return False
@@ -382,7 +384,7 @@ def scrub_py2_sys_modules():
         return {}
     scrubbed = {}
     for modulename in REPLACED_MODULES & set(RENAMES.keys()):
-        if not modulename in sys.modules:
+        if modulename not in sys.modules:
             continue
 
         module = sys.modules[modulename]
@@ -400,6 +402,7 @@ def scrub_future_sys_modules():
     """
     return {}
 
+
 class suspend_hooks(object):
     """
     Acts as a context manager. Use like this:
@@ -414,6 +417,7 @@ class suspend_hooks(object):
     If the hooks were disabled before the context, they are not installed when
     the context is left.
     """
+
     def __enter__(self):
         self.hooks_were_installed = detect_hooks()
         remove_hooks()
@@ -597,6 +601,7 @@ def detect_hooks():
 if not hasattr(sys, 'py2_modules'):
     sys.py2_modules = {}
 
+
 def cache_py2_modules():
     """
     Currently this function is unneeded, as we are not attempting to provide import hooks
@@ -687,12 +692,12 @@ def import_(module_name, backport=False):
 
         modules = []
         for i, part in enumerate(parts):
-            sofar = '.'.join(parts[:i+1])
+            sofar = '.'.join(parts[:i + 1])
             modules.append(importlib.import_module(sofar))
         for i, part in reversed(list(enumerate(parts))):
             if i == 0:
                 break
-            setattr(modules[i-1], part, modules[i])
+            setattr(modules[i - 1], part, modules[i])
 
         # Return the next-most top-level module after future.backports / future.moves:
         return modules[2]
@@ -745,6 +750,7 @@ class exclude_local_folder_imports(object):
     folder would otherwise have prevented setuptools from running on Py3. Maybe
     it's not needed any more?)
     """
+
     def __init__(self, *args):
         assert len(args) > 0
         self.module_names = args
@@ -790,6 +796,7 @@ class exclude_local_folder_imports(object):
         for m in set(self.old_sys_modules.keys()) - set(sys.modules.keys()):
             sys.modules[m] = self.old_sys_modules[m]
 
+
 TOP_LEVEL_MODULES = ['builtins',
                      'copyreg',
                      'html',
@@ -804,7 +811,8 @@ TOP_LEVEL_MODULES = ['builtins',
                      '_dummy_thread',
                      '_markupbase',
                      '_thread',
-                    ]
+                     ]
+
 
 def import_top_level_modules():
     with exclude_local_folder_imports(*TOP_LEVEL_MODULES):

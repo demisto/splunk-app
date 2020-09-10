@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from future.builtins import super
 
 from future.standard_library.email._policybase import (Policy, Compat32,
-                                                  compat32, _extend_docstrings)
+                                                       compat32, _extend_docstrings)
 from future.standard_library.email.utils import _has_surrogates
 from future.standard_library.email.headerregistry import HeaderRegistry as HeaderRegistry
 
@@ -20,7 +20,8 @@ __all__ = [
     'strict',
     'SMTP',
     'HTTP',
-    ]
+]
+
 
 @_extend_docstrings
 class EmailPolicy(Policy):
@@ -118,7 +119,7 @@ class EmailPolicy(Policy):
         """
         if hasattr(value, 'name') and value.name.lower() == name.lower():
             return (name, value)
-        if isinstance(value, str) and len(value.splitlines())>1:
+        if isinstance(value, str) and len(value.splitlines()) > 1:
             raise ValueError("Header values may not contain linefeed "
                              "or carriage return characters")
         return (name, self.header_factory(name, value))
@@ -168,7 +169,7 @@ class EmailPolicy(Policy):
         data consists of single byte characters or multibyte characters.
 
         """
-        folded = self._fold(name, value, refold_binary=self.cte_type=='7bit')
+        folded = self._fold(name, value, refold_binary=self.cte_type == '7bit')
         return folded.encode('ascii', 'surrogateescape')
 
     def _fold(self, name, value, refold_binary=False):
@@ -178,8 +179,8 @@ class EmailPolicy(Policy):
         lines = value.splitlines()
         refold = (self.refold_source == 'all' or
                   self.refold_source == 'long' and
-                    (lines and len(lines[0])+len(name)+2 > maxlen or
-                     any(len(x) > maxlen for x in lines[1:])))
+                  (lines and len(lines[0]) + len(name) + 2 > maxlen or
+                   any(len(x) > maxlen for x in lines[1:])))
         if refold or refold_binary and _has_surrogates(value):
             return self.header_factory(name, ''.join(lines)).fold(policy=self)
         return name + ': ' + self.linesep.join(lines) + self.linesep

@@ -18,6 +18,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
+
 class Scheme(object):
     """Class representing the metadata for a modular input kind.
 

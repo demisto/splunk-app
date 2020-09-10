@@ -77,7 +77,7 @@ if PY3:
         if not isinstance(mylocals, Mapping):
             raise TypeError('locals must be a mapping')
         with open(filename, "rbU") as fin:
-             source = fin.read()
+            source = fin.read()
         code = compile(source, filename, "exec")
         exec_(code, myglobals, mylocals)
 

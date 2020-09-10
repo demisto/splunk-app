@@ -1,11 +1,11 @@
 from __future__ import absolute_import
+from SimpleHTTPServer import *
+from CGIHTTPServer import *
+from BaseHTTPServer import *
 import sys
 
 assert sys.version_info[0] < 3
 
-from BaseHTTPServer import *
-from CGIHTTPServer import *
-from SimpleHTTPServer import *
 try:
     from CGIHTTPServer import _url_collapse_path     # needed for a test
 except ImportError:

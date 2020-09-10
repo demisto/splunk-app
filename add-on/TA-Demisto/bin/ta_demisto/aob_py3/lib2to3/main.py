@@ -75,7 +75,7 @@ class StdoutRefactoringTool(refactor.MultiprocessRefactoringTool):
             else:
                 raise ValueError('filename %s does not start with the '
                                  'input_base_dir %s' % (
-                                         filename, self._input_base_dir))
+                                     filename, self._input_base_dir))
         if self._append_suffix:
             filename += self._append_suffix
         if orig_filename != filename:
@@ -125,6 +125,7 @@ class StdoutRefactoringTool(refactor.MultiprocessRefactoringTool):
                     warn("couldn't encode %s's diff for your terminal" %
                          (filename,))
                     return
+
 
 def warn(msg):
     print("WARNING: %s" % (msg,), file=sys.stderr)
@@ -233,7 +234,7 @@ def main(fixer_pkg, args=None):
     fixer_names = requested.difference(unwanted_fixes)
     input_base_dir = os.path.commonprefix(args)
     if (input_base_dir and not input_base_dir.endswith(os.sep)
-        and not os.path.isdir(input_base_dir)):
+            and not os.path.isdir(input_base_dir)):
         # One or more similar names were passed, their directory is the base.
         # os.path.commonprefix() is ignorant of path elements, this corrects
         # for that weird API.
@@ -243,11 +244,11 @@ def main(fixer_pkg, args=None):
         logger.info('Output in %r will mirror the input directory %r layout.',
                     options.output_dir, input_base_dir)
     rt = StdoutRefactoringTool(
-            sorted(fixer_names), flags, sorted(explicit),
-            options.nobackups, not options.no_diffs,
-            input_base_dir=input_base_dir,
-            output_dir=options.output_dir,
-            append_suffix=options.add_suffix)
+        sorted(fixer_names), flags, sorted(explicit),
+        options.nobackups, not options.no_diffs,
+        input_base_dir=input_base_dir,
+        output_dir=options.output_dir,
+        append_suffix=options.add_suffix)
 
     # Refactor all files and directories passed as arguments
     if not rt.errors:

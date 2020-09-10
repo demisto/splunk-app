@@ -12,6 +12,7 @@ from lib2to3 import fixer_util
 from lib2to3.fixer_util import Attr, Name, Call, Comma
 from lib2to3.pgen2 import token
 
+
 def parse(code, strip_levels=0):
     # The topmost node is file_input, which we don't care about.
     # The next-topmost node is a *_stmt node, which we also don't care about
@@ -20,6 +21,7 @@ def parse(code, strip_levels=0):
         tree = tree.children[0]
     tree.parent = None
     return tree
+
 
 class MacroTestCase(support.TestCase):
     def assertStr(self, node, string):
@@ -108,10 +110,12 @@ class Test_does_tree_import(support.TestCase):
         # Search a tree for a binding -- used to find the starting
         # point for these tests.
         c = fixer_util.find_binding(name, node)
-        if c: return c
+        if c:
+            return c
         for child in node.children:
             c = self._find_bind_rec(name, child)
-            if c: return c
+            if c:
+                return c
 
     def does_tree_import(self, package, name, string):
         node = parse(string)
@@ -146,6 +150,7 @@ class Test_does_tree_import(support.TestCase):
 
     def test_in_function(self):
         self.try_with("def foo():\n\tbar.baz()\n\tstart=3")
+
 
 class Test_find_binding(support.TestCase):
     def find_binding(self, name, string, package=None):
@@ -549,6 +554,7 @@ class Test_find_binding(support.TestCase):
                     b = 7"""
         self.assertFalse(self.find_binding("a", s))
 
+
 class Test_touch_import(support.TestCase):
 
     def test_after_docstring(self):
@@ -575,6 +581,7 @@ class Test_touch_import(support.TestCase):
         node = parse('bar()')
         fixer_util.touch_import(None, "cgi", node)
         self.assertEqual(str(node), 'import cgi\nbar()\n\n')
+
 
 class Test_find_indentation(support.TestCase):
 

@@ -73,7 +73,7 @@ class FixHasKey(fixer_base.BaseFix):
         assert results
         syms = self.syms
         if (node.parent.type == syms.not_test and
-            self.pattern.match(node.parent)):
+                self.pattern.match(node.parent)):
             # Don't transform a node matching the first alternative of the
             # pattern when its parent matches the second alternative
             return None

@@ -45,6 +45,7 @@ the setsockopt() and getsockopt() methods.
 """
 
 from __future__ import unicode_literals
+from socket import _GLOBAL_DEFAULT_TIMEOUT
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
@@ -53,7 +54,9 @@ from future.builtins import super
 import _socket
 from _socket import *
 
-import os, sys, io
+import os
+import sys
+import io
 
 try:
     import errno
@@ -75,7 +78,7 @@ if sys.platform.lower().startswith("win"):
     errorTab[10004] = "The operation was interrupted."
     errorTab[10009] = "A bad file handle was passed."
     errorTab[10013] = "Permission denied."
-    errorTab[10014] = "A fault occurred on the network??" # WSAEFAULT
+    errorTab[10014] = "A fault occurred on the network??"  # WSAEFAULT
     errorTab[10022] = "An invalid operation was attempted."
     errorTab[10035] = "The socket operation would block"
     errorTab[10036] = "A blocking operation is already in progress."
@@ -157,12 +160,21 @@ class socket(_socket.socket):
         except the only mode characters supported are 'r', 'w' and 'b'.
         The semantics are similar too.  (XXX refactor to share code?)
         """
-        if 'newline' in _3to2kwargs: newline = _3to2kwargs['newline']; del _3to2kwargs['newline']
-        else: newline = None
-        if 'errors' in _3to2kwargs: errors = _3to2kwargs['errors']; del _3to2kwargs['errors']
-        else: errors = None
-        if 'encoding' in _3to2kwargs: encoding = _3to2kwargs['encoding']; del _3to2kwargs['encoding']
-        else: encoding = None
+        if 'newline' in _3to2kwargs:
+            newline = _3to2kwargs['newline']
+            del _3to2kwargs['newline']
+        else:
+            newline = None
+        if 'errors' in _3to2kwargs:
+            errors = _3to2kwargs['errors']
+            del _3to2kwargs['errors']
+        else:
+            errors = None
+        if 'encoding' in _3to2kwargs:
+            encoding = _3to2kwargs['encoding']
+            del _3to2kwargs['encoding']
+        else:
+            encoding = None
         for c in mode:
             if c not in ("r", "w", "b"):
                 raise ValueError("invalid mode %r (only r, w, b allowed)")
@@ -224,6 +236,7 @@ class socket(_socket.socket):
         self._closed = True
         return super().detach()
 
+
 def fromfd(fd, family, type, proto=0):
     """ fromfd(fd, family, type[, proto]) -> socket object
 
@@ -232,6 +245,7 @@ def fromfd(fd, family, type, proto=0):
     """
     nfd = dup(fd)
     return socket(family, type, proto, nfd)
+
 
 if hasattr(_socket.socket, "share"):
     def fromshare(info):
@@ -264,6 +278,7 @@ if hasattr(_socket, "socketpair"):
 
 
 _blocking_errnos = set([EAGAIN, EWOULDBLOCK])
+
 
 class SocketIO(io.RawIOBase):
 
@@ -411,7 +426,6 @@ def getfqdn(name=''):
 
 
 # Re-use the same sentinel as in the Python stdlib socket module:
-from socket import _GLOBAL_DEFAULT_TIMEOUT
 # Was: _GLOBAL_DEFAULT_TIMEOUT = object()
 
 

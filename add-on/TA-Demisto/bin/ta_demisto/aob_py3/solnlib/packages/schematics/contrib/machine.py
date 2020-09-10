@@ -36,7 +36,7 @@ class Machine(object):
     def _transition(self, trigger=None, src_state=None, dst_state=None):
         try:
             return next(self._transitions(trigger=trigger, src_state=src_state,
-            dst_state=dst_state))
+                                          dst_state=dst_state))
         except StopIteration:
             return None
 
@@ -44,10 +44,10 @@ class Machine(object):
         def pred(d, key, var):
             return d.get(key) == var if var is not None else True
         return (d for d in self.transitions if
-            pred(d, 'trigger', trigger) and
-            pred(d, 'from', src_state) and
-            pred(d, 'to', dst_state)
-        )
+                pred(d, 'trigger', trigger) and
+                pred(d, 'from', src_state) and
+                pred(d, 'to', dst_state)
+                )
 
     def trigger(self, trigger):
         transition = self._transition(trigger=trigger, src_state=self.state)

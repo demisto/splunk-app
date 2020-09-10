@@ -2,13 +2,14 @@
 """
 Compatibility utils for Python 2 & 3.
 """
+from .prepareable import Prepareable
 import sys
 
 
 IS_PY3 = sys.version_info[0] == 3
 string_types = (str, ) if IS_PY3 else (basestring, )
 text_type = str if IS_PY3 else unicode
-_identity = lambda x: x
+def _identity(x): return x
 
 
 if IS_PY3:
@@ -33,15 +34,15 @@ def iterkeys(obj, **kwargs):
 
 def iteritems(obj, **kwargs):
     """Iterate over dict items in Python 2 & 3."""
-    return (obj.iteritems(**kwargs) 
-            if hasattr(obj, 'iteritems') 
+    return (obj.iteritems(**kwargs)
+            if hasattr(obj, 'iteritems')
             else iter(obj.items(**kwargs)))
 
 
 def itervalues(obj, **kwargs):
     """Iterate over dict values in Python 2 & 3."""
-    return (obj.itervalues(**kwargs) 
-            if hasattr(obj, 'itervalues') 
+    return (obj.itervalues(**kwargs)
+            if hasattr(obj, 'itervalues')
             else iter(obj.values(**kwargs)))
 
 
@@ -75,6 +76,3 @@ try:
     from collections import OrderedDict
 except ImportError:
     from .ordereddict import OrderedDict
-
-
-from .prepareable import Prepareable

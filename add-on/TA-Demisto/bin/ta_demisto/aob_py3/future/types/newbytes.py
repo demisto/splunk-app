@@ -67,12 +67,12 @@ class newbytes(with_metaclass(BaseNewBytes, _builtin_bytes)):
             args = list(args)
             if len(args) == 3:
                 errors = args.pop()
-            encoding=args.pop()
+            encoding = args.pop()
         # Was: elif isinstance(args[0], newbytes):
         # We use type() instead of the above because we're redefining
         # this to be True for all unicode string subclasses. Warning:
         # This may render newstr un-subclassable.
-        if type(args[0]) == newbytes:
+        if isinstance(args[0], newbytes):
             # Special-case: for consistency with Py3.3, we return the same object
             # (with the same id) if a newbytes object is passed into the
             # newbytes constructor.
@@ -113,7 +113,7 @@ class newbytes(with_metaclass(BaseNewBytes, _builtin_bytes)):
                 # anyway.
                 try:
                     value = bytearray([_newchr(x) for x in args[0]])
-                except:
+                except BaseException:
                     raise ValueError('bytes must be in range(0, 256)')
         elif isinstance(args[0], Integral):
             if args[0] < 0:
@@ -121,7 +121,7 @@ class newbytes(with_metaclass(BaseNewBytes, _builtin_bytes)):
             value = b'\x00' * args[0]
         else:
             value = args[0]
-        if type(value) == newbytes:
+        if isinstance(value, newbytes):
             # Above we use type(...) rather than isinstance(...) because the
             # newbytes metaclass overrides __instancecheck__.
             # oldbytes(value) gives the wrong thing on Py2: the same
@@ -152,7 +152,7 @@ class newbytes(with_metaclass(BaseNewBytes, _builtin_bytes)):
             newbyteskey = newbytes([key])
         # Don't use isinstance() here because we only want to catch
         # newbytes, not Python 2 str:
-        elif type(key) == newbytes:
+        elif isinstance(key, newbytes):
             newbyteskey = key
         else:
             newbyteskey = newbytes(key)

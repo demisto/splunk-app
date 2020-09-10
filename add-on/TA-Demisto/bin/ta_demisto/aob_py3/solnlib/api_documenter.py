@@ -676,5 +676,6 @@ class _SwaggerApi(object):
                 properties[prop]['$ref'] = '#/definitions/' + \
                     properties[prop]['$ref']
 
+
 spec = _SwaggerApi()
 generator = _SwaggerSpecGenerator(spec)

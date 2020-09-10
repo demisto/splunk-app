@@ -92,7 +92,6 @@ class DataObject(object):
     def _setdefault(self, *args): return self.__dict__.setdefault(*args)
 
 
-
 class Context(DataObject):
 
     _fields = ()

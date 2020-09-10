@@ -57,7 +57,7 @@ myfixes = (list(fixes.libfuturize_fix_names_stage1) +
 # to it. If the diff is empty, it's Python 3 code.
 
 py2_detect_fixers = [
-# From stage 1:
+    # From stage 1:
     'lib2to3.fixes.fix_apply',
     # 'lib2to3.fixes.fix_dict',        # TODO: add support for utils.viewitems() etc. and move to stage2
     'lib2to3.fixes.fix_except',
@@ -67,7 +67,8 @@ py2_detect_fixers = [
     'lib2to3.fixes.fix_filter',
     'lib2to3.fixes.fix_has_key',
     'lib2to3.fixes.fix_idioms',
-    'lib2to3.fixes.fix_import',    # makes any implicit relative imports explicit. (Use with ``from __future__ import absolute_import)
+    # makes any implicit relative imports explicit. (Use with ``from __future__ import absolute_import)
+    'lib2to3.fixes.fix_import',
     'lib2to3.fixes.fix_intern',
     'lib2to3.fixes.fix_isinstance',
     'lib2to3.fixes.fix_methodattrs',
@@ -88,7 +89,7 @@ py2_detect_fixers = [
     'lib2to3.fixes.fix_ws_comma',
     'lib2to3.fixes.fix_xreadlines',
 
-# From stage 2:
+    # From stage 2:
     'lib2to3.fixes.fix_basestring',
     # 'lib2to3.fixes.fix_buffer',    # perhaps not safe. Test this.
     # 'lib2to3.fixes.fix_callable',  # not needed in Py3.2+
@@ -138,7 +139,6 @@ class RTs:
             RTs._rt = RefactoringTool(myfixes)
             RTs._rtp = RefactoringTool(myfixes, {'print_function': True})
 
-
     @staticmethod
     def setup_detect_python2():
         """
@@ -178,7 +178,7 @@ def splitall(path):
         if parts[0] == path:  # sentinel for absolute paths
             allparts.insert(0, parts[0])
             break
-        elif parts[1] == path: # sentinel for relative paths
+        elif parts[1] == path:  # sentinel for relative paths
             allparts.insert(0, parts[1])
             break
         else:
@@ -313,7 +313,7 @@ class Py2Fixer(object):
             tree = RTs._rtp.refactor_string(source, self.pathname)
         # could optimise a bit for only doing str(tree) if
         # getattr(tree, 'was_changed', False) returns True
-        return str(tree)[:-1] # remove added newline
+        return str(tree)[:-1]  # remove added newline
 
     def load_module(self, fullname):
         logger.debug('Running load_module for {0}...'.format(fullname))
@@ -361,10 +361,10 @@ class Py2Fixer(object):
                 # ispkg = self.pathname.endswith('__init__.py')
 
                 if self.kind == imp.PKG_DIRECTORY:
-                    mod.__path__ = [ os.path.dirname(self.pathname) ]
+                    mod.__path__ = [os.path.dirname(self.pathname)]
                     mod.__package__ = fullname
                 else:
-                    #else, regular module
+                    # else, regular module
                     mod.__path__ = []
                     mod.__package__ = fullname.rpartition('.')[0]
 
@@ -414,11 +414,12 @@ class Py2Fixer(object):
                 except Exception as e:
                     # must remove module from sys.modules
                     del sys.modules[fullname]
-                    raise # keep it simple
+                    raise  # keep it simple
 
         if self.found[0]:
             self.found[0].close()
         return mod
+
 
 _hook = Py2Fixer()
 
@@ -437,7 +438,7 @@ def install_hooks(include_paths=(), exclude_paths=()):
         sys.meta_path.insert(0, _hook)  # insert at beginning. This could be made a parameter
 
     # We could return the hook when there are ways of configuring it
-    #return _hook
+    # return _hook
 
 
 def remove_hooks():
@@ -464,6 +465,7 @@ class hooks(object):
     >>> import requests        # py2/3 compatible anyway
     >>> # etc.
     """
+
     def __enter__(self):
         self.hooks_were_installed = detect_hooks()
         install_hooks()
@@ -488,10 +490,12 @@ class suspend_hooks(object):
     If the hooks were disabled before the context, they are not installed when
     the context is left.
     """
+
     def __enter__(self):
         self.hooks_were_installed = detect_hooks()
         remove_hooks()
         return self
+
     def __exit__(self, *args):
         if self.hooks_were_installed:
             install_hooks()

@@ -263,7 +263,7 @@ def adjust_whitespace(text):
         def match(reg, t):
             m = re.match(reg, t)
             if m:
-                return m, t[len(m.group(0)) :]
+                return m, t[len(m.group(0)):]
             else:
                 return None, t
 

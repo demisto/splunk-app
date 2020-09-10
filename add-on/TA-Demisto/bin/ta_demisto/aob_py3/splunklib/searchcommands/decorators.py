@@ -39,6 +39,7 @@ class Configuration(object):
     <http://docs.splunk.com/Documentation/Splunk/latest/Search/Searchcommandstyleguide>`_
 
     """
+
     def __init__(self, o=None, **kwargs):
         #
         # The o argument enables the configuration decorator to be used with or without parentheses. For example, it
@@ -111,6 +112,7 @@ class ConfigurationSetting(property):
     :rtype: property
 
     """
+
     def __init__(self, fget=None, fset=None, fdel=None, doc=None, name=None, readonly=None, value=None):
         property.__init__(self, fget=fget, fset=fset, fdel=fdel, doc=doc)
         self._readonly = readonly
@@ -132,7 +134,7 @@ class ConfigurationSetting(property):
     @staticmethod
     def fix_up(cls, values):
 
-        is_configuration_setting = lambda attribute: isinstance(attribute, ConfigurationSetting)
+        def is_configuration_setting(attribute): return isinstance(attribute, ConfigurationSetting)
         definitions = getmembers(cls, is_configuration_setting)
         i = 0
 
@@ -271,6 +273,7 @@ class Option(property):
             self._logging_configuration = None
 
     """
+
     def __init__(self, fget=None, fset=None, fdel=None, doc=None, name=None, default=None, require=None, validate=None):
         property.__init__(self, fget, fset, fdel, doc)
         self.name = name
@@ -295,7 +298,7 @@ class Option(property):
     @classmethod
     def fix_up(cls, command_class):
 
-        is_option = lambda attribute: isinstance(attribute, Option)
+        def is_option(attribute): return isinstance(attribute, Option)
         definitions = getmembers(command_class, is_option)
         validate_option_name = OptionName()
         i = 0
@@ -353,6 +356,7 @@ class Option(property):
         This class is used by SearchCommand.process to parse and report on option values.
 
         """
+
         def __init__(self, command, option):
             self._command = command
             self._option = option
@@ -415,6 +419,7 @@ class Option(property):
         This class is used by SearchCommand.process to parse and report on option values.
 
         """
+
         def __init__(self, command):
             definitions = type(command).option_definitions
             item_class = Option.Item

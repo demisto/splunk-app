@@ -18,12 +18,10 @@ class _NoModuleFound(Exception):
     """
 
 
-
 class InvalidName(ValueError):
     """
     The given name is not a dot-separated list of Python objects.
     """
-
 
 
 class ModuleNotFound(InvalidName):
@@ -33,13 +31,11 @@ class ModuleNotFound(InvalidName):
     """
 
 
-
 class ObjectNotFound(InvalidName):
     """
     The object associated with the given name doesn't exist and it can't be
     imported.
     """
-
 
 
 if PY3:
@@ -89,7 +85,6 @@ def _importAndCheckStack(importName):
                 reraise(excValue, excTraceback)
             excTraceback = excTraceback.tb_next
         raise _NoModuleFound()
-
 
 
 def namedAny(name):

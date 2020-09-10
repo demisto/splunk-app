@@ -322,7 +322,12 @@ class GeneratingCommand(SearchCommand):
                 iteritems = ifilter(lambda name_value1: name_value1[0] != 'distributed', iteritems)
                 if not self.distributed and self.type == 'streaming':
                     iteritems = imap(
-                        lambda name_value: (name_value[0], 'stateful') if name_value[0] == 'type' else (name_value[0], name_value[1]), iteritems)
+                        lambda name_value: (
+                            name_value[0],
+                            'stateful') if name_value[0] == 'type' else (
+                            name_value[0],
+                            name_value[1]),
+                        iteritems)
             return iteritems
 
         pass

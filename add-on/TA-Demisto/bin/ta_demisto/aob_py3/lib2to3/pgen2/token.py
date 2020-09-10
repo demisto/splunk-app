@@ -5,7 +5,7 @@
 #  Taken from Python (r53757) and modified to include some tokens
 #   originally monkeypatched in by pgen2.tokenize
 
-#--start constants--
+# --start constants--
 ENDMARKER = 0
 NAME = 1
 NUMBER = 2
@@ -67,19 +67,21 @@ ASYNC = 57
 ERRORTOKEN = 58
 N_TOKENS = 59
 NT_OFFSET = 256
-#--end constants--
+# --end constants--
 
 tok_name = {}
 for _name, _value in list(globals().items()):
-    if type(_value) is type(0):
+    if isinstance(_value, type(0)):
         tok_name[_value] = _name
 
 
 def ISTERMINAL(x):
     return x < NT_OFFSET
 
+
 def ISNONTERMINAL(x):
     return x >= NT_OFFSET
+
 
 def ISEOF(x):
     return x == ENDMARKER

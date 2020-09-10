@@ -3,17 +3,16 @@ Data Loader main entry point
 """
 
 
+from ...splunktalib.common import log
+from ...splunktalib.schedule import job as sjob
+from ...splunktalib import timer_queue as tq
+from ...splunktalib.concurrent import concurrent_executor as ce
+import configparser
+import os.path as op
+import queue
+from builtins import object
 from future import standard_library
 standard_library.install_aliases()
-from builtins import object
-import queue
-import os.path as op
-import configparser
-
-from ...splunktalib.concurrent import concurrent_executor as ce
-from ...splunktalib import timer_queue as tq
-from ...splunktalib.schedule import job as sjob
-from ...splunktalib.common import log
 
 
 class TADataLoader(object):
@@ -73,7 +72,7 @@ class TADataLoader(object):
 
     def _wait_for_tear_down(self):
         wakeup_q = self._wakeup_queue
-        while 1:
+        while True:
             try:
                 go_exit = wakeup_q.get(timeout=1)
             except queue.Empty:
@@ -120,7 +119,7 @@ class TADataLoader(object):
     @staticmethod
     def _read_default_settings():
         cur_dir = op.dirname(op.abspath(__file__))
-        setting_file = op.join(cur_dir,"../../","splunktalib", "setting.conf")
+        setting_file = op.join(cur_dir, "../../", "splunktalib", "setting.conf")
         parser = configparser.ConfigParser()
         parser.read(setting_file)
         settings = {}

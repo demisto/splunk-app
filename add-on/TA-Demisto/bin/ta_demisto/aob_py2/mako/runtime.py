@@ -940,7 +940,7 @@ def _exec_template(callable_, context, args=None, kwargs=None):
             callable_(context, *args, **kwargs)
         except Exception:
             _render_error(template, context, compat.exception_as())
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             _render_error(template, context, e)
     else:

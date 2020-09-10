@@ -93,7 +93,6 @@ class CredentialManager(object):
             **context)
         self._storage_passwords = self.service.storage_passwords
 
-
     @retry(exceptions=[binding.HTTPError])
     def get_password(self, user):
         '''Get password.
@@ -181,10 +180,9 @@ class CredentialManager(object):
                     if pwd_stanza.realm == self._realm and pwd_stanza.username == user:
                         pwd_stanza.update(password=password)
                         return
-                raise ValueError("Can not get the password object for realm: %s user: %s" %(self._realm, user))
+                raise ValueError("Can not get the password object for realm: %s user: %s" % (self._realm, user))
             else:
                 raise ex
-
 
     @retry(exceptions=[binding.HTTPError])
     def delete_password(self, user):
@@ -206,10 +204,10 @@ class CredentialManager(object):
         '''
         all_passwords = self._get_all_passwords_in_realm()
         deleted = False
-        ent_pattern = re.compile('(%s%s\d+)' % (user.replace('\\','\\\\'), self.SEP))
+        ent_pattern = re.compile(r'(%s%s\d+)' % (user.replace('\\', '\\\\'), self.SEP))
         for password in list(all_passwords):
             match = (user == password.username) \
-                    or ent_pattern.match(password.username)
+                or ent_pattern.match(password.username)
             if match and password.realm == self._realm:
                 password.delete()
                 deleted = True
@@ -222,7 +220,7 @@ class CredentialManager(object):
     def _get_all_passwords_in_realm(self):
         if self._realm:
             all_passwords = self._storage_passwords.list(count=-1, search="realm={}"
-                                                                     .format(self._realm))
+                                                         .format(self._realm))
         else:
             all_passwords = self._storage_passwords.list(count=-1, search='')
         return all_passwords

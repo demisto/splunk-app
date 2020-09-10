@@ -76,7 +76,7 @@ else:
 
     try:
         from cStringIO import StringIO
-    except:
+    except BaseException:
         from StringIO import StringIO
 
     byte_buffer = StringIO

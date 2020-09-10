@@ -100,14 +100,24 @@ def main(args=None):
                       help="Add all __future__ and future imports to each module")
     parser.add_option("-1", "--stage1", action="store_true",
                       help="Modernize Python 2 code only; no compatibility with Python 3 (or dependency on ``future``)")
-    parser.add_option("-2", "--stage2", action="store_true",
-                      help="Take modernized (stage1) code and add a dependency on ``future`` to provide Py3 compatibility.")
+    parser.add_option(
+        "-2",
+        "--stage2",
+        action="store_true",
+        help="Take modernized (stage1) code and add a dependency on ``future`` to provide Py3 compatibility.")
     parser.add_option("-0", "--both-stages", action="store_true",
                       help="Apply both stages 1 and 2")
-    parser.add_option("-u", "--unicode-literals", action="store_true",
-                      help="Add ``from __future__ import unicode_literals`` to implicitly convert all unadorned string literals '' into unicode strings")
-    parser.add_option("-f", "--fix", action="append", default=[],
-                      help="Each FIX specifies a transformation; default: all.\nEither use '-f division -f metaclass' etc. or use the fully-qualified module name: '-f lib2to3.fixes.fix_types -f libfuturize.fixes.fix_unicode_keep_u'")
+    parser.add_option(
+        "-u",
+        "--unicode-literals",
+        action="store_true",
+        help="Add ``from __future__ import unicode_literals`` to implicitly convert all unadorned string literals '' into unicode strings")
+    parser.add_option(
+        "-f",
+        "--fix",
+        action="append",
+        default=[],
+        help="Each FIX specifies a transformation; default: all.\nEither use '-f division -f metaclass' etc. or use the fully-qualified module name: '-f lib2to3.fixes.fix_types -f libfuturize.fixes.fix_unicode_keep_u'")
     parser.add_option("-j", "--processes", action="store", default=1,
                       type="int", help="Run 2to3 concurrently")
     parser.add_option("-x", "--nofix", action="append", default=[],
@@ -278,7 +288,7 @@ def main(args=None):
 
     input_base_dir = os.path.commonprefix(args)
     if (input_base_dir and not input_base_dir.endswith(os.sep)
-        and not os.path.isdir(input_base_dir)):
+            and not os.path.isdir(input_base_dir)):
         # One or more similar names were passed, their directory is the base.
         # os.path.commonprefix() is ignorant of path elements, this corrects
         # for that weird API.
@@ -293,15 +303,15 @@ def main(args=None):
         extra_kwargs = {}
     else:
         extra_kwargs = {
-                        'append_suffix': options.add_suffix,
-                        'output_dir': options.output_dir,
-                        'input_base_dir': input_base_dir,
-                       }
+            'append_suffix': options.add_suffix,
+            'output_dir': options.output_dir,
+            'input_base_dir': input_base_dir,
+        }
 
     rt = StdoutRefactoringTool(
-            sorted(fixer_names), flags, sorted(explicit),
-            options.nobackups, not options.no_diffs,
-            **extra_kwargs)
+        sorted(fixer_names), flags, sorted(explicit),
+        options.nobackups, not options.no_diffs,
+        **extra_kwargs)
 
     # Refactor all files and directories passed as arguments
     if not rt.errors:
@@ -313,7 +323,7 @@ def main(args=None):
                             options.processes)
             except refactor.MultiprocessingUnsupported:
                 assert options.processes > 1
-                print("Sorry, -j isn't " \
+                print("Sorry, -j isn't "
                       "supported on this platform.", file=sys.stderr)
                 return 1
         rt.summarize()

@@ -2,20 +2,18 @@
 """
 
 from __future__ import absolute_import
-
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import json
-from urllib.parse import urlparse
-
+from .error import RestError
+from .util import get_base_app_name
 from solnlib.credentials import (
     CredentialManager,
     CredentialNotExistException,
 )
+from urllib.parse import urlparse
+import json
+from builtins import object
 
-from .util import get_base_app_name
-from .error import RestError
+from future import standard_library
+standard_library.install_aliases()
 
 
 __all__ = [
@@ -335,7 +333,7 @@ class RestCredentials(object):
                         need_write_magic_pwd = True
                         need_write_back_pwd = True
                         clear_password[k] = existed_model['content'][k]
-                else: 
+                else:
                     # mark to delete it
                     clear_password[k] = ''
                     need_write_back_pwd = True

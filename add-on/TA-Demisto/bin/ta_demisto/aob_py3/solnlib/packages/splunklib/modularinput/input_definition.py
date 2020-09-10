@@ -20,6 +20,7 @@ except ImportError as ie:
 
 from .utils import parse_xml_data
 
+
 class InputDefinition:
     """``InputDefinition`` encodes the XML defining inputs that Splunk passes to
     a modular input script.
@@ -29,7 +30,8 @@ class InputDefinition:
         i = InputDefinition()
 
     """
-    def __init__ (self):
+
+    def __init__(self):
         self.metadata = {}
         self.inputs = {}
 

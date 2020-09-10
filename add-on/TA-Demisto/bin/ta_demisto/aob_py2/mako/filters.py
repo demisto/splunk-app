@@ -188,7 +188,7 @@ def htmlentityreplace_errors(ex):
     """
     if isinstance(ex, UnicodeEncodeError):
         # Handle encoding errors
-        bad_text = ex.object[ex.start : ex.end]
+        bad_text = ex.object[ex.start: ex.end]
         text = _html_entities_escaper.escape(bad_text)
         return (compat.text_type(text), ex.end)
     raise ex

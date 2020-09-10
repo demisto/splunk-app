@@ -15,6 +15,7 @@ version to target for Py2/3 compatibility.
 from lib2to3 import fixer_base
 from libfuturize.fixer_util import remove_future_import
 
+
 class FixRemoveOldFutureImports(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = "file_input"

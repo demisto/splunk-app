@@ -108,7 +108,7 @@ class ModelCompatibilityMixin(object):
     @deprecated
     def convert(cls, raw_data, context=None, **kw):
         return transforms.convert(cls._schema, raw_data, oo=True,
-            context=context, **kw)
+                                  context=context, **kw)
 
 
 class BaseErrorV1Mixin(object):
@@ -125,6 +125,7 @@ def patch_models():
     from . import schema
     from . import models
     models_Model = models.Model
+
     class Model(ModelCompatibilityMixin, models.Model):
         __doc__ = models.Model.__doc__
     models.Model = Model
@@ -135,6 +136,7 @@ def patch_schema():
     global schema_Schema
     from . import schema
     schema_Schema = schema.Schema
+
     class Schema(SchemaCompatibilityMixin, schema.Schema):
         __doc__ = schema.Schema.__doc__
     schema.Schema = Schema

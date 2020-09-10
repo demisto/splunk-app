@@ -589,8 +589,11 @@ class SearchCommand(object):
                 debug('Writing configuration settings')
 
                 ifile = self._prepare_protocol_v1(argv, ifile, ofile)
-                self._record_writer.write_record(dict(
-                    (n, ','.join(v) if isinstance(v, (list, tuple)) else v) for n, v in six.iteritems(self._configuration)))
+                self._record_writer.write_record(
+                    dict(
+                        (n, ','.join(v) if isinstance(
+                            v, (list, tuple)) else v) for n, v in six.iteritems(
+                            self._configuration)))
                 self.finish()
 
             elif argv[1] == '__EXECUTE__':
@@ -626,7 +629,7 @@ class SearchCommand(object):
             self.flush()
             raise
 
-        except:
+        except BaseException:
             self._report_unexpected_error()
             self.flush()
             exit(1)
@@ -683,7 +686,7 @@ class SearchCommand(object):
                 raise RuntimeError('%s.metadata.searchinfo.dispatch_dir is undefined'.format(class_name))
 
             debug('  tempfile.tempdir=%r', tempfile.tempdir)
-        except:
+        except BaseException:
             self._record_writer = RecordWriterV2(ofile)
             self._report_unexpected_error()
             self.finish()
@@ -701,7 +704,7 @@ class SearchCommand(object):
 
             debug('Parsing arguments')
 
-            if args and type(args) == list:
+            if args and isinstance(args, list):
                 for arg in args:
                     result = arg.split('=', 1)
                     if len(result) == 1:
@@ -763,7 +766,7 @@ class SearchCommand(object):
             self._record_writer.write_metadata(self._configuration)
             self.finish()
             raise
-        except:
+        except BaseException:
             self._record_writer.write_metadata(self._configuration)
             self._report_unexpected_error()
             self.finish()
@@ -781,7 +784,7 @@ class SearchCommand(object):
         except SystemExit:
             self.finish()
             raise
-        except:
+        except BaseException:
             self._report_unexpected_error()
             self.finish()
             exit(1)
@@ -989,6 +992,7 @@ class SearchCommand(object):
         """ Represents the configuration settings common to all :class:`SearchCommand` classes.
 
         """
+
         def __init__(self, command):
             self.command = command
 
@@ -1015,8 +1019,10 @@ class SearchCommand(object):
             :return: String representation of this instance
 
             """
-            #text = ', '.join(imap(lambda (name, value): name + '=' + json_encode_string(unicode(value)), self.iteritems()))
-            text = ', '.join(['{}={}'.format(name, json_encode_string(six.text_type(value))) for (name, value) in six.iteritems(self)])
+            # text = ', '.join(imap(lambda (name, value): name + '=' +
+            # json_encode_string(unicode(value)), self.iteritems()))
+            text = ', '.join(['{}={}'.format(name, json_encode_string(six.text_type(value)))
+                              for (name, value) in six.iteritems(self)])
             return text
 
         # region Methods

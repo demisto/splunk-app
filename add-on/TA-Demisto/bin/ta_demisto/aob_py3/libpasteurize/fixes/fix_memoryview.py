@@ -9,7 +9,7 @@ from lib2to3.fixer_util import Name
 
 class FixMemoryview(fixer_base.BaseFix):
 
-    explicit = True # User must specify that they want this.
+    explicit = True  # User must specify that they want this.
 
     PATTERN = u"""
               power< name='memoryview' trailer< '(' [any] ')' >

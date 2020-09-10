@@ -29,6 +29,7 @@ class Converter(object):
     Converting data: encode for in-coming request
         and decode for out-coming response.
     """
+
     def encode(self, value, request):
         """
         Encode data from client for request.
@@ -163,6 +164,7 @@ class Upper(Normaliser):
     """
     Normalize a string to all upper cases.
     """
+
     def normalize(self, value, data):
         return value.strip().upper()
 
@@ -199,7 +201,7 @@ class Unifier(Normaliser):
 
     def normalize(self, value, data):
         need_lower = not self._case_sensitive and \
-                     isinstance(value, basestring)
+            isinstance(value, basestring)
         val_old = value.lower() if need_lower else value
         val_default = self._default or value
         return self._value_map.get(val_old, val_default)

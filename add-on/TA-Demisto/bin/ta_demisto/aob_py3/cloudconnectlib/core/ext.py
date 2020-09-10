@@ -150,9 +150,9 @@ def splunk_xml(candidates,
         sourcetype=sourcetype
     )
     _logger.info(
-                "[%s] events are formated as splunk stream xml",
-                len(candidates)
-            )
+        "[%s] events are formated as splunk stream xml",
+        len(candidates)
+    )
     return xml_events
 
 
@@ -174,7 +174,7 @@ def std_output(candidates):
             )
             try:
                 candidate = json.dumps(candidate)
-            except:
+            except BaseException:
                 _logger.exception('The type of data needs to print is "%s"'
                                   ' rather than %s',
                                   type(candidate),

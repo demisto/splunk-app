@@ -40,7 +40,7 @@ def newround(number, ndigits=None):
 
     if not PY26:
         d = Decimal.from_float(number).quantize(exponent,
-                                            rounding=ROUND_HALF_EVEN)
+                                                rounding=ROUND_HALF_EVEN)
     else:
         d = from_float_26(number).quantize(exponent, rounding=ROUND_HALF_EVEN)
 
@@ -50,7 +50,7 @@ def newround(number, ndigits=None):
         return float(d)
 
 
-### From Python 2.7's decimal.py. Only needed to support Py2.6:
+# From Python 2.7's decimal.py. Only needed to support Py2.6:
 
 def from_float_26(f):
     """Converts a float to a decimal number, exactly.
@@ -86,13 +86,14 @@ def from_float_26(f):
         sign = 1
     n, d = abs(f).as_integer_ratio()
     # int.bit_length() method doesn't exist on Py2.6:
+
     def bit_length(d):
         if d != 0:
             return len(bin(abs(d))) - 2
         else:
             return 0
     k = bit_length(d) - 1
-    result = _dec_from_triple(sign, str(n*5**k), -k)
+    result = _dec_from_triple(sign, str(n * 5**k), -k)
     return result
 
 

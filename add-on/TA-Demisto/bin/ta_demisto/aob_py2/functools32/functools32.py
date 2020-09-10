@@ -22,11 +22,13 @@ except ImportError:
     from ._dummy_thread32 import allocate_lock as Lock
 
 ################################################################################
-### OrderedDict
+# OrderedDict
 ################################################################################
+
 
 class _Link(object):
     __slots__ = 'prev', 'next', 'key', '__weakref__'
+
 
 class OrderedDict(dict):
     'Dictionary that remembers insertion order'
@@ -233,19 +235,22 @@ class OrderedDict(dict):
 
         '''
         if isinstance(other, OrderedDict):
-            return len(self)==len(other) and \
-                   all(p==q for p, q in zip(self.items(), other.items()))
+            return len(self) == len(other) and \
+                all(p == q for p, q in zip(self.items(), other.items()))
         return dict.__eq__(self, other)
 
 # update_wrapper() and wraps() are tools to help write
 # wrapper functions that can handle naive introspection
 
+
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__doc__')
 WRAPPER_UPDATES = ('__dict__',)
+
+
 def update_wrapper(wrapper,
                    wrapped,
-                   assigned = WRAPPER_ASSIGNMENTS,
-                   updated = WRAPPER_UPDATES):
+                   assigned=WRAPPER_ASSIGNMENTS,
+                   updated=WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
        wrapper is the function to be updated
@@ -270,9 +275,10 @@ def update_wrapper(wrapper,
     # Return the wrapper so this can be used as a decorator via partial()
     return wrapper
 
+
 def wraps(wrapped,
-          assigned = WRAPPER_ASSIGNMENTS,
-          updated = WRAPPER_UPDATES):
+          assigned=WRAPPER_ASSIGNMENTS,
+          updated=WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -283,6 +289,7 @@ def wraps(wrapped,
     """
     return partial(update_wrapper, wrapped=wrapped,
                    assigned=assigned, updated=updated)
+
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
@@ -311,28 +318,38 @@ def total_ordering(cls):
             setattr(cls, opname, opfunc)
     return cls
 
+
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     class K(object):
         __slots__ = ['obj']
+
         def __init__(self, obj):
             self.obj = obj
+
         def __lt__(self, other):
             return mycmp(self.obj, other.obj) < 0
+
         def __gt__(self, other):
             return mycmp(self.obj, other.obj) > 0
+
         def __eq__(self, other):
             return mycmp(self.obj, other.obj) == 0
+
         def __le__(self, other):
             return mycmp(self.obj, other.obj) <= 0
+
         def __ge__(self, other):
             return mycmp(self.obj, other.obj) >= 0
+
         def __ne__(self, other):
             return mycmp(self.obj, other.obj) != 0
         __hash__ = None
     return K
 
+
 _CacheInfo = namedtuple("CacheInfo", "hits misses maxsize currsize")
+
 
 def lru_cache(maxsize=100):
     """Least-recently-used cache decorator.
@@ -355,7 +372,7 @@ def lru_cache(maxsize=100):
     # to allow the implementation to change (including a possible C version).
 
     def decorating_function(user_function,
-                tuple=tuple, sorted=sorted, len=len, KeyError=KeyError):
+                            tuple=tuple, sorted=sorted, len=len, KeyError=KeyError):
 
         hits, misses = [0], [0]
         kwd_mark = (object(),)          # separates positional and keyword args

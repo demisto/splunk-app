@@ -19,7 +19,7 @@ __all__ = [
     'Policy',
     'Compat32',
     'compat32',
-    ]
+]
 
 
 class _PolicyBase(object):
@@ -53,15 +53,15 @@ class _PolicyBase(object):
         """
         for name, value in kw.items():
             if hasattr(self, name):
-                super(_PolicyBase,self).__setattr__(name, value)
+                super(_PolicyBase, self).__setattr__(name, value)
             else:
                 raise TypeError(
                     "{!r} is an invalid keyword argument for {}".format(
                         name, self.__class__.__name__))
 
     def __repr__(self):
-        args = [ "{}={!r}".format(name, value)
-                 for name, value in self.__dict__.items() ]
+        args = ["{}={!r}".format(name, value)
+                for name, value in self.__dict__.items()]
         return "{}({})".format(self.__class__.__name__, ', '.join(args))
 
     def clone(self, **kw):
@@ -102,6 +102,7 @@ def _append_doc(doc, added_doc):
     doc = doc.rsplit('\n', 1)[0]
     added_doc = added_doc.split('\n', 1)[1]
     return doc + '\n' + added_doc
+
 
 def _extend_docstrings(cls):
     if cls.__doc__ and cls.__doc__.startswith('+'):
@@ -329,7 +330,7 @@ class Compat32(Policy):
         header is used, with its existing line breaks and/or binary data.
 
         """
-        folded = self._fold(name, value, sanitize=self.cte_type=='7bit')
+        folded = self._fold(name, value, sanitize=self.cte_type == '7bit')
         return folded.encode('ascii', 'surrogateescape')
 
     def _fold(self, name, value, sanitize):

@@ -1,4 +1,9 @@
 from __future__ import print_function
+from splunk_aoblib.setup_util import Setup_Util
+from splunk_aoblib.rest_helper import TARestHelper
+import logging
+from logging_helper import get_logger
+from cim_actions import ModularAction
 from builtins import str
 import csv
 import gzip
@@ -11,12 +16,6 @@ except ImportError:
 
 # TODO: How does it depend on CIM module?
 sys.path.insert(0, make_splunkhome_path(["etc", "apps", "Splunk_SA_CIM", "lib"]))
-
-from cim_actions import ModularAction
-from logging_helper import get_logger
-import logging
-from splunk_aoblib.rest_helper import TARestHelper
-from splunk_aoblib.setup_util import Setup_Util
 
 
 class ModularAlertBase(ModularAction):
@@ -105,7 +104,18 @@ class ModularAlertBase(ModularAction):
                 uri = '{0}://{1}'.format(proxy['proxy_type'], uri)
         return uri
 
-    def send_http_request(self, url, method, parameters=None, payload=None, headers=None, cookies=None, verify=True, cert=None, timeout=None, use_proxy=True):
+    def send_http_request(
+            self,
+            url,
+            method,
+            parameters=None,
+            payload=None,
+            headers=None,
+            cookies=None,
+            verify=True,
+            cert=None,
+            timeout=None,
+            use_proxy=True):
         return self.rest_helper.send_http_request(url=url, method=method, parameters=parameters, payload=payload,
                                                   headers=headers, cookies=cookies, verify=verify, cert=cert,
                                                   timeout=timeout,
@@ -181,7 +191,7 @@ class ModularAlertBase(ModularAction):
         try:
             try:
                 self.result_handle = gzip.open(self.results_file, 'rt')
-            except ValueError: # Workaround for Python 2.7 on Windows
+            except ValueError:  # Workaround for Python 2.7 on Windows
                 self.result_handle = gzip.open(self.results_file, 'r')
             return (self.pre_handle(num, result) for num, result in enumerate(csv.DictReader(self.result_handle)))
         except IOError:
@@ -193,7 +203,7 @@ class ModularAlertBase(ModularAction):
         try:
             try:
                 rf = gzip.open(self.results_file, 'rt')
-            except ValueError: # Workaround for Python 2.7 on Windows
+            except ValueError:  # Workaround for Python 2.7 on Windows
                 rf = gzip.open(self.results_file, 'r')
             for num, result in enumerate(csv.DictReader(rf)):
                 result.setdefault('rid', str(num))

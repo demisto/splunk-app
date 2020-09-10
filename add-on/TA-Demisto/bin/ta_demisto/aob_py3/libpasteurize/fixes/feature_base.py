@@ -7,9 +7,10 @@ features.add(Feature("py3k_feature", "power< 'py3k' any* >", "2.7"))
 PATTERN = features.PATTERN
 """
 
-pattern_unformatted = u"%s=%s" # name=pattern, for dict lookups
+pattern_unformatted = u"%s=%s"  # name=pattern, for dict lookups
 message_unformatted = u"""
 %s is only supported in Python %s and above."""
+
 
 class Feature(object):
     u"""
@@ -17,6 +18,7 @@ class Feature(object):
     required to use the feature (or 3.x if there is no backwards-compatible
     version of 2.x)
     """
+
     def __init__(self, name, PATTERN, version):
         self.name = name
         self._pattern = PATTERN
@@ -27,6 +29,7 @@ class Feature(object):
         Format the above text with the name and minimum version required.
         """
         return message_unformatted % (self.name, self.version)
+
 
 class Features(set):
     u"""

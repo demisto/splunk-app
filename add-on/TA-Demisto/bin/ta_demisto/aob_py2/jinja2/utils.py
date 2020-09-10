@@ -8,13 +8,14 @@
     :copyright: (c) 2017 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
+from markupsafe import Markup, escape, soft_unicode
 import re
 import json
 import errno
 from collections import deque
 from threading import Lock
 from jinja2._compat import text_type, string_types, implements_iterator, \
-     url_quote
+    url_quote
 
 
 _word_split_re = re.compile(r'(\s+)')
@@ -200,9 +201,9 @@ def urlize(text, trim_url_limit=None, rel=None, target=None):
 
     If target is not None, a target attribute will be added to the link.
     """
-    trim_url = lambda x, limit=trim_url_limit: limit is not None \
-                         and (x[:limit] + (len(x) >=limit and '...'
-                         or '')) or x
+    def trim_url(x, limit=trim_url_limit): return limit is not None \
+        and (x[:limit] + (len(x) >= limit and '...'
+                          or '')) or x
     words = _word_split_re.split(text_type(escape(text)))
     rel_attr = rel and ' rel="%s"' % text_type(escape(rel)) or ''
     target_attr = target and ' target="%s"' % escape(target) or ''
@@ -212,23 +213,23 @@ def urlize(text, trim_url_limit=None, rel=None, target=None):
         if match:
             lead, middle, trail = match.groups()
             if middle.startswith('www.') or (
-                '@' not in middle and
-                not middle.startswith('http://') and
-                not middle.startswith('https://') and
-                len(middle) > 0 and
-                middle[0] in _letters + _digits and (
-                    middle.endswith('.org') or
-                    middle.endswith('.net') or
-                    middle.endswith('.com')
-                )):
+                    '@' not in middle and
+                    not middle.startswith('http://') and
+                    not middle.startswith('https://') and
+                    len(middle) > 0 and
+                    middle[0] in _letters + _digits and (
+                        middle.endswith('.org') or
+                        middle.endswith('.net') or
+                        middle.endswith('.com')
+                    )):
                 middle = '<a href="http://%s"%s%s>%s</a>' % (middle,
-                    rel_attr, target_attr, trim_url(middle))
+                                                             rel_attr, target_attr, trim_url(middle))
             if middle.startswith('http://') or \
                middle.startswith('https://'):
                 middle = '<a href="%s"%s%s>%s</a>' % (middle,
-                    rel_attr, target_attr, trim_url(middle))
+                                                      rel_attr, target_attr, trim_url(middle))
             if '@' in middle and not middle.startswith('www.') and \
-               not ':' in middle and _simple_email_re.match(middle):
+               ':' not in middle and _simple_email_re.match(middle):
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
             if lead + middle + trail != word:
                 words[i] = lead + middle + trail
@@ -326,9 +327,9 @@ class LRUCache(object):
 
     def __getstate__(self):
         return {
-            'capacity':     self.capacity,
-            '_mapping':     self._mapping,
-            '_queue':       self._queue
+            'capacity': self.capacity,
+            '_mapping': self._mapping,
+            '_queue': self._queue
         }
 
     def __setstate__(self, d):
@@ -530,6 +531,7 @@ def select_autoescape(enabled_extensions=('html', 'htm', 'xml'),
                              for x in enabled_extensions)
     disabled_patterns = tuple('.' + x.lstrip('.').lower()
                               for x in disabled_extensions)
+
     def autoescape(template_name):
         if template_name is None:
             return default_for_string
@@ -644,4 +646,3 @@ except SyntaxError:
 
 
 # Imported here because that's where it was in the past
-from markupsafe import Markup, escape, soft_unicode

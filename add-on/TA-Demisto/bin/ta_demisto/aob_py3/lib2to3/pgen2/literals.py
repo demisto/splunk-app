@@ -16,6 +16,7 @@ simple_escapes = {"a": "\a",
                   '"': '"',
                   "\\": "\\"}
 
+
 def escape(m):
     all, tail = m.group(0, 1)
     assert all.startswith("\\")
@@ -37,15 +38,17 @@ def escape(m):
             raise ValueError("invalid octal string escape ('\\%s')" % tail) from None
     return chr(i)
 
+
 def evalString(s):
     assert s.startswith("'") or s.startswith('"'), repr(s[:1])
     q = s[0]
-    if s[:3] == q*3:
-        q = q*3
+    if s[:3] == q * 3:
+        q = q * 3
     assert s.endswith(q), repr(s[-len(q):])
-    assert len(s) >= 2*len(q)
+    assert len(s) >= 2 * len(q)
     s = s[len(q):-len(q)]
     return re.sub(r"\\(\'|\"|\\|[abfnrtv]|x.{0,2}|[0-7]{1,3})", escape, s)
+
 
 def test():
     for i in range(256):

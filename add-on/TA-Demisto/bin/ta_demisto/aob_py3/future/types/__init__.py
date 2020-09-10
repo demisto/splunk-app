@@ -159,7 +159,7 @@ def disallow_types(argnums, disallowed_types):
                 # Here we use type() rather than isinstance() because
                 # __instancecheck__ is being overridden. E.g.
                 # isinstance(b'abc', newbytes) is True on Py2.
-                if type(args[argnum]) == mytype:
+                if isinstance(args[argnum], mytype):
                     raise TypeError(errmsg.format(mytype))
 
             return function(*args, **kwargs)
@@ -208,7 +208,7 @@ def issubset(list1, list2):
     """
     n = len(list1)
     for startpos in range(len(list2) - n + 1):
-        if list2[startpos:startpos+n] == list1:
+        if list2[startpos:startpos + n] == list1:
             return True
     return False
 

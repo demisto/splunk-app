@@ -53,7 +53,7 @@ class CloudConnectEngine(object):
                                 self._add_job(temp)
                         else:
                             self._add_job(result)
-        except:
+        except BaseException:
             logger.exception("CloudConnectEngine encountered exception")
         finally:
             self._teardown()
@@ -87,7 +87,7 @@ class CloudConnectEngine(object):
                 return None
             invoke_result = job.run()
             return invoke_result
-        except:
+        except BaseException:
             logger.exception("job %s is invoked with exception", job)
             return None
         finally:

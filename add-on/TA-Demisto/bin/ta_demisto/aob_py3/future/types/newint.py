@@ -82,7 +82,7 @@ class newint(with_metaclass(BaseNewInt, long)):
             # Py2: long(bytearray(b'10'), 2) == 2 raises TypeError
             try:
                 return super(newint, cls).__new__(cls, newbytes(val))
-            except:
+            except BaseException:
                 raise TypeError("newint argument must be a string or a number,"
                                 "not '{0}'".format(type(val)))
 
@@ -321,7 +321,7 @@ class newint(with_metaclass(BaseNewInt, long)):
         if byteorder not in ('little', 'big'):
             raise ValueError("byteorder must be either 'little' or 'big'")
         h = b'%x' % num
-        s = newbytes((b'0'*(len(h) % 2) + h).zfill(length*2).decode('hex'))
+        s = newbytes((b'0' * (len(h) % 2) + h).zfill(length * 2).decode('hex'))
         if signed:
             high_set = s[0] & 0x80
             if self > 0 and high_set:
@@ -365,7 +365,7 @@ class newint(with_metaclass(BaseNewInt, long)):
         # str has it:
         num = int(native(b).encode('hex'), 16)
         if signed and (b[0] & 0x80):
-            num = num - (2 ** (len(b)*8))
+            num = num - (2 ** (len(b) * 8))
         return cls(num)
 
 

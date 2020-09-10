@@ -12,6 +12,7 @@ from lib2to3 import fixer_base
 
 _literal_re = re.compile(r"[^bBuUrR]?[\'\"]")
 
+
 class FixBytes(fixer_base.BaseFix):
     BM_compatible = True
     PATTERN = "STRING"

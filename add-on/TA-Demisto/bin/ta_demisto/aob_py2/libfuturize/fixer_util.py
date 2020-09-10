@@ -41,24 +41,26 @@ def canonical_fix_name(fix, avail_fixes):
                  if f.endswith('fix_{0}'.format(fix))]
         if len(found) > 1:
             raise ValueError("Ambiguous fixer name. Choose a fully qualified "
-                  "module name instead from these:\n" +
-                  "\n".join("  " + myf for myf in found))
+                             "module name instead from these:\n" +
+                             "\n".join("  " + myf for myf in found))
         elif len(found) == 0:
             raise ValueError("Unknown fixer. Use --list-fixes or -l for a list.")
         return found[0]
 
 
-
-## These functions are from 3to2 by Joe Amenta:
+# These functions are from 3to2 by Joe Amenta:
 
 def Star(prefix=None):
     return Leaf(token.STAR, u'*', prefix=prefix)
 
+
 def DoubleStar(prefix=None):
     return Leaf(token.DOUBLESTAR, u'**', prefix=prefix)
 
+
 def Minus(prefix=None):
     return Leaf(token.MINUS, u'-', prefix=prefix)
+
 
 def commatize(leafs):
     """
@@ -71,6 +73,7 @@ def commatize(leafs):
         new_leafs.append(Comma())
     del new_leafs[-1]
     return new_leafs
+
 
 def indentation(node):
     """
@@ -93,6 +96,7 @@ def indentation(node):
     else:
         return node.prefix
 
+
 def indentation_step(node):
     """
     Dirty little trick to get the difference between each indentation level
@@ -105,9 +109,10 @@ def indentation_step(node):
     all_indents = set(i.value for i in r.pre_order() if i.type == token.INDENT)
     if not all_indents:
         # nothing is indented anywhere, so we get to pick what we want
-        return u"    " # four spaces is a popular convention
+        return u"    "  # four spaces is a popular convention
     else:
         return min(all_indents)
+
 
 def suitify(parent):
     """
@@ -127,11 +132,12 @@ def suitify(parent):
         raise ValueError(u"No class suite and no ':'!")
     # Move everything into a suite node
     suite = Node(syms.suite, [Newline(), Leaf(token.INDENT, indentation(node) + indentation_step(node))])
-    one_node = parent.children[i+1]
+    one_node = parent.children[i + 1]
     one_node.remove()
     one_node.prefix = u''
     suite.append_child(one_node)
     parent.append_child(suite)
+
 
 def NameImport(package, as_name=None, prefix=None):
     """
@@ -147,8 +153,10 @@ def NameImport(package, as_name=None, prefix=None):
                          Name(as_name, prefix=u" ")])
     return Node(syms.import_name, children)
 
+
 _compound_stmts = (syms.if_stmt, syms.while_stmt, syms.for_stmt, syms.try_stmt, syms.with_stmt)
 _import_stmts = (syms.import_name, syms.import_from)
+
 
 def import_binding_scope(node):
     """
@@ -209,6 +217,7 @@ def import_binding_scope(node):
             if p is None:
                 break
 
+
 def ImportAsName(name, as_name, prefix=None):
     new_name = Name(name)
     new_as = Name(u"as", prefix=u" ")
@@ -263,7 +272,7 @@ def future_import(feature, node):
         root.children[0].prefix = u''
         # End the __future__ import line with a newline and add a blank line
         # afterwards:
-    children = [import_ , Newline()]
+    children = [import_, Newline()]
     root.insert_child(idx, Node(syms.simple_stmt, children))
 
 
@@ -298,6 +307,7 @@ def future_import2(feature, node):
 
     children = [import_, Newline()]
     root.insert_child(insert_pos, Node(syms.simple_stmt, children, prefix=prefix))
+
 
 def parse_args(arglist, scheme):
     u"""
@@ -406,12 +416,12 @@ def touch_import_top(package, name_to_import, node):
                                  [Node(syms.power,
                                        [Leaf(token.NAME, u'standard_library'),
                                         Node(syms.trailer, [Leaf(token.DOT, u'.'),
-                                        Leaf(token.NAME, u'install_aliases')]),
+                                                            Leaf(token.NAME, u'install_aliases')]),
                                         Node(syms.trailer, [Leaf(token.LPAR, u'('),
                                                             Leaf(token.RPAR, u')')])
-                                       ])
-                                 ]
-                                )
+                                        ])
+                                  ]
+                                 )
             children_hooks = [install_hooks, Newline()]
         else:
             children_hooks = []
@@ -426,7 +436,7 @@ def touch_import_top(package, name_to_import, node):
         root.insert_child(insert_pos + 1, Node(syms.simple_stmt, children_hooks))
 
 
-## The following functions are from python-modernize by Armin Ronacher:
+# The following functions are from python-modernize by Armin Ronacher:
 # (a little edited).
 
 def check_future_import(node):
