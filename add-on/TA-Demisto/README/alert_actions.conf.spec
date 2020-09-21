@@ -11,4 +11,4 @@ param.labels = <string> Labels.
 param.ignore_labels = <string> Ignore Labels.
 param.severity = <list> Severity.  It's default value is 0.
 param.details = <string> Details.  It's default value is Incident created from Splunk to XSOAR.
-
+param._cam = <json> Json specification for classifying response actions.
