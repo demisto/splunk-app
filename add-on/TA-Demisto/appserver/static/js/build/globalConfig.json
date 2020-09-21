@@ -245,7 +245,7 @@
                             "field": "validate_ssl",
                             "label": "Validate SSL",
                             "type": "checkbox",
-                            "defaultValue": 0
+                            "defaultValue": 1
                         }
                     ]
                 }

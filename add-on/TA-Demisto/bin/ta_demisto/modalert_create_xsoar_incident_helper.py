@@ -32,7 +32,8 @@ def process_event(helper, *args, **kwargs):
         'Content-type': 'application/json',
         'Accept': 'application/json'
     }
-    verify = True if helper.get_global_setting('validate_ssl') else False
+
+    verify = True if helper.get_global_setting('validate_ssl') == '1' else False
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
 
     proxy_settings = helper.get_proxy()
@@ -46,6 +47,11 @@ def process_event(helper, *args, **kwargs):
 
                 helper.log_info('Sending the incident to server {}...'.format(server_url))
                 headers['Authorization'] = api_key
+
+                helper.log_debug('verify={}'.format(str(verify)))
+                helper.log_debug('ssl_cert_loc={}'.format(str(ssl_cert_loc)))
+                helper.log_debug('proxy_enabled={}'.format(str(proxy_enabled)))
+
                 resp = helper.send_http_request(
                     url=server_url + '/incident/splunkapp',
                     method='POST',
@@ -58,12 +64,13 @@ def process_event(helper, *args, **kwargs):
 
                 helper.log_debug('resp.status_code={}'.format(str(resp.status_code)))
                 helper.log_debug('resp.content={}'.format(str(resp.text)))
+
             except Exception as e:
                 helper.log_error(
                     'Failed creating an incident to server {}. Reason: {}'.format(server_url, str(e))
                 )
 
-        helper.log_debug('event={}'.format(json.dumps(event, indent=4)))
+        helper.log_debug('event={}'.format(json.dumps(event)))
 
     return 0
 
@@ -112,7 +119,7 @@ def get_configured_servers(helper):
 def get_servers_details(helper):
     servers_to_api_keys = {}
 
-    helper.log_info('send_all_servers: {}'.format(helper.get_param('send_all_servers')))
+    helper.log_debug('send_all_servers={}'.format(helper.get_param('send_all_servers')))
 
     if helper.get_param('send_all_servers') == '1':
         # get all server urls

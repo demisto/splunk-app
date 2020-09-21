@@ -1,7 +1,7 @@
 
 # ABOUT THIS APP
 
-Supporting Add-on for XSOAR. This application allows a user to create incident into XSOAR from Splunk using custom alert action.
+Supporting Add-on for Cortex XSOAR. This application allows a user to create incident into XSOAR from Splunk using custom alert action.
 
 
 # REQUIREMENTS
@@ -27,7 +27,7 @@ $SPLUNK_HOME/bin/splunk install app $PATH_TO_SPL/TA-Demisto.spl/
 
 # Application Setup
 * The user must complete the setup of the application. In order to create incident into XSOAR, a user needs to enter "Launch app" action after installing the add-on and provide the following:
-    1) Create an XSOAR instance:
+    1) Create a XSOAR instance:
        Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
     2) Set up proxy settings (optional):
        Under Proxy tab, check the "Enable" checkbox and fill all the proxy parameters needed.
@@ -35,7 +35,8 @@ $SPLUNK_HOME/bin/splunk install app $PATH_TO_SPL/TA-Demisto.spl/
        By default, the logging level is "INFO". You may change the logging level to "DEBUG" in case needed.
     4) Additional Settings (optional):
        - If you have an SSL certificate, please provide its full path under "Location to Certificate" field.
-       - By default, Validate SSL is disabled. You may check it
+       - By default, "Validate SSL" is enabled.
+* You must restart Splunk in order to apply changes in the configuration settings.
        
 # Custom Alert Action
 * This application will add custom alert action named XSOAR Custom Alert Action. The user can configure this action on saved search. The user can pass following parameters to XSOAR:
