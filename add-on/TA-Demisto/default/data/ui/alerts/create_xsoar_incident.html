@@ -1,0 +1,86 @@
+<form class="form-horizontal form-complex">
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_name">Name  </label>
+    <div class="controls">
+	<input type="text" name="action.create_xsoar_incident.param.incident_name" id="create_xsoar_incident_name"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_occurred">Time Occurred (epoch)  </label>
+    <div class="controls">
+	<input type="text" name="action.create_xsoar_incident.param.occurred" id="create_xsoar_incident_occurred"/>
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label">Send Alert to all the Servers</label>
+
+    <div class="controls">
+        <input type="checkbox" name="action.create_xsoar_incident.param.send_all_servers" id="create_xsoar_incident_send_all_servers" checked="false" value="true"/>
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label" for="server_url">XSOAR Server</label>
+
+    <splunk-search-dropdown
+        name="action.create_xsoar_incident.param.server_url"
+        search="| rest /servicesNS/nobody/TA-Demisto/server_list"
+        label-field="server_url" value-field="title">
+    </splunk-search-dropdown>
+  <span class="help-block">Send incidents to the specified server.</span>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_type">Type  </label>
+    <div class="controls">
+	<input type="text" name="action.create_xsoar_incident.param.type" id="create_xsoar_incident_type"/>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_custom_fields">Custom Fields  </label>
+    <div class="controls">
+	<input type="text" name="action.create_xsoar_incident.param.custom_fields" id="create_xsoar_incident_custom_fields"/>
+                <span class="help-block">
+                    A comma separated 'key:value' custom fields pairs, e.g. killchain:1.1.1.1,User:john
+                </span>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_labels">Labels  </label>
+    <div class="controls">
+	<input type="text" name="action.create_xsoar_incident.param.labels" id="create_xsoar_incident_labels"/>
+                <span class="help-block">
+                    If Labels field is empty, all fields from Splunk will be passed into XSOAR incident labels unless specified in Ignore labels section.
+                </span>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_ignore_labels">Ignore Labels  </label>
+    <div class="controls">
+	<input type="text" name="action.create_xsoar_incident.param.ignore_labels" id="create_xsoar_incident_ignore_labels"/>
+                <span class="help-block">
+                    e.g. dest,User
+                </span>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_severity">Severity  </label>
+    <div class="controls">
+<select name="action.create_xsoar_incident.param.severity" id="create_xsoar_incident_severity">
+        <option value="0">Unknown</option>
+        <option value="0_5">Informational</option>
+        <option value="1">Low</option>
+        <option value="2">Medium</option>
+        <option value="3">High</option>
+        <option value="4">Critical</option>
+</select>
+    </div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="create_xsoar_incident_details">Details  </label>
+    <div class="controls">
+    <textarea name="action.create_xsoar_incident.param.details" rows="10" id="create_xsoar_incident_details">Incident created from data available in Splunk</textarea>
+                <span class="help-block">
+                    Include tokens to insert text based on search results.
+                </span>
+    </div>
+</div>
+</form>

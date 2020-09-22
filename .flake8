@@ -1,0 +1,12 @@
+[flake8]
+max-line-length = 120
+exclude =
+    # auto-generated files by Splunk Add-on Builder
+    add-on/TA-Demisto/bin/ta_demisto/aob_py2,
+    add-on/TA-Demisto/bin/ta_demisto/aob_py3,
+    add-on/TA-Demisto/bin/ta_demisto/cim_actions.py,
+    add-on/TA-Demisto/bin/ta_demisto/alert_actions_base.py,
+    add-on/TA-Demisto/bin/TA_Demisto_rh_account.py,
+    add-on/TA-Demisto/bin/TA_Demisto_rh_settings.py,
+    add-on/TA-Demisto/bin/create_xsoar_incident.py
+

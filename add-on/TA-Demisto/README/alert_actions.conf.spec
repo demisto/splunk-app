@@ -1,60 +1,14 @@
-[demisto]
-param._cam = <json>
-	* Json specification for classifying response actions.
-    * Used in AR.
-    * For more information refer Appendix A of Splunk_SA_CIM.
-    * Defaults to None.
 
-param.incident_name = <string>
-	* Field defines name of the Incident in Demisto
-	* Defaults to "Incident from AR"
-
-param.occured = <int>
-	*EPOCH time when the alert was created.
-	*Defaults to $trigger_time$
-
-param.type = <string>
-	*Type of incident in Demisto
-	*Defaults to "default"
-
-param.labels = <string>
-	*Comma separted key value pair of strings to be put in Label field of Demisto
-	*e.g IP:1.1.1.1,Type:Trojan
-	*Defaults to blank
-
-param.custom_field = <string>
-	*Comma separted key value pair of strings to be put in Custom fields of Demisto
-	*e.g KillChain:1.1.1.1,Type:Trojan
-	*Defaults to blank
-
-param.ignore_labels = <string>
-	*Comma separted column names which won't be pushed to demisto when no label is set.
-	*e.g User,Type
-	*Defaults to blank
-	
-param.investigate = <int>
-	*Indicates if investigation should be created in Demisto. 
-	*Takes either 1 or 0 
-	*Defaults to 0
-
-param.severity = <float>
-	*Drop down to define severity of the incident in Demisto
-	*Can take one of the following values 0: Unknown, 1: Low, 2: Medium, 3: High, 4: Critical
-	*Defaults to 0.
-
-param.details = <string>
-    * Details field in Demisto..
-    * Defaults to blank
-
-param.demisto_server = <string>
-    * The Demisto server to send the alert to
-    * Defaults to blank
-
-param.verbose         = <bool>
-   * Set modular alert action logger to verbose mode
-   * Defaults to "false"
-
-param.send_all_servers = <bool>
-    * Send alert to all the Demisto servers
-    * Defaults to false
-
+[create_xsoar_incident]
+python.version = python3
+param.incident_name = <string> Incident Name.  It's default value is Event from Splunk for host $result.host$.
+param.occurred = <string> Time Occurred (epoch).  It's default value is $trigger_time$.
+param.send_all_servers = <Checkbox> Whether or not to send the alert to all servers.  It's default value is false.
+param.xsoar_server = <list> XSOAR Server.
+param.type = <string> Type.  It's default value is Unclassified.
+param.custom_fields = <string> Custom Fields.
+param.labels = <string> Labels.
+param.ignore_labels = <string> Ignore Labels.
+param.severity = <list> Severity.  It's default value is 0.
+param.details = <string> Details.  It's default value is Incident created from Splunk to XSOAR.
+param._cam = <json> Json specification for classifying response actions.
