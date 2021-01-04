@@ -21,7 +21,7 @@ jobs:
         if: ${{ always() }}
         run: |
           export PYTHONPATH=$PYTHONPATH:/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin
-          echo ::set-env name=PYTHONPATH::$PYTHONPATH
+          echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
           pytest -vv
       - name: Run Flake8
         run: |
@@ -31,7 +31,7 @@ jobs:
           mkdir $GITHUB_WORKSPACE/artifacts
 
           export SPL_PATH="$GITHUB_WORKSPACE/artifacts/demisto-add-on-for-splunk.tgz"
-          echo ::set-env name=SPL_PATH::$SPL_PATH
+          echo "SPL_PATH=$SPL_PATH" >> $GITHUB_ENV
 
           cd add-on
           COPYFILE_DISABLE=1 tar -cvzf $SPL_PATH --exclude='*.pyc' TA-Demisto
@@ -68,9 +68,9 @@ jobs:
           echo "Container is ready!"
 
           HOST=https://localhost:8089
-          echo ::set-env name=HOST::$HOST
+          echo "HOST=$HOST" >> $GITHUB_ENV
           ADD_ON_PATH=$HOST/servicesNS/nobody/TA-Demisto
-          echo ::set-env name=ADD_ON_PATH::$ADD_ON_PATH
+          echo "ADD_ON_PATH=$ADD_ON_PATH" >> $GITHUB_ENV
       - name: Setup Add-on
         if: ${{ always() }}
         env:
