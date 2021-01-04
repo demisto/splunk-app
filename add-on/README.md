@@ -5,6 +5,15 @@ Supporting Add-on for Cortex XSOAR. This application allows a user to create inc
 # Requirements
 * Splunk version 7.2 >=
 
+# Procedure for Using the Demisto Add-on in Splunk
+
+1. [Prepare a local Splunk Environment](#prepare-a-local-splunk-environment)
+2. [Installation](#installation-of-the-add-on)
+3. [Configuration](#configuration)
+4. [Connectivity Test](#connectivity-test-create-a-custom-alert-action)
+5. [About Add-on Builder, AppInspect and Compatibility](#about-add-on-builder-appinspect-and-compatibility)
+6. [Tips for Developers](#tips-for-developers)
+7. [Common Issues - SSL Certificates](#common-issues-ssl-certificates)
 
 # Prepare a local Splunk Environment
 Run the following command to create a Splunk docker container (replace the `*****` with any 8-character password, containing letters and digits):
