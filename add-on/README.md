@@ -26,7 +26,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
 
 
 # Configuration
-* The user must complete the setup of the application. In order to create incident into XSOAR, a user needs to enter "Launch app" action after installing the add-on and provide the following:
+* In order to use the add-on and create incidents in XSOAR, you must complete the setup of the application. Press "Launch app" action after installing the add-on and provide the following:
     1) Create a XSOAR instance:
        Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings → Integration → API Keys.
     
@@ -45,7 +45,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
        
 # Connectivity Test - Create a Custom Alert Action
 ![alert](https://user-images.githubusercontent.com/38749041/103539271-6d467500-4ea0-11eb-89f9-2a551893800f.gif)
-* Upload data to Splunk (any PDF, CSV or YML file is ok)
+* Upload data to Splunk (any PDF, CSV or YML file is ok).
 * Create an alert by uploading any PDF, CSV or YML file to Splunk.
 * When the file is uploaded, click "Start Searching" and save the search as an Alert (on the top-right corner).
   * Complete the Alert settings:
@@ -53,6 +53,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
       2. Permissions – Shared in App
       3. Alert type – Run on Cron Schedule
       4. Cron Expression – * * * * * (every 1 minute)
+  
   * Press "Add Actions" and choose **Create XSOAR Incident**, from which you can setup the alert incident details:
       1. Name - name of the alert
       2. Time Occurred - time when alert was triggered
@@ -81,7 +82,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
 
 
 # Tips for Developers
-1. The main python script which handles the incidents creation is found on our splunk-app repo under `add-on/TA-Demisto/bin/ta_demisto/modalert_create_xsoar_incident_helper.py`
+1. The main python script which handles the incidents creation is found on our splunk-app repo under `add-on/TA-Demisto/bin/ta_demisto/modalert_create_xsoar_incident_helper.py`.
    An additional script is `modalert_create_xsoar_incident_utils.py` on the same directory. 
    **Any other python file shouldn’t be touched** unless we need to modify the configuration parameters.
    
@@ -100,7 +101,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
    sudo cat var/log/splunk/<log_filename>.log
    ```
 
-3. If you need to update the add-on, make sure to:
+3. If you need to update the add-on, make sure to do the following:
 
    a. Bump the add-on version when you make changes in the add-on. The version should be updated in three locations:
 
@@ -114,7 +115,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
       COPYFILE_DISABLE=1 tar -cvzf add-on/spls/demisto-add-on-for-splunk-xxx.tgz --exclude='*.pyc' TA-Demisto (replace xxx with new version)
       ```
 
-   c. AppInspect passes in the build.
+   c. Verify AppInspect passes in the build.
 
    d. Upload your new version to Splunkbase (ADMINISTRATOR TOOLS → Manage app → NEW VERSION) - make sure the new version is compatible with Splunk Cloud and Splunk Enterprise.
 
