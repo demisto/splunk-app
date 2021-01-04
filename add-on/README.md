@@ -17,11 +17,11 @@ Once executed, the splunk env will be available at https://localhost:8000.
 * After initializing the container, open the Splunk platform (via http://localhost:8000).
 * Download Splunk add-on from Splunkbase.
 
-  ![image](https://user-images.githubusercontent.com/38749041/103535473-6cf6ab80-4e99-11eb-8d13-99c7815f6b4b.png)
+  ![image](https://user-images.githubusercontent.com/38749041/103540830-07a7b800-4ea3-11eb-8f55-4f52a9928002.png)
 * Go to “Manage Apps” → Install app from file → upload the latest version of Demisto Add-on for Splunk.
   *Note:* if a version of the app already exists, mark the “Upgrade app” checkbox.
   
-  ![image](https://user-images.githubusercontent.com/38749041/103535521-8861b680-4e99-11eb-85ab-950b024eab65.png)
+  ![install](https://user-images.githubusercontent.com/38749041/103541256-db406b80-4ea3-11eb-9280-279f50e447f6.gif)
 * Restart Splunk and login again.
 
 
@@ -30,7 +30,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
     1) Create a XSOAR instance:
        Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
     
-       ![image](https://user-images.githubusercontent.com/38749041/103535676-d4acf680-4e99-11eb-894e-f847ab358783.png)
+       ![image](https://user-images.githubusercontent.com/38749041/103541473-25c1e800-4ea4-11eb-8868-8cad571ff58c.png)
     2) Set up proxy settings (optional):
        Under Proxy tab, check the "Enable" checkbox and fill all the proxy parameters needed.
     3) Choose log level (optional):
@@ -39,7 +39,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
        - If you have an SSL certificate, please provide its full path under "Location to Certificate" field.
        - By default, "Validate SSL" is enabled.
        
-       ![image](https://user-images.githubusercontent.com/38749041/103535713-e4c4d600-4e99-11eb-8026-f22d7680eb7c.png)
+       ![image](https://user-images.githubusercontent.com/38749041/103541559-4722d400-4ea4-11eb-8b01-754d9edd570c.png)
 * You must restart Splunk in order to apply changes in the configuration settings.
 
        
@@ -75,7 +75,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
 * Splunkbase’s way to validate their apps is called **AppInspect**. Our splunk-app repository on github has a build which sends the modified version of the add-on to AppInspect.
 
   ![image](https://user-images.githubusercontent.com/38749041/103539976-a6cbb000-4ea1-11eb-8bcf-774262e91a0e.png)
-* When bumping a version of the add-on on Splunkbase, we need to make sure it’s **compatible** with Splunk Enterprise and Splunk Cloud.
+* When bumping a version of the add-on on Splunkbase, we need to make sure it’s **compatible** with **Splunk Enterprise** and **Splunk Cloud**.
 
   ![image](https://user-images.githubusercontent.com/38749041/103540045-c06cf780-4ea1-11eb-9658-a559d744fa8b.png)
 
