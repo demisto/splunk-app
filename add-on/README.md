@@ -15,14 +15,14 @@ Supporting Add-on for Cortex XSOAR. This application allows a user to create inc
 6. [Tips for Developers](#tips-for-developers)
 7. [Common Issues - SSL Certificates](#common-issues---ssl-certificates)
 
-# Prepare a local Splunk Environment
+### Prepare a local Splunk Environment
 Run the following command to create a Splunk docker container (replace the `*****` with any 8-character password, containing letters and digits):
 ```
 docker run -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=*****" --name splunk splunk/splunk:latest
 ```
 Once executed, the splunk env will be available at http://localhost:8000.
 
-# Installation of the add-on
+### Installation of the add-on
 * Download Demisto Add-on for Splunk from [Splunkbase](https://splunkbase.splunk.com/app/3448).
 * After initializing the container, open your local Splunk environment.
 * Go to “Manage Apps” → Install app from file → upload the latest version of Demisto Add-on for Splunk.
@@ -32,7 +32,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
 * Restart Splunk and login again.
 
 
-# Configuration
+### Configuration
 * In order to use the add-on and create incidents in XSOAR, you must complete the setup of the application. Press "Launch app" action after installing the add-on and provide the following:
     1) Create a XSOAR instance:
        Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings → Integration → API Keys.
@@ -50,7 +50,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
 * You must restart Splunk in order to apply changes in the configuration settings.
 
        
-# Connectivity Test - Create a Custom Alert Action
+### Connectivity Test - Create a Custom Alert Action
 * Upload data to Splunk (any small PDF, CSV or YML file is ok).
 
   ![alert](https://user-images.githubusercontent.com/38749041/103539271-6d467500-4ea0-11eb-89f9-2a551893800f.gif)
@@ -78,7 +78,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
 * *Note:* Saved Alerts can be found under Search & Reporting → Alerts.
 
 
-# About Add-on Builder, AppInspect and Compatibility
+### About Add-on Builder, AppInspect and Compatibility
 * Versions 3.0.0 and above of the add-on were built using **Splunk Add-on Builder**, which simplified the latest upgrade of the add-on and the required python 2 and 3 compatibility process. Click [here](https://docs.splunk.com/Documentation/AddonBuilder/3.0.2/UserGuide/UseTheApp) to learn more about the Add-on builder.
 * Splunkbase’s way to validate their apps is called **AppInspect**. Our splunk-app repository on github has a build which sends the modified version of the add-on to AppInspect.
 
@@ -88,7 +88,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
   ![image](https://user-images.githubusercontent.com/38749041/103540045-c06cf780-4ea1-11eb-9658-a559d744fa8b.png)
 
 
-# Tips for Developers
+### Tips for Developers
 1. The main python script which handles the incidents creation is found on our splunk-app repo under `add-on/TA-Demisto/bin/ta_demisto/modalert_create_xsoar_incident_helper.py`.
    An additional script is `modalert_create_xsoar_incident_utils.py` on the same directory. 
    **Any other python file shouldn’t be touched** unless we need to modify the configuration parameters.
@@ -128,7 +128,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
 
       ![image](https://user-images.githubusercontent.com/38749041/103540137-ebefe200-4ea1-11eb-86e1-74d196988487.png)
 
-# Common Issues - SSL Certificates
+### Common Issues - SSL Certificates
 * **If you don’t use a certificate, make sure the “Validate SSL” checkbox is unmarked.**
 * **If the client has a self-signed certificate, we must add it to the Splunk server first, and then set the path to it in the Add-on setup page.**
 * In the case of a self-signed certificate, make sure that the **whole** certificate chain exist. If you won’t have the root, intermediate, and client certificates it won’t work (explanation about how it works can be found here).
