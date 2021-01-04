@@ -15,8 +15,6 @@ Once executed, the splunk env will be available at http://localhost:8000.
 
 # Installation of the add-on
 * Download Demisto Add-on for Splunk from [Splunkbase](https://splunkbase.splunk.com/app/3448).
-
-  ![image](https://user-images.githubusercontent.com/38749041/103540830-07a7b800-4ea3-11eb-8f55-4f52a9928002.png)
 * After initializing the container, open your local Splunk environment.
 * Go to “Manage Apps” → Install app from file → upload the latest version of Demisto Add-on for Splunk.
   *Note:* if a version of the app already exists, mark the “Upgrade app” checkbox.
@@ -34,7 +32,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
     2) Set up proxy settings (optional):
        Under Proxy tab, check the "Enable" checkbox and fill all the proxy parameters needed.
     3) Choose log level (optional):
-       By default, the logging level is "INFO". You may change the logging level to "DEBUG" in case needed.
+       By default, the logging level is "INFO". You may change the logging level to "DEBUG" if needed.
     4) Additional Settings (optional):
        - If you have an SSL certificate, please provide its full path under "Location to Certificate" field.
        - By default, "Validate SSL" is enabled.
@@ -44,9 +42,9 @@ Once executed, the splunk env will be available at http://localhost:8000.
 
        
 # Connectivity Test - Create a Custom Alert Action
-![alert](https://user-images.githubusercontent.com/38749041/103539271-6d467500-4ea0-11eb-89f9-2a551893800f.gif)
-* Upload data to Splunk (any PDF, CSV or YML file is ok).
-* Create an alert by uploading any PDF, CSV or YML file to Splunk.
+* Upload data to Splunk (any small PDF, CSV or YML file is ok).
+
+  ![alert](https://user-images.githubusercontent.com/38749041/103539271-6d467500-4ea0-11eb-89f9-2a551893800f.gif)
 * When the file is uploaded, click "Start Searching" and save the search as an Alert (on the top-right corner).
   * Complete the Alert settings:
       1. Title
@@ -76,7 +74,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
 * Splunkbase’s way to validate their apps is called **AppInspect**. Our splunk-app repository on github has a build which sends the modified version of the add-on to AppInspect.
 
   ![image](https://user-images.githubusercontent.com/38749041/103539976-a6cbb000-4ea1-11eb-8bcf-774262e91a0e.png)
-* When bumping a version of the add-on on Splunkbase, we need to make sure it’s **compatible** with **Splunk Enterprise** and **Splunk Cloud**.
+* When bumping a version of the add-on in Splunkbase, we need to make sure it’s **compatible** with **Splunk Enterprise** and **Splunk Cloud**.
 
   ![image](https://user-images.githubusercontent.com/38749041/103540045-c06cf780-4ea1-11eb-9658-a559d744fa8b.png)
 
@@ -110,9 +108,9 @@ Once executed, the splunk env will be available at http://localhost:8000.
       - `add-on/TA-Demisto/app.manifest`
 
    b. Add a compressed (.tgz) file of your version under add-on/spls path.
-      To create a compressed file from your local repository, run the following command on the root directory:
+      To create a compressed file from your local repository, run the following command on the root directory (replace xxx with new version):
       ```
-      COPYFILE_DISABLE=1 tar -cvzf add-on/spls/demisto-add-on-for-splunk-xxx.tgz --exclude='*.pyc' TA-Demisto (replace xxx with new version)
+      COPYFILE_DISABLE=1 tar -cvzf add-on/spls/demisto-add-on-for-splunk-xxx.tgz --exclude='*.pyc' TA-Demisto
       ```
 
    c. Verify AppInspect passes in the build.
