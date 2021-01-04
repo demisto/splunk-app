@@ -14,7 +14,7 @@ docker run -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS
 Once executed, the splunk env will be available at https://localhost:8000.
 
 # Installation of the add-on
-* After initializing the container, open the Splunk platform (via http://localhost:8000).
+* After initializing the container, open Splunk (via http://localhost:8000).
 * Download Splunk add-on from Splunkbase.
 
   ![image](https://user-images.githubusercontent.com/38749041/103540830-07a7b800-4ea3-11eb-8f55-4f52a9928002.png)
@@ -28,7 +28,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
 # Configuration
 * The user must complete the setup of the application. In order to create incident into XSOAR, a user needs to enter "Launch app" action after installing the add-on and provide the following:
     1) Create a XSOAR instance:
-       Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings --> Integration --> API Keys.
+       Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings → Integration → API Keys.
     
        ![image](https://user-images.githubusercontent.com/38749041/103541473-25c1e800-4ea4-11eb-8868-8cad571ff58c.png)
     2) Set up proxy settings (optional):
@@ -53,7 +53,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
       2. Permissions – Shared in App
       3. Alert type – Run on Cron Schedule
       4. Cron Expression – * * * * * (every 1 minute)
-  * Press Add Actions and choose Create XSOAR Incident, from which you can setup the alert incident details:
+  * Press "Add Actions" and choose **Create XSOAR Incident**, from which you can setup the alert incident details:
       1. Name - name of the alert
       2. Time Occurred - time when alert was triggered
       3. XSOAR Server (if “Send Alert to all the servers” is unchecked)
@@ -63,7 +63,7 @@ Once executed, the splunk env will be available at https://localhost:8000.
       7. Severity – the alert severity
       8. Details – “details” field of the incident
 
-* Go to server and wait for incidents (one for each event in Splunk).
+* Go to the XSOAR server and wait for incidents (one for each event in Splunk).
 
   ![image](https://user-images.githubusercontent.com/38749041/103539782-52c0cb80-4ea1-11eb-94a3-e284a97b33f3.png)
 
@@ -86,13 +86,13 @@ Once executed, the splunk env will be available at https://localhost:8000.
    **Any other python file shouldn’t be touched** unless we need to modify the configuration parameters.
    
    **Useful links to learn more about splunk add-ons structure:**
-   App Directory Structure: https://dev.splunk.com/enterprise/docs/developapps/createapps/appdirectorystructure/
-   Configuration Files: https://docs.splunk.com/Documentation/Splunk/8.1.0/Admin/Aboutconfigurationfiles
-   Splexicon – the Splunk glossary: https://docs.splunk.com/Splexicon
+   - App Directory Structure: https://dev.splunk.com/enterprise/docs/developapps/createapps/appdirectorystructure/
+   - Configuration Files: https://docs.splunk.com/Documentation/Splunk/8.1.0/Admin/Aboutconfigurationfiles
+   - Splexicon – the Splunk glossary: https://docs.splunk.com/Splexicon
 
 2. In case something is not working and we are not sure what happened, we have two kinds of logs:
-   `splunkd.log` – for Splunk issues
-   `create_xsoar_incident_modalert.log` – for the add-on issues
+   - `splunkd.log` – for Splunk issues
+   - `create_xsoar_incident_modalert.log` – for the add-on issues
 
    We can reach them from the container by typing:
    ```
@@ -104,9 +104,9 @@ Once executed, the splunk env will be available at https://localhost:8000.
 
    a. Bump the add-on version when you make changes in the add-on. The version should be updated in three locations:
 
-      `add-on/TA-Demisto/appserver/static/js/build/globalConfig.json` (only the “version” field, and not the “apiVersion” field)
-      `add-on/TA-Demisto/default/app.conf`
-      `add-on/TA-Demisto/app.manifest`
+      - `add-on/TA-Demisto/appserver/static/js/build/globalConfig.json` (only the “version” field, and not the “apiVersion” field)
+      - `add-on/TA-Demisto/default/app.conf`
+      - `add-on/TA-Demisto/app.manifest`
 
    b. Add a compressed (.tgz) file of your version under add-on/spls path.
       To create a compressed file from your local repository, run the following command on the root directory:
