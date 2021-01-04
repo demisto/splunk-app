@@ -11,13 +11,13 @@ Run the following command to create a Splunk docker container (replace the `****
 ```
 docker run -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=*****" --name splunk splunk/splunk:latest
 ```
-Once executed, the splunk env will be available at https://localhost:8000.
+Once executed, the splunk env will be available at http://localhost:8000.
 
 # Installation of the add-on
-* After initializing the container, open Splunk (via http://localhost:8000).
-* Download Splunk add-on from Splunkbase.
+* Download Demisto Add-on for Splunk from [Splunkbase](https://splunkbase.splunk.com/app/3448).
 
   ![image](https://user-images.githubusercontent.com/38749041/103540830-07a7b800-4ea3-11eb-8f55-4f52a9928002.png)
+* After initializing the container, open your local Splunk environment.
 * Go to “Manage Apps” → Install app from file → upload the latest version of Demisto Add-on for Splunk.
   *Note:* if a version of the app already exists, mark the “Upgrade app” checkbox.
   
