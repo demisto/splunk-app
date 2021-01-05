@@ -42,6 +42,8 @@ def process_event(helper, *args, **kwargs):
     events = helper.get_events()
     for event in events:
         for server_url, api_key in list(servers_to_api_keys.items()):
+            server_url = server_url.replace('http:', 'https:')
+
             try:
                 incident = create_incident_dictionary(helper, event, search_query, search_name, search_url)
 
