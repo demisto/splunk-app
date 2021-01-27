@@ -1,5 +1,5 @@
 # Demisto Add-on for Splunk
-Supporting Add-on for Cortex XSOAR. This application allows a user to create incident into XSOAR from Splunk using custom alert action.
+Supporting Add-on for Cortex XSOAR. This application allows a user to push incidents into Cortex XSOAR from Splunk using a custom alert action.
 
 
 # Requirements
