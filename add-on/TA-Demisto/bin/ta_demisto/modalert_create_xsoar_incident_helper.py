@@ -1,5 +1,6 @@
 import json
 import splunk
+from json import JSONDecodeError
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
@@ -36,20 +37,33 @@ def process_event(helper, *args, **kwargs):
     verify = True if helper.get_global_setting('validate_ssl') == '1' else False
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
 
+    server_to_cert = {}
+    try:
+        server_to_cert = json.loads(str(ssl_cert_loc))
+    except JSONDecodeError:
+        helper.log_debug('Failed to parse ssl_cert_loc to json, ssl_cert_loc={}'.format(str(ssl_cert_loc)))
+
     proxy_settings = helper.get_proxy()
     proxy_enabled = bool(proxy_settings)
 
     events = helper.get_events()
     for event in events:
         for server_url, api_key in list(servers_to_api_keys.items()):
+            server_url = server_url.replace('http:', 'https:')
+
             try:
+                if server_to_cert and server_to_cert.get(server_url):
+                    ssl_cert_tmp = server_to_cert.get(server_url)
+                else:
+                    ssl_cert_tmp = ssl_cert_loc
+
                 incident = create_incident_dictionary(helper, event, search_query, search_name, search_url)
 
                 helper.log_info('Sending the incident to server {}...'.format(server_url))
                 headers['Authorization'] = api_key
 
                 helper.log_debug('verify={}'.format(str(verify)))
-                helper.log_debug('ssl_cert_loc={}'.format(str(ssl_cert_loc)))
+                helper.log_debug('ssl_cert_loc={}'.format(str(ssl_cert_tmp)))
                 helper.log_debug('proxy_enabled={}'.format(str(proxy_enabled)))
 
                 resp = helper.send_http_request(
@@ -58,7 +72,7 @@ def process_event(helper, *args, **kwargs):
                     headers=headers,
                     payload=incident,
                     verify=verify,
-                    cert=ssl_cert_loc,
+                    cert=ssl_cert_tmp,
                     use_proxy=proxy_enabled
                 )
 
