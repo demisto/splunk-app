@@ -5,7 +5,7 @@ Supporting Add-on for Cortex XSOAR. This application allows a user to create inc
 # Requirements
 * Splunk version 7.2 >=
 
-# Procedure for Using the Demisto Add-on in Splunk
+# Development Setup for Using the Demisto Add-on in Splunk
 
 1. [Prepare a local Splunk Environment](#prepare-a-local-splunk-environment)
 2. [Installation](#installation-of-the-add-on)
