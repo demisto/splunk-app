@@ -98,7 +98,8 @@ def create_incident_dictionary(helper, event, search_query=None, search_name=Non
     event.update({
         'SplunkURL': search_url,
         'search_name': search_name,
-        'SplunkSearch': search_query
+        'SplunkSearch': search_query,
+        'name': helper.get_param('incident_name')
     })
 
     incident = {
