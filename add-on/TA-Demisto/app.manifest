@@ -5,11 +5,11 @@
     "id": {
       "group": null,
       "name": "TA-Demisto",
-      "version": "3.0.2"
+      "version": "3.0.3"
     },
     "author": [
       {
-        "name": "Dan Tavori",
+        "name": "Palo Alto Networks",
         "email": null,
         "company": null
       }

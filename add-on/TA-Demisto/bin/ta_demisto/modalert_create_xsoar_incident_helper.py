@@ -48,6 +48,7 @@ def process_event(helper, *args, **kwargs):
 
     events = helper.get_events()
     for event in events:
+        helper.log_debug('event = {}'.format(json.dumps(event, indent=4, sort_keys=True)))
         for server_url, api_key in list(servers_to_api_keys.items()):
             server_url = server_url.replace('http:', 'https:')
 
@@ -62,9 +63,10 @@ def process_event(helper, *args, **kwargs):
                 helper.log_info('Sending the incident to server {}...'.format(server_url))
                 headers['Authorization'] = api_key
 
-                helper.log_debug('verify={}'.format(str(verify)))
-                helper.log_debug('ssl_cert_loc={}'.format(str(ssl_cert_tmp)))
-                helper.log_debug('proxy_enabled={}'.format(str(proxy_enabled)))
+                helper.log_debug('verify = {}'.format(str(verify)))
+                helper.log_debug('ssl_cert_loc = {}'.format(str(ssl_cert_tmp)))
+                helper.log_debug('proxy_enabled = {}'.format(str(proxy_enabled)))
+                helper.log_debug('payload = {}'.format(json.dumps(incident, indent=4, sort_keys=True)))
 
                 resp = helper.send_http_request(
                     url=server_url + '/incident/splunkapp',
@@ -76,16 +78,13 @@ def process_event(helper, *args, **kwargs):
                     use_proxy=proxy_enabled
                 )
 
-                helper.log_debug('resp.status_code={}'.format(str(resp.status_code)))
-                helper.log_debug('resp.content={}'.format(str(resp.text)))
+                helper.log_debug('resp.status_code = {}'.format(str(resp.status_code)))
+                helper.log_debug('resp.content = {}'.format(json.dumps(resp.json(), indent=4, sort_keys=True)))
 
             except Exception as e:
                 helper.log_error(
                     'Failed creating an incident to server {}. Reason: {}'.format(server_url, str(e))
                 )
-
-        helper.log_debug('event={}'.format(json.dumps(event)))
-
     return 0
 
 
@@ -94,6 +93,14 @@ def create_incident_dictionary(helper, event, search_query=None, search_name=Non
     severity = float(helper.get_param('severity').replace('_', '.'))
     labels = helper.get_param('labels')
     ignore_labels = helper.get_param('ignore_labels')
+
+    # include some search metadata in the rawJSON event dict
+    event.update({
+        'SplunkURL': search_url,
+        'search_name': search_name,
+        'SplunkSearch': search_query,
+        'name': helper.get_param('incident_name')
+    })
 
     incident = {
         'details': helper.get_param('details'),
