@@ -8,24 +8,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Checkout to repository
-      - name: Set up Python 3.7
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: '3.9'
       - name: Install dependencies
         run: |
-          python3 -m pip install flake8
-          python3 -m pip install requests
-          python3 -m pip install pytest
-      - name: Run unit-tests
-        if: ${{ always() }}
+          pip install pipenv
+          pipenv install --dev
+      - name: Unit Testing
         run: |
-          export PYTHONPATH=$PYTHONPATH:/home/runner/work/splunk-app/splunk-app/add-on/TA-Demisto/bin
-          echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
-          pytest -vv
+          pipenv run pytest -v
       - name: Run Flake8
         run: |
-          flake8 ./add-on/TA-Demisto
+          pipenv run flake8 ./add-on/TA-Demisto
       - name: Compress Add-on
         run: |
           mkdir $GITHUB_WORKSPACE/artifacts
@@ -46,42 +42,4 @@ jobs:
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
           SPL_PATH: ${{ env.SPL_PATH }}
         run: |
-          echo "Running AppInspect on add-on"
-          python3 .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
-      - name: Create Splunk Container with Add-on
-        if: ${{ always() }}
-        env:
-          ADD_ON_DIR: add-on/TA-Demisto
-        run: |
-          docker run -it --mount type=bind,source=$GITHUB_WORKSPACE/"$ADD_ON_DIR",target=/opt/splunk/etc/apps/TA-Demisto/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
-
-          IS_CONTAINER_HEALTHY=false
-          TRY_COUNT=1
-          MAX_TRIES=10
-
-          while [ "$IS_CONTAINER_HEALTHY" = false ] && [[ $TRY_COUNT -le $MAX_TRIES ]]; do
-             echo "waiting for container to be ready..."
-             sleep 20
-             CONTAINER_STATUS=$(docker inspect --format='{{.State.Health.Status}}' splunk)
-             [ "$CONTAINER_STATUS" = "healthy" ] && IS_CONTAINER_HEALTHY=true || IS_CONTAINER_HEALTHY=false
-          done
-          echo "Container is ready!"
-
-          HOST=https://localhost:8089
-          echo "HOST=$HOST" >> $GITHUB_ENV
-          ADD_ON_PATH=$HOST/servicesNS/nobody/TA-Demisto
-          echo "ADD_ON_PATH=$ADD_ON_PATH" >> $GITHUB_ENV
-      - name: Setup Add-on
-        if: ${{ always() }}
-        env:
-          HOST: ${{ env.HOST }}
-          ADD_ON_PATH: ${{ env.ADD_ON_PATH }}
-          DEMISTO_URL: https://test.com
-          DEMISTO_API_KEY: test_api_key
-        run: |
-          echo "First-time password setting"
-          docker exec splunk sudo /opt/splunk/bin/splunk edit user admin -password passw0rd -role admin -auth admin:changeme
-
-          echo "Setting up Demisto client credentials"
-          # curl -k -u admin:passw0rd "$ADD_ON_PATH"/configs/conf-demistosetup/demistoenv/ -d VALIDATE_SSL=false -d DEMISTOURL="$DEMISTO_URL" -d AUTHKEY=$DEMISTO_API_KEY
-
+          pipenv run python .github/appinspect.py $SPLUNK_USERNAME $SPLUNK_PASSWORD $SPL_PATH
