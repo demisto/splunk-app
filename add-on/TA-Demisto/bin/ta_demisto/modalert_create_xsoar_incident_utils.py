@@ -54,7 +54,8 @@ def split_fields(s):
     temp = ''
     for item in arr:
         temp += item.strip()
-        if ':' in temp and temp.count('"') % 2 == 0 and temp.count('`') % 2 == 0 and temp.count("'") % 2 == 0 and temp.count("(") == temp.count(")") and temp.count("{") == temp.count("}"):
+        if ':' in temp and temp.count('"') % 2 == 0 and temp.count('`') % 2 == 0 and temp.count("'") % 2 == 0 \
+                and temp.count("(") == temp.count(")") and temp.count("{") == temp.count("}"):
             result.append(temp)
             temp = ''
         elif ':' not in temp:
