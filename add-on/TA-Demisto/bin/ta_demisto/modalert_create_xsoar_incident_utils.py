@@ -37,12 +37,35 @@ def get_incident_labels(helper, event, labels_str, ignore_labels, search_query=N
 
 
 def get_incident_custom_fields(custom_fields_str):
-    str_data = custom_fields_str.strip().split(',')
+    str_data = split_fields(custom_fields_str.strip())
     custom_fields = {}
     for data in str_data:
         param_data = data.split(':')
         custom_fields[param_data[0]] = ':'.join(param_data[1:])
     return custom_fields
+
+
+def split_fields(s):
+    result = []
+    if s is None or len(s) == 0:
+        return result
+
+    arr = s.split(',')
+    temp = ''
+    for item in arr:
+        temp += item.strip()
+        if ':' in temp and temp.count('"') % 2 == 0 and temp.count('`') % 2 == 0 and temp.count("'") % 2 == 0 and temp.count("(") == temp.count(")") and temp.count("{") == temp.count("}"):
+            result.append(temp)
+            temp = ''
+        elif ':' not in temp:
+            if len(result) == 0:
+                result.append(temp)
+            else:
+                result[-1] += (',' + temp)
+            temp = ''
+        else:
+            temp += ','
+    return result
 
 
 def get_incident_occurred_field(occurred):
