@@ -66,7 +66,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
       2. Time Occurred - time when alert was triggered
       3. XSOAR Server (if “Send Alert to all the servers” is unchecked)
       4. Type – incident type in XSOAR
-      5. Custom Fields - A comma separated 'key:value' custom fields pairs. If a value contains commas, it should be wrapped with apostrophes, quotes, backticks, parenthesis or curly brackets.
+      5. Custom Fields - A comma separated 'key:value' custom fields pairs. If a value contains commas or colons, it should be wrapped with apostrophes, quotes, backticks, parenthesis or curly brackets.
       6. Labels – a comma separated values to be put in the labels field
       7. Severity – the alert severity
       8. Details – “details” field of the incident
