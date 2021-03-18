@@ -46,6 +46,16 @@ def get_incident_custom_fields(custom_fields_str):
 
 
 def split_fields(s):
+    """ Splits the custom fields string, and takes in count commas which are part of the field value.
+    For example, a possible value for s:
+        "key1:\"val,with,commas\",key2:`val2,with,commas`,key3:(val,3),key4:val4a:val4b"
+    Expected result would be:
+        ["key1:\"val,with,commas\"", "key2:`val2,with,commas`", "key3:(val,3)", "key4:val4a:val4b"]
+
+    :param s: the custom fields string input
+    :return: a key:value list of the custom fields.
+    """
+
     result = []
     if s is None or len(s) == 0:
         return result
