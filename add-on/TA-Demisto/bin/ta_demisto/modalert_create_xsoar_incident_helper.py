@@ -1,6 +1,5 @@
 import json
 import splunk
-from json import JSONDecodeError
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
@@ -40,7 +39,7 @@ def process_event(helper, *args, **kwargs):
     server_to_cert = {}
     try:
         server_to_cert = json.loads(str(ssl_cert_loc))
-    except JSONDecodeError:
+    except ValueError:
         helper.log_debug('Failed to parse ssl_cert_loc to json, ssl_cert_loc={}'.format(str(ssl_cert_loc)))
 
     proxy_settings = helper.get_proxy()
@@ -53,7 +52,7 @@ def process_event(helper, *args, **kwargs):
             server_url = server_url.replace('http:', 'https:')
 
             try:
-                if server_to_cert and server_to_cert.get(server_url):
+                if isinstance(server_to_cert, dict) and server_to_cert.get(server_url):
                     ssl_cert_tmp = server_to_cert.get(server_url)
                 else:
                     ssl_cert_tmp = ssl_cert_loc
@@ -79,7 +78,10 @@ def process_event(helper, *args, **kwargs):
                 )
 
                 helper.log_debug('resp.status_code = {}'.format(str(resp.status_code)))
-                helper.log_debug('resp.content = {}'.format(json.dumps(resp.json(), indent=4, sort_keys=True)))
+                try:
+                    helper.log_debug('resp.json = {}'.format(json.dumps(resp.json(), indent=4, sort_keys=True)))
+                except Exception:
+                    helper.log_debug('Could not deserialize response, resp.text = {}'.format(resp.text))
 
             except Exception as e:
                 helper.log_error(
@@ -127,11 +129,19 @@ def get_configured_servers(helper):
                                                  getargs={'output_mode': 'json'})
 
     conf_dict = json.loads(content)
+    if not isinstance(conf_dict, dict):
+        raise TypeError('Invalid content from TA_Demisto_account. conf_dict = ' + str(conf_dict))
     servers = []
 
     if success and conf_dict:
         for entry in conf_dict.get('entry', []):
+            if not isinstance(entry, dict):
+                raise TypeError('Invalid content from TA_Demisto_account. entry = ' + str(entry))
+
             entry_content = entry.get('content', {})
+            if not isinstance(entry_content, dict):
+                raise TypeError('Invalid content from TA_Demisto_account. entry_content = ' + str(entry_content))
+
             servers.append(entry_content.get('username'))
 
     return servers
@@ -152,6 +162,10 @@ def get_servers_details(helper):
 
     for server in servers:
         account = helper.get_user_credential(server)
+
+        if not isinstance(account, dict):
+            raise TypeError('Invalid type. account = ' + str(account))
+
         api_key = account.get('password')
         servers_to_api_keys[server.strip('/')] = api_key
 
@@ -160,6 +174,10 @@ def get_servers_details(helper):
 
 def get_search_data(helper):
     search_query = None
+
+    if not isinstance(helper.settings, dict):
+        raise TypeError('Invalid type. helper.settings = ' + str(helper.settings))
+
     search_name = helper.settings.get('search_name')
     results_link = helper.settings.get('results_link')
     search_uri = helper.settings.get('search_uri')
