@@ -173,14 +173,14 @@ def get_servers_details(helper):
 
 
 def get_search_data(helper):
-    search_query = None
+    search_query = ''
 
     if not isinstance(helper.settings, dict):
         raise TypeError('Invalid type. helper.settings = ' + str(helper.settings))
 
-    search_name = helper.settings.get('search_name')
-    results_link = helper.settings.get('results_link')
-    search_uri = helper.settings.get('search_uri')
+    search_name = helper.settings.get('search_name', '')
+    results_link = helper.settings.get('results_link', '')
+    search_uri = helper.settings.get('search_uri', '')
 
     helper.log_info('Alert name is ' + search_name)
     helper.log_info('Search URI is ' + search_uri)
