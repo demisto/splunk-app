@@ -15,8 +15,8 @@ def get_incident_labels(helper, event, labels_str, ignore_labels, search_query=N
     if ignore_labels:
         ignore_labels = ignore_labels.strip().lower().split(',')
 
-    helper.log_info('Labels::::' + str(list(event.keys())))
-    helper.log_info('Ignored Labels::::' + str(ignore_labels))
+    helper.log_info('Labels::::{}'.format(list(event.keys())))
+    helper.log_info('Ignored Labels::::{}'.format(ignore_labels))
 
     if labels_str:
         labels_str = labels_str.strip().split(',')
