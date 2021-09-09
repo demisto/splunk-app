@@ -130,17 +130,17 @@ def get_configured_servers(helper):
 
     conf_dict = json.loads(content)
     if not isinstance(conf_dict, dict):
-        raise TypeError('Invalid content from TA_Demisto_account. conf_dict = ' + str(conf_dict))
+        raise TypeError('Invalid content from TA_Demisto_account. conf_dict = {}'.format(conf_dict))
     servers = []
 
     if success and conf_dict:
         for entry in conf_dict.get('entry', []):
             if not isinstance(entry, dict):
-                raise TypeError('Invalid content from TA_Demisto_account. entry = ' + str(entry))
+                raise TypeError('Invalid content from TA_Demisto_account. entry = {}'.format(entry))
 
             entry_content = entry.get('content', {})
             if not isinstance(entry_content, dict):
-                raise TypeError('Invalid content from TA_Demisto_account. entry_content = ' + str(entry_content))
+                raise TypeError('Invalid content from TA_Demisto_account. entry_content = {}'.format(entry_content))
 
             servers.append(entry_content.get('username'))
 
@@ -164,7 +164,7 @@ def get_servers_details(helper):
         account = helper.get_user_credential(server)
 
         if not isinstance(account, dict):
-            raise TypeError('Invalid type. account = ' + str(account))
+            raise TypeError('Invalid type. account = {}'.format(account))
 
         api_key = account.get('password')
         servers_to_api_keys[server.strip('/')] = api_key
@@ -176,22 +176,22 @@ def get_search_data(helper):
     search_query = ''
 
     if not isinstance(helper.settings, dict):
-        raise TypeError('Invalid type. helper.settings = ' + str(helper.settings))
+        raise TypeError('Invalid type. helper.settings = {}'.format(helper.settings))
 
     search_name = helper.settings.get('search_name', '')
     results_link = helper.settings.get('results_link', '')
     search_uri = helper.settings.get('search_uri', '')
 
-    helper.log_info('Alert name is ' + search_name)
-    helper.log_info('Search URI is ' + search_uri)
-    helper.log_info('Manually created Search URI is ' + '/services/saved/searches/' + quote(search_name))
+    helper.log_info('Alert name is {}'.format(search_name))
+    helper.log_info('Search URI is {}'.format(search_uri))
+    helper.log_info('Manually created Search URI is /services/saved/searches/{}'.format(quote(search_name)))
 
     if not search_name:
         helper.log_info('Creating search uri')
         search_app_name = helper.settings.get('app', '')
         if '|' in search_app_name:
             search_name = '//|'.join(search_app_name.split('|'))
-        search_uri = pathname2url('/services/saved/searches/' + quote(search_name))
+        search_uri = pathname2url('/services/saved/searches/{}'.format(quote(search_name)))
 
     r = splunk.rest.simpleRequest(search_uri,
                                   sessionKey=helper.session_key,
@@ -201,6 +201,6 @@ def get_search_data(helper):
     if len(result_op['entry']) > 0:
         search_query = result_op['entry'][0]['content']['qualifiedSearch']
 
-    helper.log_info('Search query is ' + search_query)
+    helper.log_info('Search query is {}'.format(search_query))
 
     return search_query, search_name, results_link
