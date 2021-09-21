@@ -72,8 +72,7 @@ def process_event(helper, *args, **kwargs):
                     method='POST',
                     headers=headers,
                     payload=incident,
-                    verify=verify,
-                    cert=ssl_cert_tmp,
+                    verify=ssl_cert_tmp if verify else False,
                     use_proxy=proxy_enabled
                 )
 
