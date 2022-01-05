@@ -1,4 +1,6 @@
 import json
+import traceback
+
 import splunk
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
@@ -23,6 +25,7 @@ def process_event(helper, *args, **kwargs):
     """
 
     helper.log_info('Alert action create_xsoar_incident started.')
+    helper.log_debug('Helper params received are: {}'.format(helper.configuration))
 
     search_query, search_name, search_url = get_search_data(helper)
 
@@ -83,6 +86,7 @@ def process_event(helper, *args, **kwargs):
                     helper.log_debug('Could not deserialize response, resp.text = {}'.format(resp.text))
 
             except Exception as e:
+                helper.log_error(traceback.format_exc())
                 helper.log_error(
                     'Failed creating an incident to server {}. Reason: {}'.format(server_url, str(e))
                 )
