@@ -76,7 +76,8 @@ def process_event(helper, *args, **kwargs):
                     headers=headers,
                     payload=incident,
                     verify=ssl_cert_tmp if ssl_cert_tmp and verify else verify,
-                    use_proxy=proxy_enabled
+                    use_proxy=proxy_enabled,
+                    timeout=(10.0, 30.0)
                 )
 
                 helper.log_debug('resp.status_code = {}'.format(str(resp.status_code)))
@@ -87,6 +88,7 @@ def process_event(helper, *args, **kwargs):
 
             except Exception as e:
                 helper.log_error(traceback.format_exc())
+                helper.log_debug('Occurred param is: {}'.format(helper.get_param('occurred')))
                 helper.log_error(
                     'Failed creating an incident to server {}. Reason: {}'.format(server_url, str(e))
                 )
