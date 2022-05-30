@@ -5,7 +5,7 @@
     "id": {
       "group": null,
       "name": "TA-Demisto",
-      "version": "3.0.8"
+      "version": "4.0.0"
     },
     "author": [
       {
@@ -15,7 +15,7 @@
       }
     ],
     "releaseDate": null,
-    "description": "",
+    "description": "This application provides an alert action to create an incident in Cortex XSOAR.",
     "classification": {
       "intendedAudience": null,
       "categories": [],

@@ -2,9 +2,9 @@
     "meta": {
         "name": "TA-Demisto",
         "displayName": "Demisto Add-on for Splunk",
-        "version": "3.0.8",
-        "apiVersion": "3.0.0",
-        "restRoot": "TA_Demisto"
+        "version": "1.0.0",
+        "restRoot": "TA_Demisto",
+        "schemaVersion": "0.0.3"
     },
     "pages": {
         "configuration": {
@@ -18,7 +18,7 @@
                         "header": [
                             {
                                 "field": "name",
-                                "label": "XSOAR Instance name"
+                                "label": "XSOAR Instance namee"
                             },
                             {
                                 "field": "username",
@@ -34,7 +34,7 @@
                     "entity": [
                         {
                             "field": "name",
-                            "label": "XSOAR Instance name",
+                            "label": "XSOAR Instance nam",
                             "type": "text",
                             "required": true,
                             "help": "Enter a unique name for this instance.",
@@ -76,7 +76,7 @@
                             "type": "text",
                             "encrypted": true,
                             "required": true,
-                            "help": "Enter the API key for this instance.",
+                            "help": "Enter the API key for this account.",
                             "validators": [
                                 {
                                     "type": "string",
@@ -223,13 +223,13 @@
                 },
                 {
                     "name": "additional_parameters",
-                    "title": "Additional Settings",
+                    "title": "Add-on Settings",
                     "entity": [
                         {
                             "field": "ssl_cert_loc",
-                            "label": "Location to Certificate",
+                            "label": "SSL Certificate Location",
                             "type": "text",
-                            "help": "Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate",
+                            "help": "",
                             "required": false,
                             "defaultValue": "",
                             "validators": [
@@ -245,6 +245,8 @@
                             "field": "validate_ssl",
                             "label": "Validate SSL",
                             "type": "checkbox",
+                            "help": "",
+                            "required": false,
                             "defaultValue": 1
                         }
                     ]
