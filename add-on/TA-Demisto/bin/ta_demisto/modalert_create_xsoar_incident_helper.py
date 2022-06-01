@@ -122,7 +122,6 @@ def create_incident_dictionary(helper, event, search_query=None, search_name=Non
 
     if helper.get_param('custom_fields'):
         incident['CustomFields'] = get_incident_custom_fields(helper.get_param('custom_fields'))
-    
     return incident
 
 
