@@ -1,4 +1,5 @@
 import json
+import traceback
 import splunk
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
@@ -23,6 +24,7 @@ def process_event(helper, *args, **kwargs):
     """
 
     helper.log_info('Alert action create_xsoar_incident started.')
+    helper.log_debug('Helper params received are: {}'.format(helper.configuration))
 
     search_query, search_name, search_url = get_search_data(helper)
 
@@ -73,7 +75,8 @@ def process_event(helper, *args, **kwargs):
                     headers=headers,
                     payload=incident,
                     verify=ssl_cert_tmp if ssl_cert_tmp and verify else verify,
-                    use_proxy=proxy_enabled
+                    use_proxy=proxy_enabled,
+                    timeout=(10.0, 30.0)
                 )
 
                 helper.log_debug('resp.status_code = {}'.format(str(resp.status_code)))
@@ -83,6 +86,8 @@ def process_event(helper, *args, **kwargs):
                     helper.log_debug('Could not deserialize response, resp.text = {}'.format(resp.text))
 
             except Exception as e:
+                helper.log_error(traceback.format_exc())
+                helper.log_debug('Occurred param is: {}'.format(helper.get_param('occurred')))
                 helper.log_error(
                     'Failed creating an incident to server {}. Reason: {}'.format(server_url, str(e))
                 )
@@ -117,7 +122,7 @@ def create_incident_dictionary(helper, event, search_query=None, search_name=Non
 
     if helper.get_param('custom_fields'):
         incident['CustomFields'] = get_incident_custom_fields(helper.get_param('custom_fields'))
-
+    
     return incident
 
 
@@ -142,7 +147,7 @@ def get_configured_servers(helper):
                 raise TypeError('Invalid content from TA_Demisto_account. entry_content = {}'.format(entry_content))
 
             servers.append(entry_content.get('username'))
-
+    helper.log_debug(servers)
     return servers
 
 
