@@ -146,7 +146,6 @@ def get_configured_servers(helper):
                 raise TypeError('Invalid content from TA_Demisto_account. entry_content = {}'.format(entry_content))
 
             servers.append(entry_content.get('username'))
-    helper.log_debug(servers)
     return servers
 
 
