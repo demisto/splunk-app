@@ -37,6 +37,9 @@ def process_event(helper, *args, **kwargs):
 
     verify = True if helper.get_global_setting('validate_ssl') == '1' else False
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
+    timeout = helper.get_global_setting('timeout_val')
+    timeout = int(timeout) if timeout else 10
+    helper.log_debug(f'request timeout is {timeout}') 
 
     server_to_cert = {}
     try:
@@ -76,7 +79,7 @@ def process_event(helper, *args, **kwargs):
                     payload=incident,
                     verify=ssl_cert_tmp if ssl_cert_tmp and verify else verify,
                     use_proxy=proxy_enabled,
-                    timeout=(10.0, 30.0)
+                    timeout=timeout
                 )
 
                 helper.log_debug('resp.status_code = {}'.format(str(resp.status_code)))

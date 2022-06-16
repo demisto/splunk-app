@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-Demisto",
         "displayName": "Demisto Add-on for Splunk",
-        "version": "1.0.0",
+        "version": "4.0.0",
         "restRoot": "TA_Demisto",
         "schemaVersion": "0.0.3"
     },
@@ -18,7 +18,7 @@
                         "header": [
                             {
                                 "field": "name",
-                                "label": "XSOAR Instance namee"
+                                "label": "XSOAR Instance name"
                             },
                             {
                                 "field": "username",
@@ -34,7 +34,7 @@
                     "entity": [
                         {
                             "field": "name",
-                            "label": "XSOAR Instance nam",
+                            "label": "XSOAR Instance name",
                             "type": "text",
                             "required": true,
                             "help": "Enter a unique name for this instance.",
@@ -76,7 +76,7 @@
                             "type": "text",
                             "encrypted": true,
                             "required": true,
-                            "help": "Enter the API key for this account.",
+                            "help": "Enter the API key for this instance.",
                             "validators": [
                                 {
                                     "type": "string",
@@ -223,13 +223,13 @@
                 },
                 {
                     "name": "additional_parameters",
-                    "title": "Add-on Settings",
+                    "title": "Additional Settings",
                     "entity": [
                         {
                             "field": "ssl_cert_loc",
-                            "label": "SSL Certificate Location",
+                            "label": "Location to Certificate",
                             "type": "text",
-                            "help": "",
+                            "help": "Enter the full path to the SSL Certificate in the Splunk server to if you are using Self Signed/Internal CA signed certificate",
                             "required": false,
                             "defaultValue": "",
                             "validators": [
@@ -247,7 +247,23 @@
                             "type": "checkbox",
                             "help": "",
                             "required": false,
-                            "defaultValue": 1
+                            "defaultValue": 0
+                        },
+                        {
+                            "field": "timeout_val",
+                            "label": "Timeout Value",
+                            "type": "text",
+                            "help": "Enter the desired timeout value for creating the incident. Default is 10.",
+                            "required": false,
+                            "defaultValue": "10",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 8192,
+                                    "errorMsg": "Max length of text input is 8192"
+                                }
+                            ]
                         }
                     ]
                 }

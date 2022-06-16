@@ -108,6 +108,16 @@ fields_additional_parameters = [
         encrypted=False,
         default=0,
         validator=None
+    ),
+    field.RestField(
+        'timeout_val',
+        required=False,
+        encrypted=False,
+        default='10',
+        validator=validator.String(
+            min_len=0, 
+            max_len=8192, 
+        )
     )
 ]
 model_additional_parameters = RestModel(fields_additional_parameters, name='additional_parameters')
