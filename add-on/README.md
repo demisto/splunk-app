@@ -3,17 +3,20 @@ Supporting Add-on for Cortex XSOAR. This application allows a user to push incid
 
 
 # Requirements
-* Splunk version 7.2 >=
+* Splunk version 8.2 >=
 
 # Development Setup for Using the Demisto Add-on in Splunk
 
-1. [Prepare a local Splunk Environment](#prepare-a-local-splunk-environment)
-2. [Installation](#installation-of-the-add-on)
-3. [Configuration](#configuration)
-4. [Connectivity Test](#connectivity-test---create-a-custom-alert-action)
-5. [About Add-on Builder, AppInspect and Compatibility](#about-add-on-builder-appinspect-and-compatibility)
-6. [Tips for Developers](#tips-for-developers)
-7. [Common Issues - SSL Certificates](#common-issues---ssl-certificates)
+- [Demisto Add-on for Splunk](#demisto-add-on-for-splunk)
+- [Requirements](#requirements)
+- [Development Setup for Using the Demisto Add-on in Splunk](#development-setup-for-using-the-demisto-add-on-in-splunk)
+    - [Prepare a local Splunk Environment](#prepare-a-local-splunk-environment)
+    - [Installation of the add-on](#installation-of-the-add-on)
+    - [Configuration](#configuration)
+    - [Connectivity Test - Create a Custom Alert Action](#connectivity-test---create-a-custom-alert-action)
+    - [About Add-on Builder, AppInspect and Compatibility](#about-add-on-builder-appinspect-and-compatibility)
+    - [Tips for Developers](#tips-for-developers)
+    - [Common Issues - SSL Certificates](#common-issues---ssl-certificates)
 
 ### Prepare a local Splunk Environment
 Run the following command to create a Splunk docker container (replace the `*****` with any 8-character password, containing letters and digits):
@@ -43,10 +46,12 @@ Once executed, the splunk env will be available at http://localhost:8000.
     3) Choose log level (optional):
        By default, the logging level is "INFO". You may change the logging level to "DEBUG" if needed.
     4) Additional Settings (optional):
-       - If you have an SSL certificate, please provide its full path under "Location to Certificate" field.
-       - By default, "Validate SSL" is enabled.
+       - If you have an SSL certificate, provide its full path under the **"Location to Certificate"** field.
+       - By default, **"Validate SSL"** is enabled.
+       - If you would like to extend the incident creatiin request timeout, provide the desired timeout under the "Timeout Value" field.
+    By default, timeout value is 10 seconds.
        
-       ![image](https://user-images.githubusercontent.com/38749041/103541559-4722d400-4ea4-11eb-8b01-754d9edd570c.png)
+       ![image](./images/splunk-add-on-config.png)
 * You must restart Splunk in order to apply changes in the configuration settings.
 
        
