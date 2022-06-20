@@ -3,7 +3,7 @@ Supporting Add-on for Cortex XSOAR. This application allows a user to push incid
 
 
 # Requirements
-* Splunk version 8.2 >=
+* Splunk version 8.0 >=
 
 # Development Setup for Using the Demisto Add-on in Splunk
 
