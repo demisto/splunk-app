@@ -38,7 +38,7 @@ def process_event(helper, *args, **kwargs):
     verify = True if helper.get_global_setting('validate_ssl') == '1' else False
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
     timeout = helper.get_global_setting('timeout_val')
-    timeout = int(timeout) if timeout else 10
+    timeout = int(timeout) if timeout else None
     helper.log_debug(f'request timeout is {timeout}')
 
     server_to_cert = {}
