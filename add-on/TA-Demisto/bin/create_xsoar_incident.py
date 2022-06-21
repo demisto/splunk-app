@@ -9,7 +9,6 @@ import sys
 from alert_actions_base import ModularAlertBase
 import modalert_create_xsoar_incident_helper
 
-
 class AlertActionWorkercreate_xsoar_incident(ModularAlertBase):
 
     def __init__(self, ta_name, alert_name):
@@ -39,7 +38,6 @@ class AlertActionWorkercreate_xsoar_incident(ModularAlertBase):
                 self.log_error(msg.format(traceback.format_exc()))
             return 5
         return status
-
 
 if __name__ == "__main__":
     exitcode = AlertActionWorkercreate_xsoar_incident("TA-Demisto", "create_xsoar_incident").run(sys.argv)

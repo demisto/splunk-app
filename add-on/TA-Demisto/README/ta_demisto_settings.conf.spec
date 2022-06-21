@@ -1,14 +1,16 @@
 [proxy]
-proxy_enabled =
-proxy_type =
-proxy_url =
-proxy_port =
-proxy_username =
-proxy_password =
-proxy_rdns =
-
-[additional_parameters]
-validate_ssl =
-ssl_cert_loc =
+proxy_enabled = 
+proxy_type = 
+proxy_url = 
+proxy_port = 
+proxy_username = 
+proxy_password = 
+proxy_rdns = 
 
 [logging]
+loglevel = 
+
+[additional_parameters]
+ssl_cert_loc = 
+validate_ssl = 
+timeout_val = 

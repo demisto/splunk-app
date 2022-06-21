@@ -2,9 +2,9 @@
     "meta": {
         "name": "TA-Demisto",
         "displayName": "Demisto Add-on for Splunk",
-        "version": "3.0.8",
-        "apiVersion": "3.0.0",
-        "restRoot": "TA_Demisto"
+        "version": "4.0.0",
+        "restRoot": "TA_Demisto",
+        "schemaVersion": "0.0.3"
     },
     "pages": {
         "configuration": {
@@ -245,7 +245,25 @@
                             "field": "validate_ssl",
                             "label": "Validate SSL",
                             "type": "checkbox",
-                            "defaultValue": 1
+                            "help": "",
+                            "required": false,
+                            "defaultValue": 0
+                        },
+                        {
+                            "field": "timeout_val",
+                            "label": "Timeout Value",
+                            "type": "text",
+                            "help": "Enter the desired timeout value for creating the incident. Default is 10.",
+                            "required": false,
+                            "defaultValue": "10",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 8192,
+                                    "errorMsg": "Max length of text input is 8192"
+                                }
+                            ]
                         }
                     ]
                 }
