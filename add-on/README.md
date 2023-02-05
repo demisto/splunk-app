@@ -39,7 +39,9 @@ Once executed, the splunk env will be available at http://localhost:8000.
 * In order to use the add-on and create incidents in XSOAR, you must complete the setup of the application. Press "Launch app" action after installing the add-on and provide the following:
     1) Create a XSOAR instance:
        Under XSOAR Instances tab, press the "Add" button. Choose an instance name, and fill the XSOAR server URL (including port if needed) and the API key fields. The API key is used for authorization with XSOAR. In order to generate this parameter, a user should log in to Demisto and then click on Settings → Integration → API Keys.
-    
+      
+       *Note:* When using XSOAR v8 and above, the API key should be inserted as follows: <API_KEY>$<API_KEY_ID>
+
        ![image](https://user-images.githubusercontent.com/38749041/103541473-25c1e800-4ea4-11eb-8868-8cad571ff58c.png)
     2) Set up proxy settings (optional):
        Under Proxy tab, check the "Enable" checkbox and fill all the proxy parameters needed.
