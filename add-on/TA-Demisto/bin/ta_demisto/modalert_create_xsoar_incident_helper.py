@@ -1,6 +1,10 @@
 import json
 import traceback
 import splunk
+import secrets
+import string
+import hashlib
+from datetime import timezone, datetime
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
@@ -67,10 +71,18 @@ def process_event(helper, *args, **kwargs):
                 helper.log_info('Sending the incident to server {}...'.format(server_url))
                 api_key_xsoar_ng = api_key.split('$')
                 if len(api_key_xsoar_ng) == 2:
+                    nonce = "".join([secrets.choice(string.ascii_letters + string.digits) for _ in range(64)])
+                    timestamp = str(int(datetime.now(timezone.utc).timestamp()) * 1000)
+                    auth_key = "%s%s%s" % (api_key_xsoar_ng[0], nonce, timestamp)
+                    auth_key = auth_key.encode("utf-8")
+                    api_key_hash = hashlib.sha256(auth_key).hexdigest()
                     headers['x-xdr-auth-id'] = api_key_xsoar_ng[1]
-                    helper.log_debug(f'auth id is {api_key_xsoar_ng[1]}')
+                    headers['Authorization'] = api_key_hash
+                    headers['x-xdr-nonce'] = nonce
+                    headers['x-xdr-timestamp'] = timestamp
                     server_url += '/xsoar'
-                headers['Authorization'] = api_key_xsoar_ng[0]
+                else:
+                    headers['Authorization'] = api_key_xsoar_ng[0]
 
                 helper.log_debug('verify = {}'.format(str(verify)))
                 helper.log_debug('ssl_cert_loc = {}'.format(str(ssl_cert_tmp)))
