@@ -69,7 +69,7 @@ def process_event(helper, *args, **kwargs):
                 incident = create_incident_dictionary(helper, event, search_query, search_name, search_url)
 
                 helper.log_info('Sending the incident to server {}...'.format(server_url))
-                api_key_xsoar_ng = api_key.split('$')
+                api_key_xsoar_ng = api_key.rsplit('$', 1)
                 if len(api_key_xsoar_ng) == 2:
                     nonce = "".join([secrets.choice(string.ascii_letters + string.digits) for _ in range(64)])
                     timestamp = str(int(datetime.now(timezone.utc).timestamp()) * 1000)
