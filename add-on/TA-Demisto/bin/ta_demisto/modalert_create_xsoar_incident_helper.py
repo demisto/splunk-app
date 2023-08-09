@@ -28,7 +28,7 @@ def process_event(helper, *args, **kwargs):
     """
 
     helper.log_info('Alert action create_xsoar_incident started.')
-    helper.log_debug('Helper params received are: {}'.format(helper.configuration))
+    helper.log_debug(f'Helper params received are: {helper.configuration}')
 
     search_query, search_name, search_url = get_search_data(helper)
 
@@ -49,7 +49,9 @@ def process_event(helper, *args, **kwargs):
     try:
         server_to_cert = json.loads(str(ssl_cert_loc))
     except ValueError:
-        helper.log_debug('Failed to parse ssl_cert_loc to json, ssl_cert_loc={}'.format(str(ssl_cert_loc)))
+        helper.log_debug(
+            f'Failed to parse ssl_cert_loc to json, ssl_cert_loc={str(ssl_cert_loc)}'
+        )
 
     proxy_settings = helper.get_proxy()
     proxy_enabled = bool(proxy_settings)
@@ -68,12 +70,12 @@ def process_event(helper, *args, **kwargs):
 
                 incident = create_incident_dictionary(helper, event, search_query, search_name, search_url)
 
-                helper.log_info('Sending the incident to server {}...'.format(server_url))
+                helper.log_info(f'Sending the incident to server {server_url}...')
                 api_key_xsoar_ng = api_key.rsplit('$', 1)
                 if len(api_key_xsoar_ng) == 2:
                     nonce = "".join([secrets.choice(string.ascii_letters + string.digits) for _ in range(64)])
                     timestamp = str(int(datetime.now(timezone.utc).timestamp()) * 1000)
-                    auth_key = "%s%s%s" % (api_key_xsoar_ng[0], nonce, timestamp)
+                    auth_key = f"{api_key_xsoar_ng[0]}{nonce}{timestamp}"
                     auth_key = auth_key.encode("utf-8")
                     api_key_hash = hashlib.sha256(auth_key).hexdigest()
                     headers['x-xdr-auth-id'] = api_key_xsoar_ng[1]
@@ -84,9 +86,9 @@ def process_event(helper, *args, **kwargs):
                 else:
                     headers['Authorization'] = api_key_xsoar_ng[0]
 
-                helper.log_debug('verify = {}'.format(str(verify)))
-                helper.log_debug('ssl_cert_loc = {}'.format(str(ssl_cert_tmp)))
-                helper.log_debug('proxy_enabled = {}'.format(str(proxy_enabled)))
+                helper.log_debug(f'verify = {verify}')
+                helper.log_debug(f'ssl_cert_loc = {str(ssl_cert_tmp)}')
+                helper.log_debug(f'proxy_enabled = {proxy_enabled}')
                 helper.log_debug('payload = {}'.format(json.dumps(incident, indent=4, sort_keys=True)))
 
                 resp = helper.send_http_request(
@@ -98,17 +100,17 @@ def process_event(helper, *args, **kwargs):
                     use_proxy=proxy_enabled,
                     timeout=timeout
                 )
-                helper.log_debug('resp.status_code = {}'.format(str(resp.status_code)))
+                helper.log_debug(f'resp.status_code = {str(resp.status_code)}')
                 try:
                     helper.log_debug('resp.json = {}'.format(json.dumps(resp.json(), indent=4, sort_keys=True)))
                 except Exception:
-                    helper.log_debug('Could not deserialize response, resp.text = {}'.format(resp.text))
+                    helper.log_debug(f'Could not deserialize response, resp.text = {resp.text}')
 
             except Exception as e:
                 helper.log_error(traceback.format_exc())
-                helper.log_debug('Occurred param is: {}'.format(helper.get_param('occurred')))
+                helper.log_debug(f"Occurred param is: {helper.get_param('occurred')}")
                 helper.log_error(
-                    'Failed creating an incident to server {}. Reason: {}'.format(server_url, str(e))
+                    f'Failed creating an incident to server {server_url}. Reason: {str(e)}'
                 )
     return 0
 
@@ -152,17 +154,21 @@ def get_configured_servers(helper):
 
     conf_dict = json.loads(content)
     if not isinstance(conf_dict, dict):
-        raise TypeError('Invalid content from TA_Demisto_account. conf_dict = {}'.format(conf_dict))
+        raise TypeError(
+            f'Invalid content from TA_Demisto_account. conf_dict = {conf_dict}'
+        )
     servers = []
 
     if success and conf_dict:
         for entry in conf_dict.get('entry', []):
             if not isinstance(entry, dict):
-                raise TypeError('Invalid content from TA_Demisto_account. entry = {}'.format(entry))
+                raise TypeError(f'Invalid content from TA_Demisto_account. entry = {entry}')
 
             entry_content = entry.get('content', {})
             if not isinstance(entry_content, dict):
-                raise TypeError('Invalid content from TA_Demisto_account. entry_content = {}'.format(entry_content))
+                raise TypeError(
+                    f'Invalid content from TA_Demisto_account. entry_content = {entry_content}'
+                )
 
             servers.append(entry_content.get('username'))
     return servers
@@ -171,7 +177,7 @@ def get_configured_servers(helper):
 def get_servers_details(helper):
     servers_to_api_keys = {}
 
-    helper.log_debug('send_all_servers={}'.format(helper.get_param('send_all_servers')))
+    helper.log_debug(f"send_all_servers={helper.get_param('send_all_servers')}")
 
     if helper.get_param('send_all_servers') == '1':
         # get all server urls
@@ -181,11 +187,13 @@ def get_servers_details(helper):
         server_url = helper.get_param('server_url')
         servers = [server_url]
 
+    helper.log_debug(f"servers are: {str(servers)}")
     for server in servers:
+        helper.log_debug(f"current server is: {str(server)}")
         account = helper.get_user_credential(server)
 
         if not isinstance(account, dict):
-            raise TypeError('Invalid type. account = {}'.format(account))
+            raise TypeError(f'Invalid type. account = {account}')
 
         api_key = account.get('password')
         servers_to_api_keys[server.strip('/')] = api_key
@@ -197,22 +205,24 @@ def get_search_data(helper):
     search_query = ''
 
     if not isinstance(helper.settings, dict):
-        raise TypeError('Invalid type. helper.settings = {}'.format(helper.settings))
+        raise TypeError(f'Invalid type. helper.settings = {helper.settings}')
 
     search_name = helper.settings.get('search_name', '')
     results_link = helper.settings.get('results_link', '')
     search_uri = helper.settings.get('search_uri', '')
 
-    helper.log_info('Alert name is {}'.format(search_name))
-    helper.log_info('Search URI is {}'.format(search_uri))
-    helper.log_info('Manually created Search URI is /services/saved/searches/{}'.format(quote(search_name)))
+    helper.log_info(f'Alert name is {search_name}')
+    helper.log_info(f'Search URI is {search_uri}')
+    helper.log_info(
+        f'Manually created Search URI is /services/saved/searches/{quote(search_name)}'
+    )
 
     if not search_name:
         helper.log_info('Creating search uri')
         search_app_name = helper.settings.get('app', '')
         if '|' in search_app_name:
             search_name = '//|'.join(search_app_name.split('|'))
-        search_uri = pathname2url('/services/saved/searches/{}'.format(quote(search_name)))
+        search_uri = pathname2url(f'/services/saved/searches/{quote(search_name)}')
 
     r = splunk.rest.simpleRequest(search_uri,
                                   sessionKey=helper.session_key,
@@ -222,6 +232,6 @@ def get_search_data(helper):
     if len(result_op['entry']) > 0:
         search_query = result_op['entry'][0]['content']['qualifiedSearch']
 
-    helper.log_info('Search query is {}'.format(search_query))
+    helper.log_info(f'Search query is {search_query}')
 
     return search_query, search_name, results_link
