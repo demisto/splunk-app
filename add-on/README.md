@@ -127,7 +127,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
    b. Add a compressed (.tgz) file of your version under add-on/spls path.
       To create a compressed file from your local repository, run the following command on the root directory (replace xxx with new version):
       ```
-      COPYFILE_DISABLE=1 tar -cvzf add-on/spls/demisto-add-on-for-splunk-xxx.tgz --exclude='*.pyc' TA-Demisto
+      COPYFILE_DISABLE=1 tar -cvzf add-on/spls/demisto-add-on-for-splunk-xxx.tgz --exclude={'*.pyc','*DS_Store'} TA-Demisto
       ```
 
    c. Verify AppInspect passes in the build.
