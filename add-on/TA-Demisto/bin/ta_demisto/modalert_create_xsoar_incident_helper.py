@@ -181,7 +181,9 @@ def get_servers_details(helper):
         server_url = helper.get_param('server_url')
         servers = [server_url]
 
+    helper.log_debug(f"servers are: {str(servers)}")
     for server in servers:
+        helper.log_debug(f"current server is: {str(server)}")
         account = helper.get_user_credential(server)
 
         if not isinstance(account, dict):
