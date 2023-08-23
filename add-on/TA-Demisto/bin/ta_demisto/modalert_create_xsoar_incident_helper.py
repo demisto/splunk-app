@@ -39,7 +39,6 @@ def process_event(helper, *args, **kwargs):
         'Accept': 'application/json'
     }
 
-    verify = True if helper.get_global_setting('validate_ssl') == '1' else False
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
     timeout = helper.get_global_setting('timeout_val')
     timeout = int(timeout) if timeout else None
@@ -84,7 +83,6 @@ def process_event(helper, *args, **kwargs):
                 else:
                     headers['Authorization'] = api_key_xsoar_ng[0]
 
-                helper.log_debug('verify = {}'.format(str(verify)))
                 helper.log_debug('ssl_cert_loc = {}'.format(str(ssl_cert_tmp)))
                 helper.log_debug('proxy_enabled = {}'.format(str(proxy_enabled)))
                 helper.log_debug('payload = {}'.format(json.dumps(incident, indent=4, sort_keys=True)))
@@ -94,7 +92,7 @@ def process_event(helper, *args, **kwargs):
                     method='POST',
                     headers=headers,
                     payload=incident,
-                    verify=ssl_cert_tmp if ssl_cert_tmp and verify else verify,
+                    verify=ssl_cert_tmp,
                     use_proxy=proxy_enabled,
                     timeout=timeout
                 )
