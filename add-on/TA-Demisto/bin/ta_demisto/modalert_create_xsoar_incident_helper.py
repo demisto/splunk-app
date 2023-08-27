@@ -166,7 +166,6 @@ def is_cloud_instance(helper):
     return False
 
 
-
 def get_configured_servers(helper):
     success, content = splunk.rest.simpleRequest(ACCOUNTS_ENDPOINT,
                                                  helper.session_key,
