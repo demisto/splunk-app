@@ -242,6 +242,14 @@
                             ]
                         },
                         {
+                            "field": "validate_ssl",
+                            "label": "Validate SSL",
+                            "type": "checkbox",
+                            "help": "This option is open only for Splunk Cloud users.",
+                            "required": false,
+                            "defaultValue": 0
+                        },
+                        {
                             "field": "timeout_val",
                             "label": "Timeout Value",
                             "type": "text",

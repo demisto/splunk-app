@@ -38,11 +38,12 @@ def process_event(helper, *args, **kwargs):
         'Content-type': 'application/json',
         'Accept': 'application/json'
     }
-
+    verify = True if helper.get_global_setting('validate_ssl') == '1' else False
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
     timeout = helper.get_global_setting('timeout_val')
     timeout = int(timeout) if timeout else None
     helper.log_debug(f'request timeout is {timeout}')
+    is_cloud = is_cloud_instance(helper)
 
     server_to_cert = {}
     try:
@@ -64,6 +65,11 @@ def process_event(helper, *args, **kwargs):
                     ssl_cert_tmp = server_to_cert.get(server_url)
                 else:
                     ssl_cert_tmp = ssl_cert_loc
+
+                if is_cloud:
+                    verify = ssl_cert_tmp
+                else:
+                    verify = ssl_cert_tmp if ssl_cert_tmp and verify else verify
 
                 incident = create_incident_dictionary(helper, event, search_query, search_name, search_url)
 
@@ -92,7 +98,7 @@ def process_event(helper, *args, **kwargs):
                     method='POST',
                     headers=headers,
                     payload=incident,
-                    verify=ssl_cert_tmp,
+                    verify=verify,
                     use_proxy=proxy_enabled,
                     timeout=timeout
                 )
@@ -140,6 +146,25 @@ def create_incident_dictionary(helper, event, search_query=None, search_name=Non
     if helper.get_param('custom_fields'):
         incident['CustomFields'] = get_incident_custom_fields(helper.get_param('custom_fields'))
     return incident
+
+
+def is_cloud_instance(helper):
+    """
+        Returns True if the add-on runs on Splunk cloud, False otherwise.
+    """
+    server_info_uri = pathname2url('/services/server/info')
+    r = splunk.rest.simpleRequest(server_info_uri,
+                                  sessionKey=helper.session_key,
+                                  getargs={'output_mode': 'json'},
+                                  method='GET')
+    result_info = json.loads(r[1])
+    instance_type = result_info.get('instance_type')
+    if instance_type and instance_type == 'cloud':
+        helper.log_info('Running on cloud.')
+        return True
+    helper.log_info('Running on enterprise.')
+    return False
+
 
 
 def get_configured_servers(helper):
