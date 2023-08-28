@@ -33,6 +33,7 @@ def process_event(helper, *args, **kwargs):
     search_query, search_name, search_url = get_search_data(helper)
 
     servers_to_api_keys = get_servers_details(helper)
+    is_cloud = is_cloud_instance(helper)
 
     headers = {
         'Content-type': 'application/json',
@@ -43,7 +44,6 @@ def process_event(helper, *args, **kwargs):
     timeout = helper.get_global_setting('timeout_val')
     timeout = int(timeout) if timeout else None
     helper.log_debug(f'request timeout is {timeout}')
-    is_cloud = is_cloud_instance(helper)
 
     server_to_cert = {}
     try:
@@ -67,7 +67,7 @@ def process_event(helper, *args, **kwargs):
                     ssl_cert_tmp = ssl_cert_loc
 
                 if is_cloud:
-                    verify = ssl_cert_tmp
+                    verify = ssl_cert_tmp or True
                 else:
                     verify = ssl_cert_tmp if ssl_cert_tmp and verify else verify
 
@@ -152,18 +152,28 @@ def is_cloud_instance(helper):
     """
         Returns True if the add-on runs on Splunk cloud, False otherwise.
     """
-    server_info_uri = pathname2url('/services/server/info')
-    r = splunk.rest.simpleRequest(server_info_uri,
-                                  sessionKey=helper.session_key,
-                                  getargs={'output_mode': 'json'},
-                                  method='GET')
-    result_info = json.loads(r[1])
-    instance_type = result_info.get('instance_type')
-    if instance_type and instance_type == 'cloud':
-        helper.log_info('Running on cloud.')
+    try:
+        server_info_uri = pathname2url('/services/server/info')
+        r = splunk.rest.simpleRequest(server_info_uri,
+                                      sessionKey=helper.session_key,
+                                      getargs={'output_mode': 'json'},
+                                      method='GET')
+        result_info = json.loads(r[1])
+        helper.log_debug(f'Got server info from Splunk: {str(result_info)}')
+        instance_type = result_info.get('instance_type')
+        if instance_type and instance_type == 'cloud':
+            helper.log_info('Running on cloud.')
+            return True
+
+        helper.log_info('Running on enterprise.')
+        return False
+
+    except Exception as e:
+        # if we fail to get the instance type from the server we return True to set the request to verify True.
+        helper.log_error(
+            'Failed getting instance type from server, acting as cloud instance. Reason: {}'.format(str(e))
+        )
         return True
-    helper.log_info('Running on enterprise.')
-    return False
 
 
 def get_configured_servers(helper):

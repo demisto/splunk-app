@@ -247,7 +247,7 @@
                             "type": "checkbox",
                             "help": "This option is open only for Splunk Cloud users.",
                             "required": false,
-                            "defaultValue": 0
+                            "defaultValue": 1
                         },
                         {
                             "field": "timeout_val",
