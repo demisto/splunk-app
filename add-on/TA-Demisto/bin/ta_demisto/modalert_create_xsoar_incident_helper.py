@@ -1,9 +1,11 @@
 import json
+import os
 import traceback
 import splunk
 import secrets
 import string
 import hashlib
+import configparser
 from datetime import timezone, datetime
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
@@ -13,7 +15,7 @@ from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurre
 # encoding = utf-8
 
 ACCOUNTS_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/TA_Demisto_account/"
-
+conf_file = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/inputs.conf'
 
 def process_event(helper, *args, **kwargs):
     """
@@ -91,6 +93,7 @@ def process_event(helper, *args, **kwargs):
 
                 helper.log_debug('ssl_cert_loc = {}'.format(str(ssl_cert_tmp)))
                 helper.log_debug('proxy_enabled = {}'.format(str(proxy_enabled)))
+                helper.log_debug('verify = {}'.format(str(verify)))
                 helper.log_debug('payload = {}'.format(json.dumps(incident, indent=4, sort_keys=True)))
 
                 resp = helper.send_http_request(
@@ -152,6 +155,19 @@ def is_cloud_instance(helper):
     """
         Returns True if the add-on runs on Splunk cloud, False otherwise.
     """
+    # get config file and search is_cloud value.
+    config = configparser.ConfigParser()
+    config.read(conf_file)
+    helper.log_info(config.sections())
+
+    if config.has_section('default') and config.get('default', 'is_cloud') != "None":
+        # We checked before if the instance is cloud and return what saved in the config file.
+        is_cloud = config.get('default', 'is_cloud')
+        helper.log_info(f'Got value from storage for instance type. The value is {is_cloud}')
+        if is_cloud == 'False':
+            return False
+        return True
+
     try:
         server_info_uri = pathname2url('/services/server/info')
         r = splunk.rest.simpleRequest(server_info_uri,
@@ -163,11 +179,16 @@ def is_cloud_instance(helper):
         instance_type = result_info.get('instance_type')
         if instance_type and instance_type == 'cloud':
             helper.log_info('Running on cloud.')
-            return True
+            is_cloud = True
+        else:
+            helper.log_info('Running on enterprise.')
+            is_cloud = False
 
-        helper.log_info('Running on enterprise.')
-        return False
+        config.set("default", "is_cloud", str(is_cloud))
+        with open(conf_file, "w") as config_file:
+            config.write(config_file)
 
+        return is_cloud
     except Exception as e:
         # if we fail to get the instance type from the server we return True to set the request to verify True.
         helper.log_error(
