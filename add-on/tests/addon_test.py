@@ -1,7 +1,3 @@
-import configparser
-import json
-from urllib.request import pathname2url
-
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
     get_incident_custom_fields
 from ta_demisto.modalert_create_xsoar_incident_helper import is_cloud_instance
