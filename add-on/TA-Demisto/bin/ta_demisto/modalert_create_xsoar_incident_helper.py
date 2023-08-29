@@ -41,7 +41,7 @@ def process_event(helper, *args, **kwargs):
         'Content-type': 'application/json',
         'Accept': 'application/json'
     }
-    verify = True if helper.get_global_setting('validate_ssl') == '1' else False
+    verify = helper.get_global_setting('validate_ssl') == '1'
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
     timeout = helper.get_global_setting('timeout_val')
     timeout = int(timeout) if timeout else None
@@ -163,9 +163,7 @@ def is_cloud_instance(helper):
         # We checked before if the instance is cloud and return what saved in the config file.
         is_cloud = config.get('default', 'is_cloud')
         helper.log_info(f'Got value from storage for instance type. The value is {is_cloud}')
-        if is_cloud == 'False':
-            return False
-        return True
+        return is_cloud == 'True'
 
     try:
         server_info_uri = pathname2url('/services/server/info')
