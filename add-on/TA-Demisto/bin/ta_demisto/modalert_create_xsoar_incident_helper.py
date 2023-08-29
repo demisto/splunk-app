@@ -158,7 +158,6 @@ def is_cloud_instance(helper):
     # get config file and search is_cloud value.
     config = configparser.ConfigParser()
     config.read(conf_file)
-    helper.log_info(config.sections())
 
     if config.has_section('default') and config.get('default', 'is_cloud') != "None":
         # We checked before if the instance is cloud and return what saved in the config file.
