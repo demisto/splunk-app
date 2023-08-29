@@ -106,7 +106,7 @@ fields_additional_parameters = [
         'validate_ssl',
         required=False,
         encrypted=False,
-        default=0,
+        default=1,
         validator=None
     ),
     field.RestField(

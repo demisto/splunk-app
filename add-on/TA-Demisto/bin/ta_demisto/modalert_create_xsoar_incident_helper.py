@@ -1,9 +1,11 @@
 import json
+import os
 import traceback
 import splunk
 import secrets
 import string
 import hashlib
+import configparser
 from datetime import timezone, datetime
 from six.moves.urllib.parse import quote
 from six.moves.urllib.request import pathname2url
@@ -13,6 +15,7 @@ from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurre
 # encoding = utf-8
 
 ACCOUNTS_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/TA_Demisto_account/"
+conf_file = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/alert_actions.conf'
 
 
 def process_event(helper, *args, **kwargs):
@@ -33,12 +36,13 @@ def process_event(helper, *args, **kwargs):
     search_query, search_name, search_url = get_search_data(helper)
 
     servers_to_api_keys = get_servers_details(helper)
+    is_cloud = is_cloud_instance(helper)
 
     headers = {
         'Content-type': 'application/json',
         'Accept': 'application/json'
     }
-
+    verify = helper.get_global_setting('validate_ssl') == '1'
     ssl_cert_loc = helper.get_global_setting('ssl_cert_loc')
     timeout = helper.get_global_setting('timeout_val')
     timeout = int(timeout) if timeout else None
@@ -65,6 +69,11 @@ def process_event(helper, *args, **kwargs):
                 else:
                     ssl_cert_tmp = ssl_cert_loc
 
+                if is_cloud:
+                    verify = ssl_cert_tmp or True
+                else:
+                    verify = ssl_cert_tmp if ssl_cert_tmp and verify else verify
+
                 incident = create_incident_dictionary(helper, event, search_query, search_name, search_url)
 
                 helper.log_info('Sending the incident to server {}...'.format(server_url))
@@ -85,6 +94,7 @@ def process_event(helper, *args, **kwargs):
 
                 helper.log_debug('ssl_cert_loc = {}'.format(str(ssl_cert_tmp)))
                 helper.log_debug('proxy_enabled = {}'.format(str(proxy_enabled)))
+                helper.log_debug('verify = {}'.format(str(verify)))
                 helper.log_debug('payload = {}'.format(json.dumps(incident, indent=4, sort_keys=True)))
 
                 resp = helper.send_http_request(
@@ -92,7 +102,7 @@ def process_event(helper, *args, **kwargs):
                     method='POST',
                     headers=headers,
                     payload=incident,
-                    verify=ssl_cert_tmp,
+                    verify=verify,
                     use_proxy=proxy_enabled,
                     timeout=timeout
                 )
@@ -140,6 +150,49 @@ def create_incident_dictionary(helper, event, search_query=None, search_name=Non
     if helper.get_param('custom_fields'):
         incident['CustomFields'] = get_incident_custom_fields(helper.get_param('custom_fields'))
     return incident
+
+
+def is_cloud_instance(helper):
+    """
+        Returns True if the add-on runs on Splunk cloud, False otherwise.
+    """
+    # get config file and search is_cloud value.
+    config = configparser.ConfigParser()
+    config.read(conf_file)
+
+    if config.has_section('create_xsoar_incident') and config.get('create_xsoar_incident', 'is_cloud') != "None":
+        # We checked before if the instance is cloud and return what saved in the config file.
+        is_cloud = config.get('create_xsoar_incident', 'is_cloud')
+        helper.log_info(f'Got value from storage for instance type. The value is {is_cloud}')
+        return is_cloud == 'True'
+
+    try:
+        server_info_uri = pathname2url('/services/server/info')
+        r = splunk.rest.simpleRequest(server_info_uri,
+                                      sessionKey=helper.session_key,
+                                      getargs={'output_mode': 'json'},
+                                      method='GET')
+        result_info = json.loads(r[1])
+        helper.log_debug(f'Got server info from Splunk: {str(result_info)}')
+        instance_type = result_info.get('instance_type')
+        if instance_type and instance_type == 'cloud':
+            helper.log_info('Running on cloud.')
+            is_cloud = True
+        else:
+            helper.log_info('Running on enterprise.')
+            is_cloud = False
+
+        config.set("create_xsoar_incident", "is_cloud", str(is_cloud))
+        with open(conf_file, "w") as config_file:
+            config.write(config_file)
+
+        return is_cloud
+    except Exception as e:
+        # if we fail to get the instance type from the server we return True to set the request to verify True.
+        helper.log_error(
+            'Failed getting instance type from server, acting as cloud instance. Reason: {}'.format(str(e))
+        )
+        return True
 
 
 def get_configured_servers(helper):
