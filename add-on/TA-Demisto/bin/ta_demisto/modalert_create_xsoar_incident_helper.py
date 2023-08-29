@@ -17,6 +17,7 @@ from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurre
 ACCOUNTS_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/TA_Demisto_account/"
 conf_file = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/inputs.conf'
 
+
 def process_event(helper, *args, **kwargs):
     """
     # IMPORTANT
