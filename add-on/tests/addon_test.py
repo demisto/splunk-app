@@ -1,6 +1,10 @@
+import configparser
+import json
+from urllib.request import pathname2url
+
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
     get_incident_custom_fields
-
+from ta_demisto.modalert_create_xsoar_incident_helper import is_cloud_instance
 
 class MockHelper:
     def __init__(self):
@@ -13,7 +17,18 @@ class MockHelper:
     def log_debug(self, msg):
         self.debug_data.append(msg)
 
+class MockParser:
+    def read(self, file):
+        pass
 
+    def has_section(self, section):
+        return True
+
+    def get(self, section, key):
+        return 'None'
+
+    def set(self, section, key, value):
+        pass
 def test_get_incident_labels__empty_labels_string():
     """
         Given:
@@ -119,3 +134,18 @@ def test_get_incident_occurred_field():
     occurred_str = '1599591202'
     occurred = get_incident_occurred_field(occurred_str)
     assert occurred == '2020-09-08T18:53:22+00:00'
+
+def test_is_cloud_instance(mocker):
+    res_cloud = {
+        "instance_type": "cloud"
+    }
+    res_not_cloud = {
+        "instance_type": "not cloud"
+    }
+
+    mocker.patch.object(configparser, 'ConfigParser', MockParser)
+    mocker.patch('splunk.rest.simpleRequest', return_value=[None, res_cloud])
+    assert is_cloud_instance(MockHelper())
+
+    mocker.patch('splunk.rest.simpleRequest', return_value=[None, res_not_cloud])
+    assert not is_cloud_instance(MockHelper())

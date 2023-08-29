@@ -15,7 +15,7 @@ from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurre
 # encoding = utf-8
 
 ACCOUNTS_ENDPOINT = "/servicesNS/nobody/TA-Demisto/admin/TA_Demisto_account/"
-conf_file = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/inputs.conf'
+conf_file = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/alert_actions.conf'
 
 
 def process_event(helper, *args, **kwargs):
@@ -160,9 +160,9 @@ def is_cloud_instance(helper):
     config = configparser.ConfigParser()
     config.read(conf_file)
 
-    if config.has_section('default') and config.get('default', 'is_cloud') != "None":
+    if config.has_section('create_xsoar_incident') and config.get('create_xsoar_incident', 'is_cloud') != "None":
         # We checked before if the instance is cloud and return what saved in the config file.
-        is_cloud = config.get('default', 'is_cloud')
+        is_cloud = config.get('create_xsoar_incident', 'is_cloud')
         helper.log_info(f'Got value from storage for instance type. The value is {is_cloud}')
         return is_cloud == 'True'
 
@@ -182,7 +182,7 @@ def is_cloud_instance(helper):
             helper.log_info('Running on enterprise.')
             is_cloud = False
 
-        config.set("default", "is_cloud", str(is_cloud))
+        config.set("create_xsoar_incident", "is_cloud", str(is_cloud))
         with open(conf_file, "w") as config_file:
             config.write(config_file)
 
