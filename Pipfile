@@ -9,7 +9,6 @@ name = "pypi"
 flake8 = "*"
 pytest = "*"
 requests = "*"
-splunk-sdk = "*"
 
 [requires]
 python_version = "3.7"
