@@ -1,5 +1,8 @@
+import configparser
+import os
 import time
 
+CONF_FILE = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/alert_actions.conf'
 
 def get_incident_labels(helper, event, labels_str, ignore_labels, search_query=None, search_name=None, search_url=None):
     # if labels parameter is not empty, gets only the specified labels.
@@ -84,3 +87,32 @@ def get_incident_occurred_field(occurred):
     timezone = zone[-5:][:3] + ':' + zone[-5:][3:]
     occurred = int(float(occurred))
     return time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(occurred)) + timezone
+
+def is_cloud_instance(helper, server_info_endpoint):
+    """
+        Returns True if the add-on runs on Splunk cloud, False otherwise.
+    """
+    # get config file and search is_cloud value.
+    config = configparser.ConfigParser()
+    config.read(CONF_FILE)
+
+    if config.has_section('create_xsoar_incident') and config.get('create_xsoar_incident', 'is_cloud') != "None":
+        # We checked before if the instance is cloud and return what saved in the config file.
+        is_cloud = config.get('create_xsoar_incident', 'is_cloud')
+        helper.log_info(f'Got value from storage for instance type. The value is {is_cloud}')
+        return is_cloud == 'True'
+
+    try:
+        is_cloud = server_info_endpoint(helper)
+        config.set("create_xsoar_incident", "is_cloud", str(is_cloud))
+        with open(CONF_FILE, "w") as config_file:
+            config.write(config_file)
+        return is_cloud
+
+    except Exception as e:
+        # if we fail to get the instance type from the server we return True to set the request to verify True.
+        helper.log_error(
+            'Failed getting instance type from server, acting as cloud instance. Reason: {}'.format(str(e))
+        )
+        return True
+
