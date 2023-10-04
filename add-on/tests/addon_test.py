@@ -1,7 +1,5 @@
-import configparser
-
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
-    get_incident_custom_fields, is_cloud_instance
+    get_incident_custom_fields
 
 
 class MockHelper:
@@ -14,6 +12,7 @@ class MockHelper:
 
     def log_debug(self, msg):
         self.debug_data.append(msg)
+
 
 def test_get_incident_labels__empty_labels_string():
     """
@@ -120,10 +119,3 @@ def test_get_incident_occurred_field():
     occurred_str = '1599591202'
     occurred = get_incident_occurred_field(occurred_str)
     assert occurred == '2020-09-08T18:53:22+00:00'
-
-
-def test_is_cloud_instance(mocker):
-    CONF_FILE = f'{os.environ.get("SPLUNK_HOME")}/etc/apps/TA-Demisto/default/alert_actions.conf'
-    mocker.patch.object(configparser.ConfigParser, 'has_section', return_value=True)
-    mocker.patch.object(configparser.ConfigParser, 'get', return_value='None')
-    mocker.patch('server_info_endpoint', return_value=)
