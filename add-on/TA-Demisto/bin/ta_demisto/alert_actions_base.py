@@ -190,16 +190,20 @@ class ModularAlertBase(ModularAction):
             sys.exit(2)
 
     def prepare_meta_for_cam(self):
+        rf = None
         try:
             try:
                 rf = gzip.open(self.results_file, 'rt')
-            except ValueError: # Workaround for Python 2.7 on Windows
+            except ValueError:  # Workaround for Python 2.7 on Windows
                 rf = gzip.open(self.results_file, 'r')
-            for num, result in enumerate(csv.DictReader(rf)):
-                result.setdefault('rid', str(num))
-                self.update(result)
-                self.invoke()
-                break
+            except FileNotFoundError:
+                self.log_info("No Results file found.")
+            if rf:
+                for num, result in enumerate(csv.DictReader(rf)):
+                    result.setdefault('rid', str(num))
+                    self.update(result)
+                    self.invoke()
+                    break
         finally:
             if rf:
                 rf.close()
