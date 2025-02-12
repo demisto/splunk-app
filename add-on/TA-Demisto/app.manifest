@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "2.0.0",
   "info": {
     "title": "Demisto Add-on for Splunk",
     "id": {
       "group": null,
       "name": "TA-Demisto",
-      "version": "4.1.2"
+      "version": "4.2.0"
     },
     "author": [
       {
@@ -49,5 +49,11 @@
     "splunk": {
       "Enterprise": "*"
     }
-  }
+  },
+  "supportedDeployments": [
+    "*"
+  ],
+  "targetWorkloads": [
+    "*"
+  ]
 }
