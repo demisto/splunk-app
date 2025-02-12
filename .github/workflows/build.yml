@@ -32,7 +32,7 @@ jobs:
           cd add-on
           COPYFILE_DISABLE=1 tar -cvzf $SPL_PATH --exclude='*.pyc' TA-Demisto
       - name: Upload tar file to artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: demisto-add-on-for-splunk.tgz
           path: ${{ env.SPL_PATH }}
