@@ -2,7 +2,7 @@
     "meta": {
         "name": "TA-Demisto",
         "displayName": "Demisto Add-On for Splunk",
-        "version": "4.2.0",
+        "version": "4.2.2",
         "restRoot": "TA_Demisto",
         "_uccVersion": "5.39.0",
         "schemaVersion": "0.0.3"
