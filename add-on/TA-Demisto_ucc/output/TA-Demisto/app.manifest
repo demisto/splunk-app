@@ -1,0 +1,56 @@
+{
+    "dependencies": {},
+    "incompatibleApps": {},
+    "info": {
+        "author": [
+            {
+                "company": null,
+                "email": null,
+                "name": "Palo Alto Networks"
+            }
+        ],
+        "classification": {
+            "categories": [],
+            "developmentStatus": null,
+            "intendedAudience": null
+        },
+        "commonInformationModels": null,
+        "description": "This application provides an alert action to create an incident in Cortex XSOAR.",
+        "id": {
+            "group": null,
+            "name": "TA-Demisto",
+            "version": "0.0.0+204c933"
+        },
+        "license": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "privacyPolicy": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "releaseDate": null,
+        "releaseNotes": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "title": "Demisto Add-on for Splunk"
+    },
+    "inputGroups": {},
+    "platformRequirements": {
+        "splunk": {
+            "Enterprise": "*"
+        }
+    },
+    "schemaVersion": "2.0.0",
+    "supportedDeployments": [
+        "*"
+    ],
+    "targetWorkloads": [
+        "*"
+    ],
+    "tasks": []
+}

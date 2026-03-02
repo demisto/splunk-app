@@ -1,0 +1,5 @@
+splunktaucclib>=4.1.0
+# 
+#   The following list *may* also be required for your modular inputs to work.   
+#   Uncomment those that are required.   
+# 
