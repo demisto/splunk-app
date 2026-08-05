@@ -1,7 +1,7 @@
 variables:
-  CURRENT_BRANCH_NAME: "${INFRA_BRANCH}"
+  CURRENT_BRANCH_NAME: sk_splunk-app_v2 #"${INFRA_BRANCH}"
 
 include:
   - file: .gitlab/ci/splunk-app/.gitlab-ci.yml
-    ref: "${INFRA_BRANCH}"
+    ref: sk_splunk-app_v2 #"${INFRA_BRANCH}"
     project: "${CI_PROJECT_NAMESPACE}/infra"
