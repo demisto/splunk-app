@@ -6,12 +6,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Checkout to repository
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - name: Install dependencies
         run: |
           pip install pipenv
@@ -32,7 +32,7 @@ jobs:
           cd add-on
           COPYFILE_DISABLE=1 tar -cvzf $SPL_PATH --exclude='*.pyc' TA-Demisto
       - name: Upload tar file to artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: demisto-add-on-for-splunk.tgz
           path: ${{ env.SPL_PATH }}
@@ -48,7 +48,7 @@ jobs:
         env:
           ADD_ON_DIR: add-on/TA-Demisto
         run: |
-          docker run -it --mount type=bind,source=$GITHUB_WORKSPACE/"$ADD_ON_DIR",target=/opt/splunk/etc/apps/TA-Demisto/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
+          docker run -it --mount type=bind,source=$GITHUB_WORKSPACE/"$ADD_ON_DIR",target=/opt/splunk/etc/apps/TA-Demisto/ -d -p "8000:8000" -p "8088:8088" -p "8089:8089" -e "SPLUNK_GENERAL_TERMS=--accept-sgt-current-at-splunk-com" -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=changeme" --name splunk splunk/splunk:latest
           IS_CONTAINER_HEALTHY=false
           TRY_COUNT=1
           MAX_TRIES=10

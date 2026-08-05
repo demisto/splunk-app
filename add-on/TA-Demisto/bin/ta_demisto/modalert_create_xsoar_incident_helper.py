@@ -221,10 +221,11 @@ def get_configured_servers(helper):
 
 def get_servers_details(helper):
     servers_to_api_keys = {}
+    send_all_servers = helper.get_param('send_all_servers')
 
-    helper.log_debug('send_all_servers={}'.format(helper.get_param('send_all_servers')))
+    helper.log_debug('send_all_servers={}'.format(send_all_servers))
 
-    if helper.get_param('send_all_servers') == '1':
+    if send_all_servers == '1' or send_all_servers == 'true':
         # get all server urls
         servers = get_configured_servers(helper)
     else:
