@@ -15,6 +15,7 @@ Supporting Add-on for Cortex XSOAR. This application allows a user to push incid
     - [Configuration](#configuration)
     - [Connectivity Test - Create a Custom Alert Action](#connectivity-test---create-a-custom-alert-action)
     - [About Add-on Builder, AppInspect and Compatibility](#about-add-on-builder-appinspect-and-compatibility)
+    - [Regenerating the Add-on with Add-on Builder](#regenerating-the-add-on-with-add-on-builder)
     - [Tips for Developers](#tips-for-developers)
     - [Common Issues - SSL Certificates](#common-issues---ssl-certificates)
 
@@ -87,7 +88,7 @@ Once executed, the splunk env will be available at http://localhost:8000.
 
 
 ### About Add-on Builder, AppInspect and Compatibility
-* Versions 3.0.0 and above of the add-on were built using **Splunk Add-on Builder**, which simplified the latest upgrade of the add-on and the required python 2 and 3 compatibility process. Click [here](https://docs.splunk.com/Documentation/AddonBuilder/3.0.2/UserGuide/UseTheApp) to learn more about the Add-on builder.
+* Versions 3.0.0 and above of the add-on were built using **Splunk Add-on Builder**, which simplified the latest upgrade of the add-on and the required python 2 and 3 compatibility process. Click [here](https://docs.splunk.com/Documentation/AddonBuilder/latest/UserGuide/Overview) to learn more about the Add-on builder.
 * Splunkbase’s way to validate their apps is called **AppInspect**. Our splunk-app repository on github has a build which sends the modified version of the add-on to AppInspect.
 
   ![image](https://user-images.githubusercontent.com/38749041/103539976-a6cbb000-4ea1-11eb-8bcf-774262e91a0e.png)
@@ -95,6 +96,30 @@ Once executed, the splunk env will be available at http://localhost:8000.
 
   ![image](https://user-images.githubusercontent.com/38749041/103540045-c06cf780-4ea1-11eb-9658-a559d744fa8b.png)
 
+
+### Regenerating the Add-on with Add-on Builder
+Some AppInspect checks (for example `check_for_addon_builder_version`, which requires the builder version to be at least 4.5.0) can only be satisfied by re-generating the add-on with an up-to-date **Splunk Add-on Builder**. Follow these steps to regenerate it and pull the result back into the repo.
+
+1. **Install Splunk Add-on Builder into your local Splunk.**
+   - In Splunk Web go to **Apps → Manage Apps**.
+   - Click **Browse more apps** (top-right) and log in with your Splunk.com account.
+   - Search for **Add-on Builder**, install it, and restart Splunk when prompted.
+
+2. **Make sure the Demisto add-on is installed in Splunk.**
+   - If it isn't already installed, go to **Manage Apps → Install app from file** and upload the latest package from [`add-on/spls`](spls) (for example the highest-numbered `demisto-add-on-for-splunk-*.tgz`). Restart Splunk when prompted.
+
+3. **Open the project in Add-on Builder and export it.**
+   - Open **Splunk Add-on Builder**.
+   - Under **Other Apps and Add-ons**, search for **"Demisto add on for splunk"** and open it.
+   - Click **Validate** to run the builder's checks, then **Download Package** to export a fresh `.spl`.
+
+4. **Replace the repo's add-on directory with the freshly generated one.**
+   - Extract the downloaded `.spl` (it is a `.tgz` archive) — it contains a `TA-Demisto/` directory.
+   - Replace the repo's [`add-on/TA-Demisto`](TA-Demisto) directory with the extracted `TA-Demisto/` directory.
+
+5. **Track the changes and keep only the real ones.**
+   - Keep **only** the intended change — typically the bumped `builder_version` in [`add-on/TA-Demisto/default/addon_builder.conf`](TA-Demisto/default/addon_builder.conf).
+6. **Verify AppInspect passes** (see the section above) before committing.
 
 ### Tips for Developers
 1. The main python script which handles the incidents creation is found on our splunk-app repo under `add-on/TA-Demisto/bin/ta_demisto/modalert_create_xsoar_incident_helper.py`.
