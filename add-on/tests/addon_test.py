@@ -1,3 +1,5 @@
+import time
+
 from ta_demisto.modalert_create_xsoar_incident_utils import get_incident_occurred_field, get_incident_labels, \
     get_incident_custom_fields
 
@@ -114,8 +116,16 @@ def test_get_incident_occurred_field():
         When:
             Calling get_incident_occurred_field function
         Then:
-            Verify the output is parsed to a valid incident occurred field in the format '%Y-%m-%dT%H:%M:%S'.
+            Verify the output is parsed to a valid incident occurred field in the format
+            '%Y-%m-%dT%H:%M:%S%z' expressed in the host's local timezone.
     """
     occurred_str = '1599591202'
+    # The function renders the epoch in the host's LOCAL timezone. Derive the
+    # expected value using the SAME primitives (time.localtime + '%z') so the
+    # test is correct regardless of the machine/CI timezone (incl. DST).
+    zone = time.strftime('%z')
+    expected_tz = zone[-5:][:3] + ':' + zone[-5:][3:]
+    expected = time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(int(occurred_str))) + expected_tz
+
     occurred = get_incident_occurred_field(occurred_str)
-    assert occurred == '2020-09-08T18:53:22+00:00'
+    assert occurred == expected
