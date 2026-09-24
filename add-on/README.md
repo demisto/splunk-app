@@ -97,6 +97,88 @@ Once executed, the splunk env will be available at http://localhost:8000.
   ![image](https://user-images.githubusercontent.com/38749041/103540045-c06cf780-4ea1-11eb-9658-a559d744fa8b.png)
 
 
+### Local Compatibility Testing
+Before bumping a version or merging changes, you can run the whole compatibility
+pipeline **locally** with [`scripts/test_compatibility.sh`](../scripts/test_compatibility.sh).
+It mirrors what CI does, but runs entirely on your machine and adds real
+pass/fail verification — including, optionally, creating a **live incident** in
+XSOAR (v6 and/or NG) and confirming it through the XSOAR REST API.
+
+The script runs these stages and exits non-zero if any executed stage fails:
+
+1. **Preflight** – verify Docker and tooling are available.
+2. **Lint/tests** – `flake8` + `pytest` (the same commands CI runs).
+3. **Package** – build the `.tgz` SPL (identical to the CI `tar` command).
+4. **AppInspect** – static compatibility checks via the `splunk-appinspect`
+   Python CLI (offline; no Splunk.com credentials needed).
+5. **Runtime** – boot `splunk/splunk:<version>` with the add-on bind-mounted.
+6. **Health** – poll container health until healthy.
+7. **Verify** – REST call (management port) confirms the add-on is loaded/enabled.
+8. **Logs** – scan `splunkd.log` + the add-on log for `TA-Demisto` errors.
+9. **XSOAR** *(opt-in)* – create a live incident in each configured XSOAR flavor
+   and confirm it via the REST API.
+
+#### Prerequisites
+* **Docker** running locally.
+* **Python + pipenv** for the lint/test stage (`pipenv install --dev`).
+* **libmagic** for the AppInspect stage. On macOS:
+  ```
+  brew install libmagic
+  export DYLD_LIBRARY_PATH=/opt/homebrew/lib   # Apple Silicon Homebrew path
+  ```
+* On **Apple Silicon / arm64**, Splunk images are `linux/amd64`-only for many
+  tags, so the script defaults to `--platform linux/amd64` (run via emulation).
+
+#### Configuration (`.env`)
+The script reads its configuration from a `.env` file in the repo root (this
+file is git-ignored — never commit real secrets). There are **no hardcoded
+credentials in the script**; the Splunk admin credentials come solely from
+`.env`:
+
+| Variable | Purpose |
+| --- | --- |
+| `SPLUNK_USERNAME` / `SPLUNK_PASSWORD` | Splunk container admin credentials (**required** for the runtime/verify/xsoar stages). The Splunk image provisions an `admin` account; the password must satisfy Splunk's [password policy](https://splunk.github.io/docker-splunk/ADVANCED.html). |
+| `DEMISTO6_BASE_URL` / `DEMISTO6_API_KEY` | XSOAR **v6** connection (used by `--xsoar`). |
+| `DEMISTO8_BASE_URL` / `DEMISTO8_API_KEY` / `DEMISTO8_AUTH_ID` | XSOAR **NG** (v8+) connection — Advanced API key format `<API_KEY>$<KEY_ID>` plus the NG REST endpoints (used by `--xsoar` / `--xsoar-ng`). |
+
+When `--xsoar` is passed, the script auto-detects which flavor(s) are configured
+in `.env` and runs against **each present flavor** (v6, NG, or both). Use
+`--xsoar-ng` to restrict the run to XSOAR NG only.
+
+#### Common invocations
+```bash
+# Full pipeline against the latest Splunk image
+scripts/test_compatibility.sh
+
+# Test a specific Splunk version
+scripts/test_compatibility.sh --splunk-version 10.2.6
+
+# Full pipeline plus live XSOAR incident creation (auto-detects v6/NG/both)
+scripts/test_compatibility.sh --xsoar
+
+# XSOAR NG only, keeping the container up afterwards for debugging
+scripts/test_compatibility.sh --xsoar-ng --keep-container
+
+# Skip the slower stages while iterating on the XSOAR flow
+scripts/test_compatibility.sh --skip-tests --skip-appinspect --xsoar
+```
+
+#### Options
+| Option | Description |
+| --- | --- |
+| `--image <ref>` | Splunk image to test against (default `splunk/splunk:latest`). |
+| `--splunk-version <v>` | Shorthand for `--image splunk/splunk:<v>` (e.g. `10.2.6`). Defaults to `latest` when omitted. |
+| `--platform <p>` | Docker platform for the Splunk image (default `linux/amd64`). |
+| `--xsoar` | Run the live XSOAR incident-creation stage against each configured flavor. |
+| `--xsoar-ng` | Like `--xsoar` but restricts the run to XSOAR NG (v8+). |
+| `--instance <name>` | (Optional) XSOAR instance name configured in the add-on. |
+| `--skip-tests` | Skip `flake8` + `pytest`. |
+| `--skip-appinspect` | Skip the AppInspect static stage. |
+| `--skip-runtime` | Skip the runtime/health/verify/logs/xsoar stages. |
+| `--keep-container` | Leave the Splunk container running on exit (for debugging). |
+| `-h`, `--help` | Show help and exit. |
+
+
 ### Regenerating the Add-on with Add-on Builder
 Some AppInspect checks (for example `check_for_addon_builder_version`, which requires the builder version to be at least 4.5.0) can only be satisfied by re-generating the add-on with an up-to-date **Splunk Add-on Builder**. Follow these steps to regenerate it and pull the result back into the repo.
 
